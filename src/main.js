@@ -1,4 +1,5 @@
 let express = require("express");
+let expressSession = require("express-session");
 let cookieParser = require("cookie-parser");
 let app = express();
 
@@ -13,6 +14,28 @@ app.set("view engine", "pug");
 let feide = require("./feide");
 let router_utils = require("./router_utils");
 let db = require("./database");
+let secrets = require("./globals");
+
+app.use(
+  expressSession({
+    secret: secrets.session_secret,
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: secrets.redirect_uri.startsWith("https") },
+  })
+);
+
+// PRIVATE ROUTES
+const private_routes = ["/edugear", "/register"];
+app.use(private_routes, (req, res, next) => {
+  if (!router_utils.userLoggedIn(req)) {
+    res.clearCookie("token");
+    req.session.destroy();
+    res.redirect("/login");
+    return;
+  }
+  next();
+});
 
 app.get("/", (req, res) => {
   res.render("index", { title: "Hey", message: "Hello there!" });
@@ -25,7 +48,8 @@ app.get("/auth", async (req, res) => {
 
   let redirect = router_utils.getRedirectPath(clientInfo);
   if (redirect.logged_in) {
-    res.cookie("sub", clientInfo.openid["sub"]);
+    res.cookie("token", clientInfo.hashed_identifier);
+    req.session.logged_in = true;
     db.addFeideUser(clientInfo);
   }
   res.redirect(redirect.redirect_url);
@@ -35,28 +59,30 @@ app.get("/login", (req, res) => {
   res.redirect(feide.OAuthURL);
 });
 
-app.get("/retry", (req, res) => {
-  res.send("retry <a href='/login'>login</a>");
+app.get("/logout", (req, res) => {
+  res.clearCookie("token");
+  req.session.destroy();
+  res.redirect("/");
 });
 
-// /register uses the cookie to get the user info
+// PROTECTED ROUTES
+/////////////////////
 app.get("/register", (req, res) => {
-  if (!req.cookies.sub) {
-    res.redirect("/login");
-    return;
-  }
-
-  res.render("register", { feide: db.readFeideUser(req.cookies.sub) });
+  res.render("register", { feide: db.readFeideUser(req.cookies.token) });
 });
 
 app.post("/register", (req, res) => {
+  if (!router_utils.userLoggedIn(req)) {
+    res.redirect("/logout");
+    return;
+  }
   try {
-    console.log(req.body)
+    console.log(req.body);
     db.addRegisteredUser(
-        req.cookies.sub,
-        req.body.classroom,
-        req.body.classroom_teacher,
-        req.body.personal_email
+      req.cookies.token,
+      req.body.classroom,
+      req.body.classroom_teacher,
+      req.body.personal_email
     );
     res.send("success");
   } catch (e) {
@@ -65,7 +91,7 @@ app.post("/register", (req, res) => {
 });
 
 app.get("/edugear", (req, res) => {
-  res.send(db.readFeideUser(req.cookies.sub));
+  res.send(db.readFeideUser(req.cookies.token));
 });
 
 // Start the server

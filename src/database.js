@@ -30,15 +30,13 @@ function initializeFeide() {
    */
   let query = `CREATE TABLE IF NOT EXISTS ${feide_table} (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
-      sub TEXT NOT NULL,
+      hashed_identifier TEXT NOT NULL,
       name TEXT NOT NULL,
       email TEXT NOT NULL,
       picture TEXT,
       affiliation TEXT NOT NULL,
       org TEXT NOT NULL,
-      org_id TEXT NOT NULL,
-      org_nin TEXT NOT NULL,
-      UNIQUE(sub)
+      UNIQUE(hashed_identifier)
     );`;
   _createTable(query);
 }
@@ -53,43 +51,64 @@ function addFeideUser(data) {
   let db = new Sqlitedb(database, db_options);
 
   // If the user already exists, remove it first
-  if (readFeideUser(data.openid.sub)) {
-    let stmt = db.prepare(`DELETE FROM ${feide_table} WHERE sub = ?`);
-    stmt.run(data.openid.sub);
+  if (readFeideUser(data.hashed_identifier)) {
+    let stmt = db.prepare(
+      `DELETE FROM ${feide_table} WHERE hashed_identifier = ?`
+    );
+    stmt.run(data.hashed_identifier);
   }
 
   let stmt = db.prepare(
-    `INSERT INTO ${feide_table} (sub, name, email, picture, affiliation, org, org_id, org_nin) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
+    `INSERT INTO ${feide_table} (hashed_identifier, name, email, picture, affiliation, org) VALUES (?, ?, ?, ?, ?, ?)`
   );
   stmt.run(
-    data.openid.sub,
+    data.hashed_identifier,
     data.openid.name,
     data.openid.email,
     data.openid.picture || null,
     data.ext_info.eduPersonPrimaryAffiliation,
-    data.groups[0].displayName,
-    data.groups[0].id,
-    data.groups[0].norEduOrgNIN
+    data.groups[0].displayName
   );
 
   db.close();
 }
 
-function readFeideUser(sub) {
+function readFeideUser(hashed_identifier) {
   /**
    * Gets the user from the database
-   * @param sub - The users sub (unique id)
+   * @param hashed_identifier - The users hashed token
    * @returns {object} - The user object
    * @type {Database}
    */
   let db = new Sqlitedb(database, db_options);
 
-  let stmt = db.prepare(`SELECT * FROM ${feide_table} WHERE sub = ?`);
-  let user = stmt.get(sub);
+  let stmt = db.prepare(
+    `SELECT * FROM ${feide_table} WHERE hashed_identifier = ?`
+  );
+  let user = stmt.get(hashed_identifier);
 
   db.close();
 
   return user;
+}
+
+function validateUser(hashed_identifier) {
+  /**
+   * Checks if the user exists in the database
+   * @param hashed_identifier - The users hashed token
+   * @returns {boolean} - If the user exists
+   * @type {Database}
+   */
+  let db = new Sqlitedb(database, db_options);
+
+  let stmt = db.prepare(
+    `SELECT * FROM ${feide_table} WHERE hashed_identifier = ?`
+  );
+  let user = stmt.get(hashed_identifier);
+
+  db.close();
+
+  return user !== undefined;
 }
 
 function getEmployeeFromName(name) {
@@ -169,16 +188,21 @@ function initializeRegisteredUsers() {
       banned BOOLEAN NOT NULL DEFAULT 0,
       banned_reason TEXT,
       last_banned_at DATETIME,
-      sub TEXT NOT NULL,
-      UNIQUE(sub)
+      hashed_identifier TEXT NOT NULL,
+      UNIQUE(hashed_identifier)
     );`;
   _createTable(query);
 }
 
-function addRegisteredUser(sub, classroom, classroom_teacher, personal_email) {
+function addRegisteredUser(
+  hashed_identifier,
+  classroom,
+  classroom_teacher,
+  personal_email
+) {
   /**
    * Adds a user to the database
-   * @param sub - The users sub (unique id)
+   * @param hashed_identifier - The users hashed_identifier (unique id)
    * @param classroom - The users classroom name
    * @param classroom_teacher - The users classroom teacher, must be a valid teacher
    * @param personal_email - The users personal email, optional
@@ -187,7 +211,7 @@ function addRegisteredUser(sub, classroom, classroom_teacher, personal_email) {
    */
   let db = new Sqlitedb(database, db_options);
 
-  let feide_info = readFeideUser(sub);
+  let feide_info = readFeideUser(hashed_identifier);
   if (!feide_info) throw new Error("User not found in feide table");
 
   // TEMPORARILY COMMENTED OUT
@@ -195,18 +219,18 @@ function addRegisteredUser(sub, classroom, classroom_teacher, personal_email) {
   //if (!teacher) throw new Error("Teacher not found in admins table");
 
   // If the user already exists, remove it first
-  if (readRegisteredUser(sub)) {
+  if (readRegisteredUser(hashed_identifier)) {
     let stmt = db.prepare(
-      `DELETE FROM ${registered_users_table} WHERE sub = ?`
+      `DELETE FROM ${registered_users_table} WHERE hashed_identifier = ?`
     );
-    stmt.run(sub);
+    stmt.run(hashed_identifier);
   }
 
   let updated_at = new Date();
   let expires_at = new Date(updated_at.getFullYear() + 1, 6, 1); // 1st of July next year
 
   let stmt = db.prepare(
-    `INSERT INTO ${registered_users_table} (name, classroom, classroom_teacher, school_email, personal_email, picture, updated_at, expires_at, sub) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
+    `INSERT INTO ${registered_users_table} (name, classroom, classroom_teacher, school_email, personal_email, picture, updated_at, expires_at, hashed_identifier) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
   );
   stmt.run(
     feide_info.name,
@@ -217,25 +241,25 @@ function addRegisteredUser(sub, classroom, classroom_teacher, personal_email) {
     feide_info.picture || null,
     updated_at.toISOString(),
     expires_at.toISOString(),
-    sub
+    hashed_identifier
   );
 
   db.close();
 }
 
-function readRegisteredUser(sub) {
+function readRegisteredUser(hashed_identifier) {
   /**
    * Gets the user from the database
-   * @param sub - The users sub (unique id)
+   * @param hashed_identifier - The users hashed_identifier (unique id)
    * @returns {object} - The user object
    * @type {Database}
    */
   let db = new Sqlitedb(database, db_options);
 
   let stmt = db.prepare(
-    `SELECT * FROM ${registered_users_table} WHERE sub = ?`
+    `SELECT * FROM ${registered_users_table} WHERE hashed_identifier = ?`
   );
-  let user = stmt.get(sub);
+  let user = stmt.get(hashed_identifier);
 
   db.close();
 
@@ -329,11 +353,11 @@ function initializeRentedItems() {
   let query = `CREATE TABLE IF NOT EXISTS ${rented_items_table} (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         item TEXT NOT NULL,
-        sub TEXT NOT NULL,
+        hashed_identifier TEXT NOT NULL,
         rented_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         due_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         checked_in_at DATETIME,
-        UNIQUE(item, sub)
+        UNIQUE(item, hashed_identifier)
     );`;
   _createTable(query);
 }
@@ -355,6 +379,7 @@ module.exports = {
   addFeideUser,
   readFeideUser,
   addRegisteredUser,
+  validateUser,
   readRegisteredUser,
   fetchRegisteredUsers,
   addInventoryItem,

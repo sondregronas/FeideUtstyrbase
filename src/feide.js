@@ -76,8 +76,12 @@ async function getClientInfo(token) {
   let ext_info = await getFeide(ext_ep, token);
   let groups = await getFeide(groups_ep, token);
 
+  // Generate an identifier for the user based on the openid info
+  let hashed_identifier = secrets.hash(openid);
+
   if (openid && ext_info && groups) {
     return {
+      hashed_identifier: hashed_identifier,
       openid,
       ext_info,
       groups,

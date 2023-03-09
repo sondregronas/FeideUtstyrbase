@@ -1,3 +1,15 @@
+const db = require("./database");
+function userLoggedIn(req) {
+  /**
+   * Checks if the user is logged in
+   * @param req - The request object
+   * @returns {boolean} - If the user is logged in
+   */
+  let is_logged_in = req.session.logged_in || false;
+  let is_valid = db.validateUser(req.cookies.token) || false;
+  return is_logged_in && is_valid;
+}
+
 function getRedirectPath(data) {
   /**
    * Redirects the user to the correct page after authentication
@@ -7,7 +19,7 @@ function getRedirectPath(data) {
    */
   let unauthorized = {
     logged_in: false,
-    redirect_url: "/retry",
+    redirect_url: "/login",
     message: "Unauthorized",
   };
   let forbidden = {
@@ -53,4 +65,5 @@ function getRedirectPath(data) {
 
 module.exports = {
   getRedirectPath,
+  userLoggedIn,
 };
