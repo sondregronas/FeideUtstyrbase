@@ -1,0 +1,8 @@
+node_modules
+.idea
+
+*.sqlite
+package-lock.json
+
+# Temporary, contains client-id and client-secret, will replace with env variables later
+globals.js
