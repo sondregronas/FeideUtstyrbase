@@ -1,45 +1,12 @@
 let Sqlitedb = require("better-sqlite3");
+let dbutils = require("./database_utils")
 
-let database = "database.sqlite";
-let db_options = { verbose: console.log };
-
-let feide_table = "feide_data";
-let classrooms_table = "classrooms";
-let registered_users_table = "registered_users";
-let inventory_table = "inventory";
-let rented_items_table = "rented_items";
-
-function _createTable(query) {
-  /**
-   * Creates a table, be careful with this function. It's not meant to be used outside this file
-   * @type {Database}
-   */
-  let db = new Sqlitedb(database, db_options);
-  db.exec(query);
-  db.close();
-}
+let database = dbutils.database
+let db_options = dbutils.db_options
 
 /*
   FEIDE
  */
-
-function initializeFeide() {
-  /**
-   * Creates the feide table if it doesn't exist
-   * @returns {void}
-   */
-  let query = `CREATE TABLE IF NOT EXISTS ${feide_table} (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      hashed_identifier TEXT NOT NULL,
-      name TEXT NOT NULL,
-      email TEXT NOT NULL,
-      picture TEXT,
-      affiliation TEXT NOT NULL,
-      org TEXT NOT NULL,
-      UNIQUE(hashed_identifier)
-    );`;
-  _createTable(query);
-}
 
 function addFeideUser(data) {
   /**
@@ -53,13 +20,13 @@ function addFeideUser(data) {
   // If the user already exists, remove it first
   if (readFeideUser(data.hashed_identifier)) {
     let stmt = db.prepare(
-      `DELETE FROM ${feide_table} WHERE hashed_identifier = ?`
+      `DELETE FROM ${dbutils.feide_table} WHERE hashed_identifier = ?`
     );
     stmt.run(data.hashed_identifier);
   }
 
   let stmt = db.prepare(
-    `INSERT INTO ${feide_table} (hashed_identifier, name, email, picture, affiliation, org) VALUES (?, ?, ?, ?, ?, ?)`
+    `INSERT INTO ${dbutils.feide_table} (hashed_identifier, name, email, picture, affiliation, org) VALUES (?, ?, ?, ?, ?, ?)`
   );
   stmt.run(
     data.hashed_identifier,
@@ -83,7 +50,7 @@ function readFeideUser(hashed_identifier) {
   let db = new Sqlitedb(database, db_options);
 
   let stmt = db.prepare(
-    `SELECT * FROM ${feide_table} WHERE hashed_identifier = ?`
+    `SELECT * FROM ${dbutils.feide_table} WHERE hashed_identifier = ?`
   );
   let user = stmt.get(hashed_identifier);
 
@@ -102,7 +69,7 @@ function validateUser(hashed_identifier) {
   let db = new Sqlitedb(database, db_options);
 
   let stmt = db.prepare(
-    `SELECT * FROM ${feide_table} WHERE hashed_identifier = ?`
+    `SELECT * FROM ${dbutils.feide_table} WHERE hashed_identifier = ?`
   );
   let user = stmt.get(hashed_identifier);
 
@@ -121,7 +88,7 @@ function getEmployeeFromName(name) {
   let db = new Sqlitedb(database, db_options);
 
   let stmt = db.prepare(
-    `SELECT * FROM ${feide_table} WHERE name = ? AND affiliation = 'employee'`
+    `SELECT * FROM ${dbutils.feide_table} WHERE name = ? AND affiliation = 'employee'`
   );
   let teacher = stmt.get(name);
 
@@ -139,7 +106,7 @@ function fetchEmployees() {
   let db = new Sqlitedb(database, db_options);
 
   let stmt = db.prepare(
-    `SELECT * FROM ${feide_table} WHERE affiliation = 'employee'`
+    `SELECT * FROM ${dbutils.feide_table} WHERE affiliation = 'employee'`
   );
   let teachers = stmt.all();
 
@@ -151,48 +118,10 @@ function fetchEmployees() {
 /*
   CLASSROOMS
  */
-function initializeClassrooms() {
-  /**
-   * Creates the admins table if it doesn't exist
-   * @returns {void}
-   */
-  let query = `CREATE TABLE IF NOT EXISTS ${classrooms_table} (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      name TEXT NOT NULL,
-      classroom_teacher TEXT,
-      UNIQUE(name)
-    );`;
-  _createTable(query);
-}
 
 /*
   REGISTERED USERS
  */
-
-function initializeRegisteredUsers() {
-  /**
-   * Creates the registered users table if it doesn't exist, students only.
-   * @returns {void}
-   */
-  // expires_at to be set the 1st of July after updated_at is updated
-  let query = `CREATE TABLE IF NOT EXISTS ${registered_users_table} (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      name TEXT NOT NULL,
-      classroom TEXT NOT NULL,
-      classroom_teacher TEXT NOT NULL,
-      school_email TEXT NOT NULL,
-      personal_email TEXT,
-      picture TEXT,
-      updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-      expires_at DATETIME NOT NULL,
-      banned BOOLEAN NOT NULL DEFAULT 0,
-      banned_reason TEXT,
-      last_banned_at DATETIME,
-      hashed_identifier TEXT NOT NULL,
-      UNIQUE(hashed_identifier)
-    );`;
-  _createTable(query);
-}
 
 function addRegisteredUser(
   hashed_identifier,
@@ -221,7 +150,7 @@ function addRegisteredUser(
   // If the user already exists, remove it first
   if (readRegisteredUser(hashed_identifier)) {
     let stmt = db.prepare(
-      `DELETE FROM ${registered_users_table} WHERE hashed_identifier = ?`
+      `DELETE FROM ${dbutils.registered_users_table} WHERE hashed_identifier = ?`
     );
     stmt.run(hashed_identifier);
   }
@@ -230,7 +159,7 @@ function addRegisteredUser(
   let expires_at = new Date(updated_at.getFullYear() + 1, 6, 1); // 1st of July next year
 
   let stmt = db.prepare(
-    `INSERT INTO ${registered_users_table} (name, classroom, classroom_teacher, school_email, personal_email, picture, updated_at, expires_at, hashed_identifier) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
+    `INSERT INTO ${dbutils.registered_users_table} (name, classroom, classroom_teacher, school_email, personal_email, picture, updated_at, expires_at, hashed_identifier) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
   );
   stmt.run(
     feide_info.name,
@@ -257,7 +186,7 @@ function readRegisteredUser(hashed_identifier) {
   let db = new Sqlitedb(database, db_options);
 
   let stmt = db.prepare(
-    `SELECT * FROM ${registered_users_table} WHERE hashed_identifier = ?`
+    `SELECT * FROM ${dbutils.registered_users_table} WHERE hashed_identifier = ?`
   );
   let user = stmt.get(hashed_identifier);
 
@@ -275,7 +204,7 @@ function fetchRegisteredUsers(only_active = true) {
   let db = new Sqlitedb(database, db_options);
 
   let stmt = db.prepare(
-    `SELECT * FROM ${registered_users_table} WHERE expires_at > ?`
+    `SELECT * FROM ${dbutils.registered_users_table} WHERE expires_at > ?`
   );
 
   let users = stmt.all(only_active ? new Date().getTime() : 0);
@@ -292,22 +221,6 @@ function fetchRegisteredUsers(only_active = true) {
   INVENTORY
  */
 
-function initializeInventory() {
-  /**
-   * Creates the inventory table if it doesn't exist
-   * @returns {void}
-   */
-  let query = `CREATE TABLE IF NOT EXISTS ${inventory_table} (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT NOT NULL,
-        description TEXT,
-        category TEXT,
-        available BOOLEAN NOT NULL DEFAULT 1,
-        UNIQUE(name)
-    );`;
-  _createTable(query);
-}
-
 function addInventoryItem(item) {
   /**
    * Adds an item to the inventory
@@ -319,7 +232,7 @@ function addInventoryItem(item) {
 
   try {
     let stmt = db.prepare(
-      `INSERT INTO ${inventory_table} (name, description, category, available) VALUES (?, ?, ?, ?)`
+      `INSERT INTO ${dbutils.inventory_table} (name, description, category, available) VALUES (?, ?, ?, ?)`
     );
     stmt.run(
       item.name,
@@ -345,33 +258,20 @@ function addInventoryItem(item) {
   RENTED ITEMS
  */
 
-function initializeRentedItems() {
-  /**
-   * Creates the rented items table if it doesn't exist
-   * @returns {void}
-   */
-  let query = `CREATE TABLE IF NOT EXISTS ${rented_items_table} (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        item TEXT NOT NULL,
-        hashed_identifier TEXT NOT NULL,
-        rented_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        due_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        checked_in_at DATETIME,
-        UNIQUE(item, hashed_identifier)
-    );`;
-  _createTable(query);
-}
+/*
+  Initialize / Exports
+ */
 
 function initializeAll() {
   /**
    * Initializes all the databases, should be called on startup
    * @returns {void}
    */
-  initializeFeide();
-  initializeClassrooms();
-  initializeRegisteredUsers();
-  initializeInventory();
-  initializeRentedItems();
+  dbutils._createTable(dbutils.feideQuery)
+  dbutils._createTable(dbutils.classroomsQuery)
+  dbutils._createTable(dbutils.registeredUsersQuery)
+  dbutils._createTable(dbutils.inventoryQuery)
+  dbutils._createTable(dbutils.rentedItemsQuery)
 }
 
 module.exports = {
