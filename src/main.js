@@ -1,9 +1,7 @@
 let express = require("express");
 let expressSession = require("express-session");
-let cookieParser = require("cookie-parser");
 let app = express();
 
-app.use(cookieParser());
 app.use(express.static("public"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
