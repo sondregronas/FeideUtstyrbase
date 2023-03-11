@@ -1,5 +1,5 @@
 let express = require("express");
-let expressSession = require("express-session");
+let session = require("express-session");
 let app = express();
 
 app.use(express.static("public"));
@@ -15,10 +15,10 @@ let db = require("./database");
 let secrets = require("./globals");
 
 app.use(
-  expressSession({
+  session({
     secret: secrets.session_secret,
     resave: false,
-    saveUninitialized: true,
+    saveUninitialized: false,
   })
 );
 
