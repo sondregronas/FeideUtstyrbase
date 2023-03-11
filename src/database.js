@@ -1,8 +1,8 @@
 let Sqlitedb = require("better-sqlite3");
-let dbutils = require("./database_utils")
+let dbutils = require("./database_utils");
 
-let database = dbutils.database
-let db_options = dbutils.db_options
+let database = dbutils.database;
+let db_options = dbutils.db_options;
 
 /*
   FEIDE
@@ -18,18 +18,16 @@ function addFeideUser(data) {
   let db = new Sqlitedb(database, db_options);
 
   // If the user already exists, remove it first
-  if (readFeideUser(data.hashed_identifier)) {
-    let stmt = db.prepare(
-      `DELETE FROM ${dbutils.feide_table} WHERE hashed_identifier = ?`
-    );
-    stmt.run(data.hashed_identifier);
+  if (readFeideUser(data.openid.sub)) {
+    let stmt = db.prepare(`DELETE FROM ${dbutils.feide_table} WHERE sub = ?`);
+    stmt.run(data.openid.sub);
   }
 
   let stmt = db.prepare(
-    `INSERT INTO ${dbutils.feide_table} (hashed_identifier, name, email, picture, affiliation, org) VALUES (?, ?, ?, ?, ?, ?)`
+    `INSERT INTO ${dbutils.feide_table} (sub, name, email, picture, affiliation, org) VALUES (?, ?, ?, ?, ?, ?)`
   );
   stmt.run(
-    data.hashed_identifier,
+    data.openid.sub,
     data.openid.name,
     data.openid.email,
     data.openid.picture || null,
@@ -40,38 +38,34 @@ function addFeideUser(data) {
   db.close();
 }
 
-function readFeideUser(hashed_identifier) {
+function readFeideUser(sub) {
   /**
    * Gets the user from the database
-   * @param hashed_identifier - The users hashed token
+   * @param sub - The users hashed token
    * @returns {object} - The user object
    * @type {Database}
    */
   let db = new Sqlitedb(database, db_options);
 
-  let stmt = db.prepare(
-    `SELECT * FROM ${dbutils.feide_table} WHERE hashed_identifier = ?`
-  );
-  let user = stmt.get(hashed_identifier);
+  let stmt = db.prepare(`SELECT * FROM ${dbutils.feide_table} WHERE sub = ?`);
+  let user = stmt.get(sub);
 
   db.close();
 
   return user;
 }
 
-function validateUser(hashed_identifier) {
+function validateUser(sub) {
   /**
    * Checks if the user exists in the database
-   * @param hashed_identifier - The users hashed token
+   * @param sub - The users hashed token
    * @returns {boolean} - If the user exists
    * @type {Database}
    */
   let db = new Sqlitedb(database, db_options);
 
-  let stmt = db.prepare(
-    `SELECT * FROM ${dbutils.feide_table} WHERE hashed_identifier = ?`
-  );
-  let user = stmt.get(hashed_identifier);
+  let stmt = db.prepare(`SELECT * FROM ${dbutils.feide_table} WHERE sub = ?`);
+  let user = stmt.get(sub);
 
   db.close();
 
@@ -123,15 +117,10 @@ function fetchEmployees() {
   REGISTERED USERS
  */
 
-function addRegisteredUser(
-  hashed_identifier,
-  classroom,
-  classroom_teacher,
-  personal_email
-) {
+function addRegisteredUser(sub, classroom, classroom_teacher, personal_email) {
   /**
    * Adds a user to the database
-   * @param hashed_identifier - The users hashed_identifier (unique id)
+   * @param sub - The users sub (unique id)
    * @param classroom - The users classroom name
    * @param classroom_teacher - The users classroom teacher, must be a valid teacher
    * @param personal_email - The users personal email, optional
@@ -140,7 +129,7 @@ function addRegisteredUser(
    */
   let db = new Sqlitedb(database, db_options);
 
-  let feide_info = readFeideUser(hashed_identifier);
+  let feide_info = readFeideUser(sub);
   if (!feide_info) throw new Error("User not found in feide table");
 
   // TEMPORARILY COMMENTED OUT
@@ -148,18 +137,18 @@ function addRegisteredUser(
   //if (!teacher) throw new Error("Teacher not found in admins table");
 
   // If the user already exists, remove it first
-  if (readRegisteredUser(hashed_identifier)) {
+  if (readRegisteredUser(sub)) {
     let stmt = db.prepare(
-      `DELETE FROM ${dbutils.registered_users_table} WHERE hashed_identifier = ?`
+      `DELETE FROM ${dbutils.registered_users_table} WHERE sub = ?`
     );
-    stmt.run(hashed_identifier);
+    stmt.run(sub);
   }
 
   let updated_at = new Date();
   let expires_at = new Date(updated_at.getFullYear() + 1, 6, 1); // 1st of July next year
 
   let stmt = db.prepare(
-    `INSERT INTO ${dbutils.registered_users_table} (name, classroom, classroom_teacher, school_email, personal_email, picture, updated_at, expires_at, hashed_identifier) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
+    `INSERT INTO ${dbutils.registered_users_table} (name, classroom, classroom_teacher, school_email, personal_email, picture, updated_at, expires_at, sub) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
   );
   stmt.run(
     feide_info.name,
@@ -170,25 +159,25 @@ function addRegisteredUser(
     feide_info.picture || null,
     updated_at.toISOString(),
     expires_at.toISOString(),
-    hashed_identifier
+    sub
   );
 
   db.close();
 }
 
-function readRegisteredUser(hashed_identifier) {
+function readRegisteredUser(sub) {
   /**
    * Gets the user from the database
-   * @param hashed_identifier - The users hashed_identifier (unique id)
+   * @param sub - The users sub (unique id)
    * @returns {object} - The user object
    * @type {Database}
    */
   let db = new Sqlitedb(database, db_options);
 
   let stmt = db.prepare(
-    `SELECT * FROM ${dbutils.registered_users_table} WHERE hashed_identifier = ?`
+    `SELECT * FROM ${dbutils.registered_users_table} WHERE sub = ?`
   );
-  let user = stmt.get(hashed_identifier);
+  let user = stmt.get(sub);
 
   db.close();
 
@@ -267,11 +256,11 @@ function initializeAll() {
    * Initializes all the databases, should be called on startup
    * @returns {void}
    */
-  dbutils._createTable(dbutils.feideQuery)
-  dbutils._createTable(dbutils.classroomsQuery)
-  dbutils._createTable(dbutils.registeredUsersQuery)
-  dbutils._createTable(dbutils.inventoryQuery)
-  dbutils._createTable(dbutils.rentedItemsQuery)
+  dbutils._createTable(dbutils.feideQuery);
+  dbutils._createTable(dbutils.classroomsQuery);
+  dbutils._createTable(dbutils.registeredUsersQuery);
+  dbutils._createTable(dbutils.inventoryQuery);
+  dbutils._createTable(dbutils.rentedItemsQuery);
 }
 
 module.exports = {

@@ -24,7 +24,7 @@ async function getFeide(endpoint, token) {
       output = response.data;
     })
     .catch((error) => {
-      console.log(error);
+      throw error;
     });
   return output;
 }
@@ -60,10 +60,11 @@ async function getAccessToken(code) {
   return token;
 }
 
-async function getClientInfo(token) {
+async function getClientInfo(token, openid_only = false) {
   /**
    * Gets the clients info from feide using openid, the users extended info & groups
    * @param token - The clients access token
+   * @param openid_only - If the function should only return the openid info
    * @returns {Promise<object>} - The clients info, undefined if the query fails
    * @type {(token: string) => Promise<object>}
    */
@@ -73,15 +74,15 @@ async function getClientInfo(token) {
   let groups_ep = "https://groups-api.dataporten.no/groups/me/groups";
 
   let openid = await getFeide(openid_ep, token);
+  if (openid_only) {
+    return openid;
+  }
+
   let ext_info = await getFeide(ext_ep, token);
   let groups = await getFeide(groups_ep, token);
 
-  // Generate an identifier for the user based on the openid info
-  let hashed_identifier = secrets.hash(openid);
-
   if (openid && ext_info && groups) {
     return {
-      hashed_identifier: hashed_identifier,
       openid,
       ext_info,
       groups,

@@ -21,15 +21,16 @@ app.use(
     secret: secrets.session_secret,
     resave: false,
     saveUninitialized: true,
-    cookie: { secure: secrets.redirect_uri.startsWith("https") },
   })
 );
 
-// PRIVATE ROUTES
-const private_routes = ["/edugear", "/register"];
-app.use(private_routes, (req, res, next) => {
-  if (!router_utils.userLoggedIn(req)) {
-    res.clearCookie("token");
+// Ensure that the user is logged in before accessing the protected routes
+const protected_routes = ["/edugear", "/register"];
+app.use(protected_routes, async (req, res, next) => {
+  try {
+    res.locals.openid = await feide.getClientInfo(req.session.token, true);
+  } catch (e) {
+    console.log("Error: User not logged in.");
     req.session.destroy();
     res.redirect("/login");
     return;
@@ -42,17 +43,26 @@ app.get("/", (req, res) => {
 });
 
 app.get("/auth", async (req, res) => {
-  let clientInfo = await feide.getClientInfo(
-    await feide.getAccessToken(req.query.code)
-  );
+  // Get the access token from the code provided by feide in the redirect_uri
+  let accessToken = await feide.getAccessToken(req.query.code);
+  try {
+    // Get the clients info, including the users extended info & groups
+    let clientInfo = await feide.getClientInfo(accessToken);
+    let affiliation = clientInfo.ext_info.eduPersonPrimaryAffiliation;
 
-  let redirect = router_utils.getRedirectPath(clientInfo);
-  if (redirect.logged_in) {
-    res.cookie("token", clientInfo.hashed_identifier);
-    req.session.logged_in = true;
+    // Add the user to the database
     db.addFeideUser(clientInfo);
+
+    // Save the access token in the session
+    req.session.token = accessToken;
+
+    // Redirect the user to the correct page, based on their affiliation
+    res.redirect(router_utils.getRedirectPath(affiliation));
+  } catch (e) {
+    // If the query fails, destroy the session and redirect the user to the login page
+    req.session.destroy();
+    res.redirect("/login");
   }
-  res.redirect(redirect.redirect_url);
 });
 
 app.get("/login", (req, res) => {
@@ -60,26 +70,22 @@ app.get("/login", (req, res) => {
 });
 
 app.get("/logout", (req, res) => {
-  res.clearCookie("token");
   req.session.destroy();
   res.redirect("/");
 });
 
 // PROTECTED ROUTES
 /////////////////////
-app.get("/register", (req, res) => {
-  res.render("register", { feide: db.readFeideUser(req.cookies.token) });
+app.get("/register", async (req, res) => {
+  res.render("register", {
+    feide: db.readFeideUser(res.locals.openid.sub),
+  });
 });
 
-app.post("/register", (req, res) => {
-  if (!router_utils.userLoggedIn(req)) {
-    res.redirect("/logout");
-    return;
-  }
+app.post("/register", async (req, res) => {
   try {
-    console.log(req.body);
     db.addRegisteredUser(
-      req.cookies.token,
+      res.locals.openid.sub,
       req.body.classroom,
       req.body.classroom_teacher,
       req.body.personal_email
@@ -91,7 +97,7 @@ app.post("/register", (req, res) => {
 });
 
 app.get("/edugear", (req, res) => {
-  res.send(db.readFeideUser(req.cookies.token));
+  res.send("edugear");
 });
 
 // Start the server

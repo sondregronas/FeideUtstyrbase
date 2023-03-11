@@ -1,4 +1,4 @@
-let Sqlitedb = require("better-sqlite3")
+let Sqlitedb = require("better-sqlite3");
 
 const database = "database.sqlite";
 const db_options = { verbose: console.log };
@@ -11,13 +11,13 @@ const rented_items_table = "rented_items";
 
 const feideQuery = `CREATE TABLE IF NOT EXISTS ${feide_table} (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
-      hashed_identifier TEXT NOT NULL,
+      sub TEXT NOT NULL,
       name TEXT NOT NULL,
       email TEXT NOT NULL,
       picture TEXT,
       affiliation TEXT NOT NULL,
       org TEXT NOT NULL,
-      UNIQUE(hashed_identifier)
+      UNIQUE(sub)
     );`;
 
 const classroomsQuery = `CREATE TABLE IF NOT EXISTS ${classrooms_table} (
@@ -40,8 +40,8 @@ const registeredUsersQuery = `CREATE TABLE IF NOT EXISTS ${registered_users_tabl
       banned BOOLEAN NOT NULL DEFAULT 0,
       banned_reason TEXT,
       last_banned_at DATETIME,
-      hashed_identifier TEXT NOT NULL,
-      UNIQUE(hashed_identifier)
+      sub TEXT NOT NULL,
+      UNIQUE(sub)
     );`;
 
 const inventoryQuery = `CREATE TABLE IF NOT EXISTS ${inventory_table} (
@@ -56,11 +56,11 @@ const inventoryQuery = `CREATE TABLE IF NOT EXISTS ${inventory_table} (
 const rentedItemsQuery = `CREATE TABLE IF NOT EXISTS ${rented_items_table} (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         item TEXT NOT NULL,
-        hashed_identifier TEXT NOT NULL,
+        sub TEXT NOT NULL,
         rented_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         due_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         checked_in_at DATETIME,
-        UNIQUE(item, hashed_identifier)
+        UNIQUE(item, sub)
     );`;
 
 function _createTable(query) {
@@ -74,22 +74,22 @@ function _createTable(query) {
 }
 
 module.exports = {
-    // Constants
-    database,
-    db_options,
-    // Tables
-    feide_table,
-    classrooms_table,
-    registered_users_table,
-    inventory_table,
-    rented_items_table,
-    // Queries
-    feideQuery,
-    classroomsQuery,
-    registeredUsersQuery,
-    inventoryQuery,
-    rentedItemsQuery,
+  // Constants
+  database,
+  db_options,
+  // Tables
+  feide_table,
+  classrooms_table,
+  registered_users_table,
+  inventory_table,
+  rented_items_table,
+  // Queries
+  feideQuery,
+  classroomsQuery,
+  registeredUsersQuery,
+  inventoryQuery,
+  rentedItemsQuery,
 
-    // Functions
-    _createTable
-}
+  // Functions
+  _createTable,
+};
