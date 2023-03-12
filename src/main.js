@@ -36,8 +36,19 @@ app.use(protected_routes, async (req, res, next) => {
   next();
 });
 
+// Employees only routes
+const employee_routes = ["/edugear"];
+app.use(employee_routes, async (req, res, next) => {
+  let affiliation = await db.readFeideUser(res.locals.openid.sub).affiliation;
+  if (affiliation !== "employee") {
+    res.status(403).render("403", { ...router_utils.getUserStatus(req) });
+    return;
+  }
+  next();
+});
+
 app.get("/", (req, res) => {
-  res.render("index", { title: "Hey", message: "Hello there!" });
+  res.render("index", { ...router_utils.getUserStatus(req) });
 });
 
 app.get("/auth", async (req, res) => {
@@ -67,9 +78,9 @@ app.get("/login", (req, res) => {
   res.redirect(feide.OAuthURL);
 });
 
-app.get("/logout", (req, res) => {
+app.get("/logout", async (req, res) => {
   req.session.destroy();
-  res.redirect("/");
+  res.redirect(`https://auth.dataporten.no/openid/endsession`);
 });
 
 // PROTECTED ROUTES
@@ -77,6 +88,7 @@ app.get("/logout", (req, res) => {
 app.get("/register", async (req, res) => {
   res.render("register", {
     feide: db.readFeideUser(res.locals.openid.sub),
+    ...router_utils.getUserStatus(req),
   });
 });
 
@@ -95,7 +107,7 @@ app.post("/register", async (req, res) => {
 });
 
 app.get("/edugear", (req, res) => {
-  res.send("edugear");
+  res.render("edugear", { ...router_utils.getUserStatus(req) });
 });
 
 // Start the server

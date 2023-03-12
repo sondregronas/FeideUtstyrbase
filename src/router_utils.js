@@ -14,6 +14,13 @@ function getRedirectPath(affiliation) {
   return "/logout";
 }
 
+function getUserStatus(req) {
+  return {
+    logged_in: !!req.session.token,
+  };
+}
+
 module.exports = {
   getRedirectPath,
+  getUserStatus,
 };
