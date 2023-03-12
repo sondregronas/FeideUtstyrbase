@@ -1,0 +1,16 @@
+extends layout
+
+block main
+    link(rel="stylesheet" href="datalist.css")
+    - var elevliste = [{name: "Elev 1", classroom: "1IMA", teacher: "Lærer 1"}, {name: "Elev 2", classroom: "1IMB", teacher: "Lærer 2"}, {name: "Elev 3", classroom: "1IMC", teacher: "Lærer 3"}]
+
+    h1 Velg elev
+    form(method="post" action="/edugear")
+        label(for="student") Velg elev
+        input(list="students" name="student" id="student" required)
+        datalist(id="students")
+            for elev in elevliste
+                option #{elev.name} (#{elev.classroom} - #{elev.teacher})
+
+    // Temporary
+    script(src="https://cdn.jsdelivr.net/npm/datalist-css/dist/datalist-css.min.js" defer)

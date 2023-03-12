@@ -1,51 +1,12 @@
-let express = require("express");
-let session = require("express-session");
-let app = express();
-
-app.use(express.static("public"));
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
-app.set("views", "./views");
-app.set("view engine", "pug");
-
 let feide = require("./feide");
 let router_utils = require("./router_utils");
 let db = require("./database");
 let secrets = require("./globals");
+let express_utils = require("./express_utils");
 
-app.use(
-  session({
-    secret: secrets.session_secret,
-    resave: false,
-    saveUninitialized: false,
-  })
-);
+let { getExpressApp } = express_utils;
 
-// Ensure that the user is logged in before accessing the protected routes
-const protected_routes = ["/edugear", "/register"];
-app.use(protected_routes, async (req, res, next) => {
-  try {
-    res.locals.openid = await feide.getClientInfo(req.session.token, true);
-  } catch (e) {
-    console.log("Error: User not logged in.");
-    req.session.destroy();
-    res.redirect("/login");
-    return;
-  }
-  next();
-});
-
-// Employees only routes
-const employee_routes = ["/edugear"];
-app.use(employee_routes, async (req, res, next) => {
-  let affiliation = await db.readFeideUser(res.locals.openid.sub).affiliation;
-  if (affiliation !== "employee") {
-    res.status(403).render("403", { ...router_utils.getUserStatus(req) });
-    return;
-  }
-  next();
-});
+let app = getExpressApp();
 
 app.get("/", (req, res) => {
   res.render("index", { ...router_utils.getUserStatus(req) });
@@ -87,7 +48,7 @@ app.get("/logout", async (req, res) => {
 /////////////////////
 app.get("/register", async (req, res) => {
   res.render("register", {
-    feide: db.readFeideUser(res.locals.openid.sub),
+    feide: await db.readFeideUser(res.locals.openid.sub),
     ...router_utils.getUserStatus(req),
   });
 });
@@ -108,6 +69,19 @@ app.post("/register", async (req, res) => {
 
 app.get("/edugear", (req, res) => {
   res.render("edugear", { ...router_utils.getUserStatus(req) });
+});
+
+app.get("/inventory", async (req, res) => {
+  res.render("inventory", {
+    //inventory: await db.readInventory(),
+    //...router_utils.getUserStatus(req),
+  });
+});
+
+app.get("/lend", async (req, res) => {
+  res.render("lend", {
+    //inventory: await db.readInventory(),
+  });
 });
 
 // Start the server

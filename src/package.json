@@ -4,7 +4,8 @@
   "description": "",
   "main": "main.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node ./main.js",
+    "watch": "nodemon --ext *"
   },
   "repository": {
     "type": "git",
@@ -23,5 +24,10 @@
     "express": "^4.18.2",
     "express-session": "^1.17.3",
     "pug": "^3.0.2"
+  },
+  "devDependencies": {
+    "connect-livereload": "^0.6.1",
+    "livereload": "^0.9.3",
+    "nodemon": "^2.0.21"
   }
 }
