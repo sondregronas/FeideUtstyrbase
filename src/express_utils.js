@@ -16,18 +16,6 @@ function getExpressApp() {
   app.set("views", "./views");
   app.set("view engine", "pug");
 
-  if (secrets.devMode) {
-    const livereload = require("livereload");
-    const connectLiveReload = require("connect-livereload");
-    const liveReloadServer = livereload.createServer();
-    liveReloadServer.server.once("connection", () => {
-      setTimeout(() => {
-        liveReloadServer.refresh("/");
-      }, 100);
-    });
-    app.use(connectLiveReload());
-  }
-
   app.use(
     session({
       secret: secrets.session_secret,
@@ -62,6 +50,28 @@ function getExpressApp() {
       }
       next();
     });
+  }
+
+  // Easy livereload
+  if (secrets.devmode) {
+    const watchFolders = [
+      "views",
+      "views/partials",
+      "views/conf",
+      "public",
+      "public/js",
+    ];
+
+    app.use(
+      require("easy-livereload")({
+        watchDirs: watchFolders.map((folder) =>
+          require("path").join(__dirname, folder)
+        ),
+        checkFunc: (file) => {
+          return /.(pug|css|js|jpg|png|gif|svg)$/.test(file);
+        },
+      })
+    );
   }
 
   return app;
