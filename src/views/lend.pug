@@ -3,14 +3,56 @@ extends layout
 block main
     link(rel="stylesheet" href="datalist.css")
     - var elevliste = [{name: "Elev 1", classroom: "1IMA", teacher: "Lærer 1"}, {name: "Elev 2", classroom: "1IMB", teacher: "Lærer 2"}, {name: "Elev 3", classroom: "1IMC", teacher: "Lærer 3"}]
+    - var items = [{id: "A6500-1", description: "Sony A6500", category: "Kamera", status: "Ledig", aktiv_bruker: undefined}, {id: "AL-MC4", description: "Aputure AL-MC4 Lyssett", category: "Lys", status: "Ledig", aktiv_bruker: {name: "Elev 1", classroom: "1IMA", teacher: "Lærer 1"}}]
 
     h1 Velg elev
     form(method="post" action="/edugear")
         label(for="student") Velg elev
-        input(list="students" name="student" id="student" required)
+        input(list="students" name="student" id="student" placeholder="Søk etter navn" required)
         datalist(id="students")
             for elev in elevliste
                 option #{elev.name} (#{elev.classroom} - #{elev.teacher})
+
+        label(for="due_date") Tilbakeleveringsdato
+        // value should be todays date + 1 day
+        - var tomorrow = new Date(new Date().getTime() + 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+        - var three_weeks = new Date(new Date().getTime() + 24 * 60 * 60 * 1000 * 21).toISOString().split('T')[0]
+        input(type="date" name="due_date" id="due_date" value=tomorrow required min=tomorrow max=three_weeks)
+
+        table
+            tbody
+                tr
+                    td
+                        label(for="equipment") Legg til utstyr
+                        input(list="available_equipment" name="equipment" id="equipment" placeholder="Legg til utstyr" required)
+                        datalist(id="available_equipment")
+                            for item in items
+                                if item.status == "Ledig"
+                                    option(value=item.id)= `${item.category} - ${item.description} (${item.id})`
+                    td
+                        button(type="button") Legg til
+
+        table
+            thead
+                tr
+                    th Utstyr
+                    th Beskrivelse
+                    th Kategori
+                    th Valg
+            tbody
+                tr
+                    td A6500-01
+                    td Sony A6500
+                    td Kamera
+                    td
+                        button(type="button") Fjern
+
+
+
+        label(for="comment") Kommentar (valgfritt)
+        textarea(name="comment" id="comment" rows="2")
+
+        input(type="submit" value="Lån utstyr")
 
     // Temporary
     script(src="https://cdn.jsdelivr.net/npm/datalist-css/dist/datalist-css.min.js" defer)
