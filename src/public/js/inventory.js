@@ -77,8 +77,12 @@ async function addItem() {
 }
 
 function deleteItem() {
-  let name = document.getElementById("edit_name_old").value;
-  removeItemInDB(name);
+  let db_name = document.getElementById("edit_name_old").value;
+  let name = document.getElementById("edit_name").value;
+  if (confirm(`Er du sikker på at du vil slette ${name}? Du kan ikke angre!`)) {
+    removeItemInDB(db_name);
+    return true;
+  }
 }
 
 async function saveChanges() {
@@ -161,8 +165,8 @@ function addToTable(item) {
   row.insertCell(0).innerHTML = item.name;
   row.insertCell(1).innerHTML = item.description;
   row.insertCell(2).innerHTML = item.category;
-  row.insertCell(3).innerHTML = "Ny!";
-  row.insertCell(4).innerHTML = "Ny!";
+  row.insertCell(3).innerHTML = "Ukjent";
+  row.insertCell(4).innerHTML = "Nylig endret";
 }
 
 function checkName(input, used_names) {
@@ -281,6 +285,7 @@ function searchTable(input) {
       }
     }
   }
+  updateResultsCounter();
 }
 
 function toggleColumnVisibility(column, toggleBtn = null) {
@@ -307,6 +312,17 @@ function toggleColumnVisibility(column, toggleBtn = null) {
     }
   }
 }
+
+function updateResultsCounter() {
+  let counter = document.getElementById("search_results_count");
+  let shown = document.querySelectorAll("#inventory_table tr");
+  shown = Array.from(shown).filter((item) => item.offsetParent !== null);
+  shown = shown.length - 1;
+  let total = document.querySelectorAll("#inventory_table tr").length - 1;
+  counter.innerHTML = `${shown} av ${total} elementer`;
+}
+
 window.onload = function () {
   sortTable(0);
+  updateResultsCounter();
 };

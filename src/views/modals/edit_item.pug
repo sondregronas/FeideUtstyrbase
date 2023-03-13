@@ -15,6 +15,6 @@
 
     p#edit_response_message Obs! Alle feltene er påkrevd
 
-    button.btn-danger(type="button" onclick=`deleteItem(); closeModal('edit_item');`) Slett
+    button.btn-danger(type="button" onclick=`if(deleteItem()) closeModal('edit_item');`) Slett
     button(type="button" onclick=`saveChanges(); closeModal('edit_item');`) Lagre
     button(type="button" onclick="closeModal('edit_item', true);") Avslutt uten å lagre
