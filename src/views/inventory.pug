@@ -11,6 +11,15 @@ block main
 
     input(type="text" placeholder="Søk i inventar" id="search" oninput="searchTable(this);")
 
+    table
+        tr
+            th
+                button(onclick="toggleColumnVisibility(1, this); this.add") Beskrivelse
+            th
+                button(onclick="toggleColumnVisibility(2, this); this.add") Kategori
+            th
+                button(onclick="toggleColumnVisibility(3, this); this.add") Sist lånt
+
     table#inventory_table
         thead
             tr
@@ -21,11 +30,14 @@ block main
                 th
                     a(onclick="sortTable(2)") Kategori
                 th
-                    a(onclick="sortTable(3)") Status
+                    a(onclick="sortTable(3)") Sist lånt
+                th
+                    a(onclick="sortTable(4)") Status
         tbody
             if !inventory
                 tr
                     td Her var det helt tomt 😢
+                    td
                     td
                     td
                     td
@@ -36,12 +48,14 @@ block main
                         td= item.description
                         td= item.category
                         td
-                            a(onclick=`updateEditItemModal("${item.name}","${item.description}","${item.category}"); openModal('edit_item');`) Rediger
-                            span &nbsp;|&nbsp;
-                            if item.available
-                                a(href="#" + item.id) Lån
+                            if item.last_borrowed
+                                = `${item.last_borrowed.name} (${item.last_borrowed.classroom}) - ${new Date(item.last_borrowed.date).toLocaleDateString(locale, {year: "numeric", month: "long", day: "numeric"})}`
                             else
-                                a(href="#" + item.id) Levert
+                                = "Aldri"
+                        td
+                            a(onclick=`updateEditItemModal("${item.name}","${item.description}","${item.category}"); openModal('edit_item');`) Rediger
+                            if !item.available
+                                a(href="#" + item.id) &nbsp;|&nbsp;Levert
 
     .modal#add_item
         include modals/add_item

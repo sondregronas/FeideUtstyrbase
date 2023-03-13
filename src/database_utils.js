@@ -50,6 +50,8 @@ const inventoryQuery = `CREATE TABLE IF NOT EXISTS ${inventory_table} (
         description TEXT,
         category TEXT,
         available BOOLEAN NOT NULL DEFAULT 1,
+        last_borrowed TEXT,
+        last_checked DATETIME DEFAULT CURRENT_TIMESTAMP,
         UNIQUE(name)
     );`;
 

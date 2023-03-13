@@ -221,9 +221,16 @@ function addInventoryItem(item) {
 
   try {
     let stmt = db.prepare(
-      `INSERT INTO ${dbutils.inventory_table} (name, description, category, available) VALUES (?, ?, ?, ?)`
+      `INSERT INTO ${dbutils.inventory_table} (name, description, category, available, last_borrowed, last_checked) VALUES (?, ?, ?, ?, ?, ?)`
     );
-    stmt.run(item.name, item.description || null, item.category || null, 1);
+    stmt.run(
+      item.name,
+      item.description || null,
+      item.category || null,
+      1,
+      JSON.stringify(item.last_borrowed) || null,
+      item.last_checked || new Date().getTime()
+    );
   } catch (e) {
     db.close();
     if (e.message.includes("UNIQUE constraint failed")) {
@@ -246,9 +253,71 @@ function getInventoryItems() {
   let stmt = db.prepare(`SELECT * FROM ${dbutils.inventory_table}`);
   let items = stmt.all();
 
+  items.forEach((item) => {
+    if (item.last_borrowed) item.last_borrowed = JSON.parse(item.last_borrowed);
+  });
+
   db.close();
 
   return items;
+}
+
+function updateItemLastBorrowed(name, last_borrowed) {
+  /**
+   * Updates the last borrowed date of an item
+   * @param name - The name of the item
+   * @param last_borrowed - The last borrowed date
+   * @returns {void}
+   * @type {Database}
+   */
+  let db = new Sqlitedb(database, db_options);
+
+  let stmt = db.prepare(
+    `UPDATE ${dbutils.inventory_table} SET last_borrowed = ? WHERE name = ?`
+  );
+  stmt.run(JSON.stringify(last_borrowed), name);
+
+  db.close();
+}
+
+function updateInventoryItemBasic(old_name, new_item) {
+  /**
+   * Updates an item in the inventory
+   * @param old_name - The old name of the item
+   * @param new_item - The new item object
+   * @returns {void}
+   * @type {Database}
+   */
+  let db = new Sqlitedb(database, db_options);
+
+  let stmt = db.prepare(
+    `UPDATE ${dbutils.inventory_table} SET name = ?, description = ?, category = ? WHERE name = ?`
+  );
+  stmt.run(
+    new_item.name,
+    new_item.description || null,
+    new_item.category || null,
+    old_name
+  );
+
+  db.close();
+}
+
+function removeInventoryItem(name) {
+  /**
+   * Deletes an item from the inventory
+   * @param name - The name of the item
+   * @returns {void}
+   * @type {Database}
+   */
+  let db = new Sqlitedb(database, db_options);
+
+  let stmt = db.prepare(
+    `DELETE FROM ${dbutils.inventory_table} WHERE name = ?`
+  );
+  stmt.run(name);
+
+  db.close();
 }
 
 /*
@@ -281,4 +350,7 @@ module.exports = {
   fetchRegisteredUsers,
   addInventoryItem,
   getInventoryItems,
+  updateItemLastBorrowed,
+  updateInventoryItemBasic,
+  removeInventoryItem,
 };

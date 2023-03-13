@@ -78,12 +78,10 @@ async function addItem() {
 
 function deleteItem() {
   let name = document.getElementById("edit_name_old").value;
-  // TODO: Send items to server
-  if (confirm("Er du sikker på at du vil slette " + name + "?"))
-    removeFromTable(name);
+  removeItemInDB(name);
 }
 
-function saveChanges() {
+async function saveChanges() {
   /**
    * @param {Object} old_item - The item before changes
    * @param {Object} new_item - The item after changes
@@ -105,11 +103,46 @@ function saveChanges() {
 
   if (!sanitizeItem(name, description, category, response_message)) return;
 
-  // TODO: Send items to server
-
   removeFromTable(old_item_name);
-  document.getElementById("edit_name_old").value = new_item.name;
   addToTable(new_item);
+  document.getElementById("edit_name_old").value = new_item.name;
+  await updateItemInDB(old_item_name, new_item, response_message);
+}
+
+async function updateItemInDB(
+  old_item_name,
+  new_item,
+  response_message = null
+) {
+  let response = await fetch("/inventory/update", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ old_name: old_item_name, new_item: new_item }),
+  });
+  let data = await response.json();
+  if (data.success && response_message) {
+    response_message.classList.add("success");
+    response_message.innerHTML = data.message;
+  } else {
+    response_message.classList.add("error");
+    response_message.innerHTML = data.message;
+  }
+}
+
+async function removeItemInDB(name) {
+  let response = await fetch("/inventory/remove", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ name }),
+  });
+  let data = await response.json();
+  if (data.success) {
+    removeFromTable(name);
+  }
 }
 
 function removeFromTable(name) {
@@ -129,6 +162,7 @@ function addToTable(item) {
   row.insertCell(1).innerHTML = item.description;
   row.insertCell(2).innerHTML = item.category;
   row.insertCell(3).innerHTML = "Ny!";
+  row.insertCell(4).innerHTML = "Ny!";
 }
 
 function checkName(input, used_names) {
@@ -222,7 +256,7 @@ function sortTable(column) {
 
 function searchTable(input) {
   /**
-   * Search the inventory table for items, and hide items that don't match the search, searches column 0 and 2 (name and category)
+   * Search the inventory table for items, and hide items that don't match the search, searches column 0, 1 and 2 (name, description and category)
    * @param {HTMLInputElement} input - The input element used to search the table
    * @returns {void} - Returns nothing, but hides items that don't match the search
    * @type {string}
@@ -230,13 +264,15 @@ function searchTable(input) {
   let filter = input.value.toLowerCase();
   let table = document.getElementById("inventory_table");
   let tr = table.getElementsByTagName("tr");
-  // Search both column 0 and 2 (name and category)
+
   for (let i = 0; i < tr.length; i++) {
     let td = tr[i].getElementsByTagName("td")[0];
+    let td1 = tr[i].getElementsByTagName("td")[1];
     let td2 = tr[i].getElementsByTagName("td")[2];
-    if (td || td2) {
+    if (td || td1 || td2) {
       if (
         td.innerHTML.toLowerCase().indexOf(filter) > -1 ||
+        td1.innerHTML.toLowerCase().indexOf(filter) > -1 ||
         td2.innerHTML.toLowerCase().indexOf(filter) > -1
       ) {
         tr[i].style.display = "";
@@ -246,3 +282,31 @@ function searchTable(input) {
     }
   }
 }
+
+function toggleColumnVisibility(column, toggleBtn = null) {
+  /**
+   * Toggle the visibility of a column in the inventory table
+   * @param {Number} column - The column to toggle, 0 = name, 1 = description, 2 = category, 3 = edit, 4 = delete
+   * @returns {void} - Returns nothing, but toggles the visibility of the column
+   */
+  let table = document.getElementById("inventory_table");
+  let rows = table.rows;
+  for (let i = 0; i < rows.length; i++) {
+    let row = rows[i];
+    let cell = row.cells[column];
+    if (cell.style.display === "none") {
+      cell.style.display = "";
+      if (toggleBtn) {
+        toggleBtn.classList.remove("filter__btn--inactive");
+      }
+    } else {
+      cell.style.display = "none";
+      if (toggleBtn) {
+        toggleBtn.classList.add("filter__btn--inactive");
+      }
+    }
+  }
+}
+window.onload = function () {
+  sortTable(0);
+};

@@ -91,6 +91,32 @@ app.post("/inventory/add", (req, res) => {
   }
 });
 
+app.post("/inventory/remove", (req, res) => {
+  try {
+    db.removeInventoryItem(req.body.name);
+    res.send({ success: true, message: `Fjernet ${req.body.name}` });
+  } catch (e) {
+    console.log(e);
+    res.send({
+      success: false,
+      message: `Kunne ikke fjerne ${req.body.name}`,
+    });
+  }
+});
+
+app.post("/inventory/update", (req, res) => {
+  try {
+    db.updateInventoryItemBasic(req.body.old_name, req.body.new_item);
+    res.send({ success: true, message: `Oppdaterte ${req.body.name}` });
+  } catch (e) {
+    console.log(e);
+    res.send({
+      success: false,
+      message: `Kunne ikke oppdatere ${req.body.name}`,
+    });
+  }
+});
+
 app.get("/lend", async (req, res) => {
   res.render("lend", {
     //inventory: await db.readInventory(),

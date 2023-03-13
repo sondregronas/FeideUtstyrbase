@@ -40,7 +40,7 @@ function getExpressApp() {
     });
 
     // Employees only routes
-    const employee_routes = ["/edugear"];
+    const employee_routes = ["/edugear", "/inventory", "/inventory/*"];
     app.use(employee_routes, async (req, res, next) => {
       let affiliation = await db.readFeideUser(res.locals.openid.sub)
         .affiliation;

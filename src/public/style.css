@@ -14,3 +14,8 @@ a{
     background-color: var(--del-color);
     border-color: var(--del-color);
 }
+
+.filter__btn--inactive {
+    background-color: var(--del-color);
+    border-color: var(--del-color);
+}
