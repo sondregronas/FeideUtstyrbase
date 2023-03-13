@@ -108,6 +108,7 @@ function saveChanges() {
   // TODO: Send items to server
 
   removeFromTable(old_item_name);
+  document.getElementById("edit_name_old").value = new_item.name;
   addToTable(new_item);
 }
 
