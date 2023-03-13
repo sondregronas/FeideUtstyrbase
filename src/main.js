@@ -73,9 +73,22 @@ app.get("/edugear", (req, res) => {
 
 app.get("/inventory", async (req, res) => {
   res.render("inventory", {
-    //inventory: await db.readInventory(),
-    //...router_utils.getUserStatus(req),
+    inventory: await db.getInventoryItems(),
+    ...router_utils.getUserStatus(req),
   });
+});
+
+app.post("/inventory/add", (req, res) => {
+  try {
+    db.addInventoryItem(req.body);
+    res.send({ success: true, message: `La til ${req.body.name}` });
+  } catch (e) {
+    console.log(e);
+    res.send({
+      success: false,
+      message: `Kunne ikke legge til ${req.body.name}`,
+    });
+  }
 });
 
 app.get("/lend", async (req, res) => {

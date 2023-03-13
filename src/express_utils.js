@@ -58,6 +58,7 @@ function getExpressApp() {
       "views",
       "views/partials",
       "views/conf",
+      "views/modals",
       "public",
       "public/js",
     ];

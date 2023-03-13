@@ -1,0 +1,50 @@
+body:has(.modal-open) {
+    overflow: hidden;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    pointer-events: none;
+
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1000;
+}
+
+.modal-open {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    backdrop-filter: blur(10px);
+    background-color: rgba(0, 0, 0, 0);
+}
+
+.modal-open * {
+    user-select: text;
+    pointer-events: auto;
+
+}
+
+.modal-content {
+    position: relative;
+    width: 70%;
+    padding: 2rem;
+    border: 5px solid var(--primary);
+    background-color: var(--background-color);
+}
+
+.modal-close {
+    position: absolute;
+    top: 0;
+    right: 1rem;
+    padding: 1rem;
+    font-size: 2rem;
+    cursor: pointer;
+}

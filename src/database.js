@@ -214,7 +214,7 @@ function addInventoryItem(item) {
   /**
    * Adds an item to the inventory
    * @param item - The item object
-   * @returns {boolean} - True if the item was added, false if it already exists
+   * @returns {void}
    * @type {Database}
    */
   let db = new Sqlitedb(database, db_options);
@@ -223,24 +223,32 @@ function addInventoryItem(item) {
     let stmt = db.prepare(
       `INSERT INTO ${dbutils.inventory_table} (name, description, category, available) VALUES (?, ?, ?, ?)`
     );
-    stmt.run(
-      item.name,
-      item.description || null,
-      item.category || null,
-      item.available || 1
-    );
+    stmt.run(item.name, item.description || null, item.category || null, 1);
   } catch (e) {
-    if (e.message.includes("UNIQUE constraint failed")) {
-      console.log(`Item ${item.name} already exists`);
-    } else {
-      console.log(e.message);
-    }
     db.close();
-    return false;
+    if (e.message.includes("UNIQUE constraint failed")) {
+      throw `Item ${item.name} already exists`;
+    }
+    throw e.message;
   }
 
   db.close();
-  return true;
+}
+
+function getInventoryItems() {
+  /**
+   * Gets all the items from the inventory
+   * @returns {object} - The item objects
+   * @type {Database}
+   */
+  let db = new Sqlitedb(database, db_options);
+
+  let stmt = db.prepare(`SELECT * FROM ${dbutils.inventory_table}`);
+  let items = stmt.all();
+
+  db.close();
+
+  return items;
 }
 
 /*
@@ -272,4 +280,5 @@ module.exports = {
   readRegisteredUser,
   fetchRegisteredUsers,
   addInventoryItem,
+  getInventoryItems,
 };

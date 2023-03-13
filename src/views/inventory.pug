@@ -1,10 +1,9 @@
 extends layout
 
 block main
-    - var items = [{id: "A6500-1", description: "Sony A6500", category: "Kamera", status: "Ledig", aktiv_bruker: undefined}, {id: "AL-MC4", description: "Aputure AL-MC4 Lyssett", category: "Lys", status: "Utlånt", aktiv_bruker: {name: "Elev 1", classroom: "1IMA", teacher: "Lærer 1"}}]
     h1 Inventar
 
-    a(href="/inventory/add") Legg til nytt inventar
+    a(onclick="openModal('add_item')") Legg til nytt inventar
 
     label(for="search") Søk i inventaren
     input(type="text" placeholder="Søk i inventar" id="search")
@@ -14,16 +13,28 @@ block main
             tr
                 th Inventar
                 th Beskrivelse
+                th Kategori
                 th Status
-                th
         tbody
-            each item in items
+            if !inventory
                 tr
-                    td= item.id
-                    td= item.description
-                    td= item.status
+                    td Her var det helt tomt 😢
                     td
-                        if item.status == "Ledig"
-                            a(href="/inventory/checkout/" + item.id) Lån
-                        else
-                            a(href="/inventory/checkin/" + item.id) Levert
+                    td
+                    td
+            else
+                for item in inventory
+                    tr
+                        td= item.name
+                        td= item.description
+                        td= item.category
+                        td
+                            a(href=`/inventory/edit?i=${item.name}&d=${item.description}&c=${item.category}`) Rediger
+                            span &nbsp;|&nbsp;
+                            if item.available
+                                a(href="/inventory/checkout/" + item.id) Lån
+                            else
+                                a(href="/inventory/checkin/" + item.id) Levert
+
+    .modal#add_item
+        include modals/add_item
