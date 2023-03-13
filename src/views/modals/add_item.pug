@@ -1,23 +1,24 @@
 .modal-content
     h2 Legg til
     .modal-close
-        a(onclick="closeModal('add_item', true, location.reload())") ×
+        a(onclick="closeModal('add_item', true)") ×
 
-    - var invalid = []
+    - let invalid = []
     for item in inventory
      - invalid.push(`'${item.name}'`)
 
     label(for="name") ID
-    input(type="text" id="name" placeholder="ID" required oninput=`checkName(this, [${invalid}]); regexCheck(this, /^[a-zA-Z0-9_\-]+$/);`)
+    input(type="text" id="name" placeholder="ID" required oninput=`checkName(this, [${invalid}]);`)
 
     label(for="description") Varebeskrivelse
     input(type="text" id="description" placeholder="Fullstendig beskrivelse (Sony A6500)" required)
 
+    // TODO: Select from list of categories, or add new category
     label(for="category") Kategori
     input(type="text" id="category" placeholder="Kategori (Kamera, Lys, Stativ, etc.)" required)
 
     p#response_message Obs! Alle feltene er påkrevd
     button(type="button" onclick="addItem()") Legg til
-    button(type="button" onclick="closeModal('add_item', false, location.reload())") Ferdig
+    button(type="button" onclick="closeModal('add_item')") Ferdig
 
     script(src="/js/inventory.js" defer)

@@ -2,19 +2,26 @@ extends layout
 
 block main
     h1 Inventar
+    p Obs: Dersom du redigerer eller legger til elementer er det lurt å oppdatere siden, da det kan være at noe ikke fungerer som det skal.
 
     a(onclick="openModal('add_item')") Legg til nytt inventar
 
-    label(for="search") Søk i inventaren
-    input(type="text" placeholder="Søk i inventar" id="search")
+    br
+    br
 
-    table
+    input(type="text" placeholder="Søk i inventar" id="search" oninput="searchTable(this);")
+
+    table#inventory_table
         thead
             tr
-                th Inventar
-                th Beskrivelse
-                th Kategori
-                th Status
+                th
+                    a(onclick="sortTable(0)") ID
+                th
+                    a(onclick="sortTable(1)") Beskrivelse
+                th
+                    a(onclick="sortTable(2)") Kategori
+                th
+                    a(onclick="sortTable(3)") Status
         tbody
             if !inventory
                 tr
@@ -29,12 +36,14 @@ block main
                         td= item.description
                         td= item.category
                         td
-                            a(href=`/inventory/edit?i=${item.name}&d=${item.description}&c=${item.category}`) Rediger
+                            a(onclick=`updateEditItemModal("${item.name}","${item.description}","${item.category}"); openModal('edit_item');`) Rediger
                             span &nbsp;|&nbsp;
                             if item.available
-                                a(href="/inventory/checkout/" + item.id) Lån
+                                a(href="#" + item.id) Lån
                             else
-                                a(href="/inventory/checkin/" + item.id) Levert
+                                a(href="#" + item.id) Levert
 
     .modal#add_item
         include modals/add_item
+    .modal#edit_item
+        include modals/edit_item
