@@ -77,7 +77,6 @@ app.post("/register", async (req, res) => {
 app.get("/edugear", (req, res) => {
   res.render("edugear", {
     ...router_utils.getUserStatus(req),
-    users: db.readAllActiveUsers(),
   });
 });
 
@@ -125,6 +124,14 @@ app.post("/inventory/update", (req, res) => {
       message: `Kunne ikke oppdatere ${req.body.name}`,
     });
   }
+});
+
+app.get("/lend", async (req, res) => {
+  res.render("lend", {
+    inventory: await db.getInventoryItems(),
+    ...router_utils.getUserStatus(req),
+    users: db.readAllActiveUsers(),
+  });
 });
 
 // Start the server

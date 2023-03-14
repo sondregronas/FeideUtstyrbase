@@ -1,0 +1,22 @@
+.modal-content
+    .modal-close
+        a(onclick="if(confirm('Er du sikker på at du vil lukke vinduet?')) closeModal('user-select')") ×
+
+    input(id="user-search" type="text" placeholder="Søk etter elev" oninput="filterStudents(this.value)")
+    #user-list
+        if !users
+            p Ingen elever funnet
+        else
+            for user in users
+                li
+                    - let text = `${user.name} (${user.classroom || "Ansatt"})`
+                    if(!user.banned)
+                        a(onclick=`selectStudent("${user.name}", "${user.classroom || 'Ansatt'}"); closeModal('user-select')`)=text
+                    if(user.banned)
+                        a.banned= text
+                        span
+                            = ` (Utestengt siden ${new Date(user.last_banned_at).toDateString()}) ${user.banned_reason}`
+    br
+    button(type="button" onclick="closeModal('user-select')") Lukk
+
+    script(src="/js/user-select.js" defer)

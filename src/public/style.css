@@ -23,3 +23,7 @@ a{
 .hidden {
     display: none;
 }
+
+.banned {
+    color: var(--del-color);
+}

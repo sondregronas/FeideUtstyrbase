@@ -136,20 +136,20 @@ function addRegisteredUser(sub, classroom, classroom_teacher, personal_email) {
   //let teacher = getEmployeeFromName(user.classroom_teacher);
   //if (!teacher) throw new Error("Teacher not found in admins table");
 
-  // If the user already exists, remove it first
+  let stmt = db.prepare(
+    `INSERT INTO ${dbutils.registered_users_table} (name, classroom, classroom_teacher, school_email, personal_email, picture, updated_at, expires_at, sub) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
+  );
+
+  // If the user already exists, update it instead
   if (readRegisteredUser(sub)) {
-    let stmt = db.prepare(
-      `DELETE FROM ${dbutils.registered_users_table} WHERE sub = ?`
+    stmt = db.prepare(
+      `UPDATE ${dbutils.registered_users_table} SET name = ?, classroom = ?, classroom_teacher = ?, school_email = ?, personal_email = ?, picture = ?, updated_at = ?, expires_at = ? WHERE sub = ?`
     );
-    stmt.run(sub);
   }
 
   let updated_at = new Date();
   let expires_at = new Date(updated_at.getFullYear() + 1, 6, 1); // 1st of July next year
 
-  let stmt = db.prepare(
-    `INSERT INTO ${dbutils.registered_users_table} (name, classroom, classroom_teacher, school_email, personal_email, picture, updated_at, expires_at, sub) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
-  );
   stmt.run(
     feide_info.name,
     classroom,

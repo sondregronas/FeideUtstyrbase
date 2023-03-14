@@ -5,6 +5,7 @@ body:has(.modal-open) {
     -moz-user-select: none;
     -ms-user-select: none;
     pointer-events: none;
+    padding-right: 1rem;
 }
 
 .modal {
@@ -48,22 +49,18 @@ body:has(.modal-open) {
     cursor: pointer;
 }
 
-.dropdown {
-    display: none;
+#user-list {
+    max-height: 30vh;
+    overflow: scroll;
+    overflow-x: hidden;
 }
 
-.dropdown-open {
-    display: block;
-    z-index: 1000;
-    position: absolute;
-    margin-inline: auto;
-    padding: 2rem;
-    border: 5px solid var(--primary);
-    background-color: var(--background-color);
-    backdrop-filter: blur(10px);
+:has(#selected_user:placeholder-shown) #selected_user--btn {
+    background-color: var(--del-color);
+    border-color: var(--del-color);
 }
 
-#user-select {
-    top: 7rem;
-    width: calc(100% - 4rem);
+:has(#selected_user:not(:placeholder-shown)) #selected_user--btn {
+    background-color: var(--ins-color);
+    border-color: var(--ins-color);
 }

@@ -1,0 +1,39 @@
+extends layout
+block main
+    hgroup
+        h1 Utstyrslån
+        h2 Velg elev og utstyr som skal lånes ut, dersom du ikke finner eleven i listen, må du be dem om å registrere seg via hjemmesiden.
+
+    // Set focus to the first input field (id="student-search")
+    button(type="button" id="selected_user--btn" onclick="openModal('user-select'); document.getElementById('user-search').focus();") Velg elev
+    input.hidden(name="selected_user" id="selected_user" required placeholder=" " disabled)
+    .modal#user-select
+        include modals/user_select
+
+
+    label(for="start_date") Startdato
+    // value should be todays date
+    - let today = new Date().toISOString().split('T')[0]
+    input(type="date" name="start_date" id="start_date" value=today required min=today disabled)
+
+
+    label(for="end_date") Tilbakeleveringsdato
+    // value should be todays date + 1 day
+    - let tomorrow = new Date(new Date().getTime() + 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+    - let three_weeks = new Date(new Date().getTime() + 24 * 60 * 60 * 1000 * 21).toISOString().split('T')[0]
+    input(type="date" name="end_date" id="end_date" value=tomorrow required min=tomorrow max=three_weeks)
+
+    label(for="gear") Legg til utstyr
+    select(name="gear" id="gear" multiple)
+        option(value="A6500-01") A6500-01
+        option(value="A6500-02") A6500-02
+
+
+
+    label(for="comment") Kommentar (valgfritt)
+    textarea(name="comment" id="comment" rows="1")
+
+    button(type="button" onclick="if(confirm('Er du sikker på at du vil avbryte?')) closeModal('user-select')") Avbryt
+    button(type="button" onclick="lendGear(); closeModal('user-select')") Bekreft
+
+    script(src="/js/lend.js" defer)
