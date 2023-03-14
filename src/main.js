@@ -14,6 +14,7 @@ app.get("/", (req, res) => {
 
 app.get("/auth", async (req, res) => {
   // Get the access token from the code provided by feide in the redirect_uri
+  console.log(req.query);
   let accessToken = await feide.getAccessToken(req.query.code);
   try {
     // Get the clients info, including the users extended info & groups
@@ -47,8 +48,14 @@ app.get("/logout", async (req, res) => {
 // PROTECTED ROUTES
 /////////////////////
 app.get("/register", async (req, res) => {
+  let feideUser = undefined;
+  try {
+    feideUser = await db.readFeideUser(res.locals.openid.sub);
+  } catch (e) {
+    console.log("Error reading feide user: " + e);
+  }
   res.render("register", {
-    feide: await db.readFeideUser(res.locals.openid.sub),
+    feide: feideUser,
     ...router_utils.getUserStatus(req),
   });
 });
@@ -68,7 +75,10 @@ app.post("/register", async (req, res) => {
 });
 
 app.get("/edugear", (req, res) => {
-  res.render("edugear", { ...router_utils.getUserStatus(req) });
+  res.render("edugear", {
+    ...router_utils.getUserStatus(req),
+    users: db.readAllActiveUsers(),
+  });
 });
 
 app.get("/inventory", async (req, res) => {
@@ -115,12 +125,6 @@ app.post("/inventory/update", (req, res) => {
       message: `Kunne ikke oppdatere ${req.body.name}`,
     });
   }
-});
-
-app.get("/lend", async (req, res) => {
-  res.render("lend", {
-    //inventory: await db.readInventory(),
-  });
 });
 
 // Start the server

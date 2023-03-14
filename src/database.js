@@ -184,7 +184,7 @@ function readRegisteredUser(sub) {
   return user;
 }
 
-function fetchRegisteredUsers(only_active = true) {
+function readAllActiveUsers(only_active = true) {
   /**
    * Gets all the users from the database
    * @returns {object} - The user object
@@ -347,7 +347,7 @@ module.exports = {
   addRegisteredUser,
   validateUser,
   readRegisteredUser,
-  fetchRegisteredUsers,
+  readAllActiveUsers,
   addInventoryItem,
   getInventoryItems,
   updateItemLastBorrowed,

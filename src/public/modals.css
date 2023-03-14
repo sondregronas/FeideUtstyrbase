@@ -5,7 +5,6 @@ body:has(.modal-open) {
     -moz-user-select: none;
     -ms-user-select: none;
     pointer-events: none;
-
 }
 
 .modal {
@@ -47,4 +46,24 @@ body:has(.modal-open) {
     padding: 1rem;
     font-size: 2rem;
     cursor: pointer;
+}
+
+.dropdown {
+    display: none;
+}
+
+.dropdown-open {
+    display: block;
+    z-index: 1000;
+    position: absolute;
+    margin-inline: auto;
+    padding: 2rem;
+    border: 5px solid var(--primary);
+    background-color: var(--background-color);
+    backdrop-filter: blur(10px);
+}
+
+#user-select {
+    top: 7rem;
+    width: calc(100% - 4rem);
 }

@@ -5,7 +5,7 @@ function getRedirectPath(affiliation) {
    * @returns {string} - The path to redirect the user to
    * @type {(affiliation: string) => string}
    */
-  switch (affiliation) {
+  switch (affiliation.toLowerCase()) {
     case "student":
       return "/register";
     case "employee":

@@ -19,3 +19,7 @@ a{
     background-color: var(--del-color);
     border-color: var(--del-color);
 }
+
+.hidden {
+    display: none;
+}
