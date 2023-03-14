@@ -25,8 +25,8 @@ block main
 
     label(for="gear") Legg til utstyr
     select(name="gear" id="gear" multiple)
-        option(value="A6500-01") A6500-01
-        option(value="A6500-02") A6500-02
+        for item in inventory
+            option(value=item.name)=`${item.name} (${item.category} | ${item.description})`
 
 
 
