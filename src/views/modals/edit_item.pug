@@ -1,20 +1,20 @@
 .modal-content
     h2 Rediger
     .modal-close
-        a(onclick="if(confirm('Vil du lagre endringene dine?')) saveChanges(); closeModal('edit_item')") ×
+        a(onclick=`if(confirm('Vil du lagre endringene dine?')) saveEditChanges('${edit_item_modal_id}'); closeModal('${edit_item_modal_id}')`) ×
 
-    label(for="edit_name") ID
-    input(type="text" id="edit_name" placeholder="ID" required oninput=`checkName(this, [${invalid}]);`)
-    input(type="hidden" id="edit_name_old")
+    label(for="edit-item-name") ID
+    input(type="text" id="edit-item-name" placeholder="ID" required oninput=`checkUniqueItemName(this, [${existing_items}]);`)
+    input(type="hidden" id="edit-item-name_old")
 
-    label(for="edit_description") Varebeskrivelse
-    input(type="text" id="edit_description" placeholder="Fullstendig beskrivelse (Sony A6500)" required)
+    label(for="edit-item-description") Varebeskrivelse
+    input(type="text" id="edit-item-description" placeholder="Fullstendig beskrivelse (Sony A6500)" required)
 
-    label(for="edit_category") Kategori
-    input(type="text" id="edit_category" placeholder="Kategori (Kamera, Lys, Stativ, etc.)" required)
+    label(for="edit-item-category") Kategori
+    input(type="text" id="edit-item-category" placeholder="Kategori (Kamera, Lys, Stativ, etc.)" required)
 
-    p#edit_response_message Obs! Alle feltene er påkrevd
+    p#edit-item-response-message Obs! Alle feltene er påkrevd
 
-    button.btn-danger(type="button" onclick=`if(deleteItem()) closeModal('edit_item');`) Slett
-    button(type="button" onclick=`saveChanges(); closeModal('edit_item');`) Lagre
-    button(type="button" onclick="closeModal('edit_item', true);") Avslutt uten å lagre
+    button.btn-danger(type="button" onclick=`if(deleteItemWithConfirm()) closeModal('${edit_item_modal_id}');`) Slett
+    button(type="button" onclick=`saveEditChanges('${edit_item_modal_id}');`) Lagre
+    button(type="button" onclick=`closeModal('${edit_item_modal_id}', true);`) Avslutt uten å lagre

@@ -116,7 +116,7 @@ app.post("/inventory/remove", (req, res) => {
 app.post("/inventory/update", (req, res) => {
   try {
     db.updateInventoryItemBasic(req.body.old_name, req.body.new_item);
-    res.send({ success: true, message: `Oppdaterte ${req.body.name}` });
+    res.send({ success: true, message: `Oppdaterte ${req.body.old_name}` });
   } catch (e) {
     console.log(e);
     res.send({

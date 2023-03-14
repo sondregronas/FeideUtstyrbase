@@ -1,38 +1,47 @@
 extends layout
 
+block single_head
+    script(src="/js/inventory.js" defer)
+    script(src="/js/tables.js" defer)
+
 block main
+    - let inventory_table_id = "inventory-table";
+    - let edit_item_modal_id = "edit_item";
+    - let add_item_modal_id = "add_item";
+    - let existing_items = inventory.map(item => `'${item.name}'`).join(", ");
+
     h1 Inventar
     p Obs: Dersom du redigerer eller legger til elementer er det lurt å oppdatere siden, da det kan være at noe ikke fungerer som det skal.
 
-    a(onclick="openModal('add_item')") Legg til nytt inventar
+    a(onclick=`resetAddItemModal(); openModal('${add_item_modal_id}')`) Legg til nytt inventar
 
     br
     br
 
-    input(type="text" placeholder="Søk i inventar" id="search" oninput="searchTable(this);")
+    input(type="text" placeholder="Søk i inventar" id="search" oninput=`searchTable(this.value, "${inventory_table_id}");`)
 
-    table
+    table#sort-options--table
         tr
             th
-                button(onclick="toggleColumnVisibility(1, this); this.add") Beskrivelse
+                button(onclick=`toggleColumnVisibility(1, this, "${inventory_table_id}");`) Beskrivelse
             th
-                button(onclick="toggleColumnVisibility(2, this); this.add") Kategori
+                button(onclick=`toggleColumnVisibility(2, this, "${inventory_table_id}");`) Kategori
             th
-                button(onclick="toggleColumnVisibility(3, this); this.add") Sist lånt
+                button(onclick=`toggleColumnVisibility(3, this, "${inventory_table_id}");`) Sist lånt
 
-    table#inventory_table
+    table(id=`${inventory_table_id}`)
         thead
             tr
                 th
-                    a(onclick="sortTable(0)") ID
+                    a(onclick=`sortTable(0, "${inventory_table_id}")`) ID
                 th
-                    a(onclick="sortTable(1)") Beskrivelse
+                    a(onclick=`sortTable(1, "${inventory_table_id}")`) Beskrivelse
                 th
-                    a(onclick="sortTable(2)") Kategori
+                    a(onclick=`sortTable(2, "${inventory_table_id}")`) Kategori
                 th
-                    a(onclick="sortTable(3)") Sist lånt
+                    a(onclick=`sortTable(3, "${inventory_table_id}")`) Sist lånt
                 th
-                    a(onclick="sortTable(4)") Status
+                    a(onclick=`sortTable(4, "${inventory_table_id}")`) Rediger
         tbody
             if !inventory
                 tr
@@ -53,14 +62,21 @@ block main
                             else
                                 = "Aldri"
                         td
-                            a(onclick=`updateEditItemModal("${item.name}","${item.description}","${item.category}"); openModal('edit_item');`) Rediger
+                            a(onclick=`updateEditItemModal("${item.name}","${item.description}","${item.category}"); openModal('${edit_item_modal_id}');`) Rediger
                             if !item.available
                                 a(href="#" + item.id) &nbsp;|&nbsp;Levert
 
     center
-        p#search_results_count
+        p#search_results_text
 
-    .modal#add_item
+    .modal(id=`${add_item_modal_id}`)
         include modals/add_item
-    .modal#edit_item
+    .modal(id=`${edit_item_modal_id}`)
         include modals/edit_item
+
+    // Sort table on page load
+    script
+        != `window.onload = function (){`
+        != `sortTable(0, "${inventory_table_id}");`
+        != `updateResultsCounter("#${inventory_table_id} tr");`
+        != `}`

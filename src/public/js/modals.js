@@ -8,10 +8,11 @@ function openModal(id) {
   modal.classList.add("modal-open");
 }
 
-function closeModal(id, confirm_close = false, callback = null) {
+function closeModal(id, confirm_close = false) {
   /**
    * Closes a modal
    * @param id - The id of the modal to close
+   * @param confirm_close - Whether or not to confirm closing the modal
    * @type {HTMLElement}
    */
   let modal = document.getElementById(id);
@@ -23,8 +24,4 @@ function closeModal(id, confirm_close = false, callback = null) {
   }
 
   modal.classList.remove("modal-open");
-
-  if (callback) {
-    callback();
-  }
 }
