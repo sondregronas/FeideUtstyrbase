@@ -9,61 +9,66 @@ const registered_users_table = "registered_users";
 const inventory_table = "inventory";
 const rented_items_table = "rented_items";
 
-const feideQuery = `CREATE TABLE IF NOT EXISTS ${feide_table} (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      sub TEXT NOT NULL,
-      name TEXT NOT NULL,
-      email TEXT NOT NULL,
-      picture TEXT,
-      affiliation TEXT NOT NULL,
-      org TEXT NOT NULL,
-      UNIQUE(sub)
-    );`;
+const feideQuery = `CREATE TABLE IF NOT EXISTS ${feide_table}
+                    (
+                        id          INTEGER PRIMARY KEY AUTOINCREMENT,
+                        sub         TEXT NOT NULL,
+                        name        TEXT NOT NULL,
+                        email       TEXT NOT NULL,
+                        picture     TEXT,
+                        affiliation TEXT NOT NULL,
+                        org         TEXT NOT NULL,
+                        UNIQUE (sub)
+                    );`;
 
-const classroomsQuery = `CREATE TABLE IF NOT EXISTS ${classrooms_table} (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      name TEXT NOT NULL,
-      classroom_teacher TEXT,
-      UNIQUE(name)
-    );`;
+const classroomsQuery = `CREATE TABLE IF NOT EXISTS ${classrooms_table}
+                         (
+                             id                INTEGER PRIMARY KEY AUTOINCREMENT,
+                             name              TEXT NOT NULL,
+                             classroom_teacher TEXT,
+                             UNIQUE (name)
+                         );`;
 
-const registeredUsersQuery = `CREATE TABLE IF NOT EXISTS ${registered_users_table} (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      name TEXT NOT NULL,
-      classroom TEXT NOT NULL,
-      classroom_teacher TEXT NOT NULL,
-      school_email TEXT NOT NULL,
-      personal_email TEXT,
-      picture TEXT,
-      updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-      expires_at DATETIME NOT NULL,
-      banned BOOLEAN NOT NULL DEFAULT 0,
-      banned_reason TEXT,
-      last_banned_at DATETIME,
-      sub TEXT NOT NULL,
-      UNIQUE(sub)
-    );`;
+const registeredUsersQuery = `CREATE TABLE IF NOT EXISTS ${registered_users_table}
+                              (
+                                  id                INTEGER PRIMARY KEY AUTOINCREMENT,
+                                  name              TEXT     NOT NULL,
+                                  classroom         TEXT     NOT NULL,
+                                  classroom_teacher TEXT     NOT NULL,
+                                  school_email      TEXT     NOT NULL,
+                                  personal_email    TEXT,
+                                  picture           TEXT,
+                                  updated_at        DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                                  expires_at        DATETIME NOT NULL,
+                                  banned            BOOLEAN  NOT NULL DEFAULT 0,
+                                  banned_reason     TEXT,
+                                  last_banned_at    DATETIME,
+                                  sub               TEXT     NOT NULL,
+                                  UNIQUE (sub)
+                              );`;
 
-const inventoryQuery = `CREATE TABLE IF NOT EXISTS ${inventory_table} (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT NOT NULL,
-        description TEXT,
-        category TEXT,
-        available BOOLEAN NOT NULL DEFAULT 1,
-        last_borrowed TEXT,
-        last_checked DATETIME DEFAULT CURRENT_TIMESTAMP,
-        UNIQUE(name)
-    );`;
+const inventoryQuery = `CREATE TABLE IF NOT EXISTS ${inventory_table}
+                        (
+                            id            INTEGER PRIMARY KEY AUTOINCREMENT,
+                            name          TEXT    NOT NULL,
+                            description   TEXT,
+                            category      TEXT,
+                            available     BOOLEAN NOT NULL DEFAULT 1,
+                            last_borrowed TEXT,
+                            last_checked  DATETIME         DEFAULT CURRENT_TIMESTAMP,
+                            UNIQUE (name)
+                        );`;
 
-const rentedItemsQuery = `CREATE TABLE IF NOT EXISTS ${rented_items_table} (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        item TEXT NOT NULL,
-        sub TEXT NOT NULL,
-        rented_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        due_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        checked_in_at DATETIME,
-        UNIQUE(item, sub)
-    );`;
+const rentedItemsQuery = `CREATE TABLE IF NOT EXISTS ${rented_items_table}
+                          (
+                              id            INTEGER PRIMARY KEY AUTOINCREMENT,
+                              item          TEXT     NOT NULL,
+                              sub           TEXT     NOT NULL,
+                              rented_at     DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                              due_at        DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                              checked_in_at DATETIME,
+                              UNIQUE (item, sub)
+                          );`;
 
 function _createTable(query) {
   /**

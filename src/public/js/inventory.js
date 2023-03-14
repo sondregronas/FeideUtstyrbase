@@ -41,6 +41,13 @@ function updateEditItemModal(name, description, category) {
   response_message.classList.remove("error");
 }
 
+function resetEditModal() {
+  /**
+   * Resets the edit item modal, removing all input and response messages
+   */
+  updateEditItemModal("", "", "");
+}
+
 // TODO: This is a bit messy, but it works
 function resetAddItemModal() {
   /**
@@ -165,10 +172,18 @@ function _checkSanitizedInput(input, options = {}) {
   return valid;
 }
 
-async function saveEditChanges(modalId) {
+function closeEditModal(modalId, confirm = false) {
+  /**
+   * Closes the edit modal
+   * @param {String} modalId - The id of the modal
+   */
+  resetEditModal();
+  closeModal(modalId, confirm);
+}
+
+async function saveEditChanges() {
   /**
    * Saves changes to the currently edited item
-   * @param {String} modalId - The id of the modal
    * @returns {Promise<boolean>} - Returns true if the changes were saved successfully, false if the changes were not saved
    */
   let name = document.getElementById(edit_item_name);
@@ -188,9 +203,9 @@ async function saveEditChanges(modalId) {
   _removeFromTable(old_item_name);
   _addToTable(new_item);
   await _updateItemInDB(old_item_name, new_item, response_message);
-  // Reset the old name input
-  document.getElementById(edit_item_name_old).value = "";
-  closeModal(modalId);
+
+  response_message.classList.add("success");
+  response_message.innerHTML = `Lagret endringer for '${new_item.name}'`;
 }
 
 async function deleteItemWithConfirm() {

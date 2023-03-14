@@ -1,7 +1,7 @@
 .modal-content
     h2 Rediger
     .modal-close
-        a(onclick=`if(confirm('Vil du lagre endringene dine?')) saveEditChanges('${edit_item_modal_id}'); closeModal('${edit_item_modal_id}')`) ×
+        a(onclick=`if(confirm('Vil du lagre endringene dine?')) saveEditChanges('${edit_item_modal_id}'); closeEditModal('${edit_item_modal_id}')`) ×
 
     label(for="edit-item-name") ID
     input(type="text" id="edit-item-name" placeholder="ID" required oninput=`checkUniqueItemName(this, [${existing_items}]);`)
@@ -15,6 +15,6 @@
 
     p#edit-item-response-message Obs! Alle feltene er påkrevd
 
-    button.btn-danger(type="button" onclick=`if(deleteItemWithConfirm()) closeModal('${edit_item_modal_id}');`) Slett
+    button.btn-danger(type="button" onclick=`if(deleteItemWithConfirm()) closeEditModal('${edit_item_modal_id}');`) Slett
     button(type="button" onclick=`saveEditChanges('${edit_item_modal_id}');`) Lagre
-    button(type="button" onclick=`closeModal('${edit_item_modal_id}', true);`) Avslutt uten å lagre
+    button(type="button" onclick=`closeEditModal('${edit_item_modal_id}', true);`) Avslutt uten å lagre

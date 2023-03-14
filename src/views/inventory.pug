@@ -32,16 +32,11 @@ block main
     table(id=`${inventory_table_id}`)
         thead
             tr
-                th
-                    a(onclick=`sortTable(0, "${inventory_table_id}")`) ID
-                th
-                    a(onclick=`sortTable(1, "${inventory_table_id}")`) Beskrivelse
-                th
-                    a(onclick=`sortTable(2, "${inventory_table_id}")`) Kategori
-                th
-                    a(onclick=`sortTable(3, "${inventory_table_id}")`) Sist lånt
-                th
-                    a(onclick=`sortTable(4, "${inventory_table_id}")`) Rediger
+                th!=`<a onclick="sortTable(0, '${inventory_table_id}')">ID</a>`
+                th!=`<a onclick="sortTable(1, '${inventory_table_id}')">Beskrivelse</a>`
+                th!=`<a onclick="sortTable(2, '${inventory_table_id}')">Kategori</a>`
+                th!=`<a onclick="sortTable(3, '${inventory_table_id}')">Sist lånt</a>`
+                th!=`<a onclick="sortTable(4, '${inventory_table_id}')">Rediger</a>`
         tbody
             if !inventory
                 tr
