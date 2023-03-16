@@ -3,11 +3,12 @@ extends layout
 block single_head
     script(src="/js/inventory.js" defer)
     script(src="/js/tables.js" defer)
-
+    script(src="/js/print-label.js" defer)
 block main
     - let inventory_table_id = "inventory-table";
     - let edit_item_modal_id = "edit_item";
     - let add_item_modal_id = "add_item";
+    - let print_label_modal_id = "print_label";
     - let existing_items = inventory.map(item => `'${item.name}'`).join(", ");
 
     h1 Inventar
@@ -57,7 +58,10 @@ block main
                             else
                                 = "Aldri"
                         td
-                            a(onclick=`updateEditItemModal("${item.name}","${item.description}","${item.category}"); openModal('${edit_item_modal_id}');`) Rediger
+                            - let itemstr = `"${item.name}","${item.description}","${item.category}"`;
+                            a(onclick=`updateEditItemModal(${itemstr}); openModal('${edit_item_modal_id}');`) Rediger
+                            span &nbsp;|&nbsp;
+                            a(onclick=`updatePrintModal(${itemstr}); openModal('${print_label_modal_id}');`) Etikett
                             if !item.available
                                 a(href="#" + item.id) &nbsp;|&nbsp;Levert
 
@@ -68,6 +72,8 @@ block main
         include modals/add_item
     .modal(id=`${edit_item_modal_id}`)
         include modals/edit_item
+    .modal(id=`${print_label_modal_id}`)
+        include modals/print_label
 
     // Sort table on page load
     script

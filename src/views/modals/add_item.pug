@@ -13,7 +13,18 @@
     label(for="add-item-category") Kategori
     input(type="text" id="add-item-category" placeholder="Kategori (Kamera, Lys, Stativ, etc.)" required)
 
+    table
+        tr
+            td
+                label(for="add-item-label-variant") Print etikett?
+                select(id="add-item-label-variant")
+                    option(value="qr" selected) QR-kode
+                    option(value="barcode") Strekkode
+            td
+                label(for="add-item-label-amount") Antall etiketter
+                input(type="number" id="add-item-label-amount" placeholder="Antall etiketter" value=0 oninput="enforceMinMax(this, 0, 20);")
+
     p#add-item-response-message Obs! Alle feltene er påkrevd
 
-    button(type="button" onclick="addItem()") Legg til
+    button(type="button" onclick=`addItem(); printLabel("add-item-name", "add-item-description", "add-item-label-variant", "add-item-label-amount");`) Legg til
     button(type="button" onclick=`closeModal('${add_item_modal_id}')`) Ferdig

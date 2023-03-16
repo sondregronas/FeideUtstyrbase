@@ -1,0 +1,21 @@
+.modal-content
+    h2 Print etikett
+    .modal-close
+        a(onclick=`closeModal('${print_label_modal_id}')`) ×
+
+    input(type="hidden" id="print-label-item-id")
+    input(type="hidden" id="print-label-item-name")
+
+    center
+        #label-preview(style="height:150px;")
+
+    label(for="print-label-variant") Etiketttype
+    select(id="print-label-variant" onchange="updateLabelPreview();")
+        option(value="qr" selected) QR-kode
+        option(value="barcode") Strekkode
+
+    label(for="print-label-amount") Antall etiketter
+    input(type="number" id="print-label-amount" placeholder="Antall etiketter" required value=1 oninput="enforceMinMax(this, 1, 20);")
+
+    button(type="button" onclick=`printLabel("print-label-item-id", "print-label-item-name", "print-label-variant", "print-label-amount"); closeModal('${print_label_modal_id}');`) Print
+    button(type="button" onclick=`closeModal('${print_label_modal_id}');`) Avslutt
