@@ -24,26 +24,18 @@ function updateLabelPreview() {
    * Updates the label preview
    * @returns {void} - but should update the label preview image
    */
-  console.log("Updating label preview...");
   let item_id = document.getElementById("print-label-item-id").value;
   let item_name = document.getElementById("print-label-item-name").value;
   let variant = document.getElementById("print-label-variant").value;
 
-  let preview_endpoint = `${printserver}/preview_raw?id=${item_id}&name=${item_name}&variant=${variant}`;
-  let print_preview_container = document.getElementById("label-preview");
+  let preview_endpoint = `${printserver}/preview?id=${item_id}&name=${item_name}&variant=${variant}`;
+  let print_preview = document.getElementById("label-preview");
 
-  // Delete old preview
-  while (print_preview_container.firstChild) {
-    print_preview_container.removeChild(print_preview_container.firstChild);
-  }
-
-  let preview = document.createElement("img");
-  preview.src = preview_endpoint;
-  preview.style.backgroundColor = "white";
-  preview.style.aspectRatio = "90/29";
-  preview.style.height = print_preview_container.style.height;
-
-  print_preview_container.appendChild(preview);
+  fetch(preview_endpoint)
+    .then((r) => r.blob())
+    .then((blob) => {
+      print_preview.src = URL.createObjectURL(blob);
+    });
 }
 
 function printLabel(
