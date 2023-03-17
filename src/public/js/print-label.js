@@ -1,19 +1,17 @@
 const printserver = "http://localhost:5000";
 
-function updatePrintModal(item_id, item_name, category = null) {
+function updatePrintModal(item) {
   /**
-   * Updates the print modal with the item id and name
-   * @param item_id - The id of the item
-   * @param item_name - The name of the item
-   * @param category - The category of the item (unused)
+   * Updates the print modal with the item data
+   * @param item - The item object
    * @returns {void} - but should update the print modal values
    */
   let print_id = document.getElementById("print-label-item-id");
   let print_name = document.getElementById("print-label-item-name");
   let print_amount = document.getElementById("print-label-amount");
 
-  print_id.value = item_id;
-  print_name.value = item_name;
+  print_id.value = decodeURIComponent(item.name);
+  print_name.value = decodeURIComponent(item.description);
   print_amount.value = 1;
 
   updateLabelPreview();
@@ -46,6 +44,10 @@ function printLabel(
 ) {
   /**
    * Sends a print job to the printer, if the input is valid
+   * @param input_id - The id of the input field for the item id
+   * @param input_name - The id of the input field for the item name
+   * @param input_variant - The id of the input field for the item variant
+   * @param input_amount - The id of the input field for the item amount
    * @returns {void} - but should physically print a label
    */
   let item_id = document.getElementById(input_id).value;
@@ -78,19 +80,4 @@ function printLabel(
       console.log("Label printing failed");
     }
   });
-}
-
-function enforceMinMax(element, min, max) {
-  /**
-   * Enforces a minimum and maximum value for an input element
-   * @param element - The input element
-   * @param min - The minimum value
-   * @param max - The maximum value
-   * @returns {void} - Sets the value of the input element to the min or max if it is out of bounds
-   */
-  if (element.value < min) {
-    element.value = min;
-  } else if (element.value > max) {
-    element.value = max;
-  }
 }

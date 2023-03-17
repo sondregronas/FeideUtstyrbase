@@ -82,9 +82,12 @@ app.get("/edugear", (req, res) => {
 
 app.get("/inventory", async (req, res) => {
   res.render("inventory", {
-    inventory: await db.getInventoryItems(),
     ...router_utils.getUserStatus(req),
   });
+});
+
+app.get("/inventory/fetch", async (req, res) => {
+  res.send(await db.getInventoryItems());
 });
 
 app.post("/inventory/add", (req, res) => {

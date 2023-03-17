@@ -19,12 +19,15 @@ function addFeideUser(data) {
 
   // If the user already exists, remove it first
   if (readFeideUser(data.openid.sub)) {
-    let stmt = db.prepare(`DELETE FROM ${dbutils.feide_table} WHERE sub = ?`);
+    let stmt = db.prepare(`DELETE
+                           FROM ${dbutils.feide_table}
+                           WHERE sub = ?`);
     stmt.run(data.openid.sub);
   }
 
   let stmt = db.prepare(
-    `INSERT INTO ${dbutils.feide_table} (sub, name, email, picture, affiliation, org) VALUES (?, ?, ?, ?, ?, ?)`
+    `INSERT INTO ${dbutils.feide_table} (sub, name, email, picture, affiliation, org)
+     VALUES (?, ?, ?, ?, ?, ?)`
   );
   stmt.run(
     data.openid.sub,
@@ -47,7 +50,9 @@ function readFeideUser(sub) {
    */
   let db = new Sqlitedb(database, db_options);
 
-  let stmt = db.prepare(`SELECT * FROM ${dbutils.feide_table} WHERE sub = ?`);
+  let stmt = db.prepare(`SELECT *
+                         FROM ${dbutils.feide_table}
+                         WHERE sub = ?`);
   let user = stmt.get(sub);
 
   db.close();
@@ -64,7 +69,9 @@ function validateUser(sub) {
    */
   let db = new Sqlitedb(database, db_options);
 
-  let stmt = db.prepare(`SELECT * FROM ${dbutils.feide_table} WHERE sub = ?`);
+  let stmt = db.prepare(`SELECT *
+                         FROM ${dbutils.feide_table}
+                         WHERE sub = ?`);
   let user = stmt.get(sub);
 
   db.close();
@@ -82,7 +89,10 @@ function getEmployeeFromName(name) {
   let db = new Sqlitedb(database, db_options);
 
   let stmt = db.prepare(
-    `SELECT * FROM ${dbutils.feide_table} WHERE name = ? AND affiliation = 'employee'`
+    `SELECT *
+     FROM ${dbutils.feide_table}
+     WHERE name = ?
+       AND affiliation = 'employee'`
   );
   let teacher = stmt.get(name);
 
@@ -100,7 +110,9 @@ function fetchEmployees() {
   let db = new Sqlitedb(database, db_options);
 
   let stmt = db.prepare(
-    `SELECT * FROM ${dbutils.feide_table} WHERE affiliation = 'employee'`
+    `SELECT *
+     FROM ${dbutils.feide_table}
+     WHERE affiliation = 'employee'`
   );
   let teachers = stmt.all();
 
@@ -137,13 +149,24 @@ function addRegisteredUser(sub, classroom, classroom_teacher, personal_email) {
   //if (!teacher) throw new Error("Teacher not found in admins table");
 
   let stmt = db.prepare(
-    `INSERT INTO ${dbutils.registered_users_table} (name, classroom, classroom_teacher, school_email, personal_email, picture, updated_at, expires_at, sub) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
+    `INSERT INTO ${dbutils.registered_users_table} (name, classroom, classroom_teacher, school_email, personal_email,
+                                                    picture, updated_at, expires_at, sub)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
   );
 
   // If the user already exists, update it instead
   if (readRegisteredUser(sub)) {
     stmt = db.prepare(
-      `UPDATE ${dbutils.registered_users_table} SET name = ?, classroom = ?, classroom_teacher = ?, school_email = ?, personal_email = ?, picture = ?, updated_at = ?, expires_at = ? WHERE sub = ?`
+      `UPDATE ${dbutils.registered_users_table}
+       SET name              = ?,
+           classroom         = ?,
+           classroom_teacher = ?,
+           school_email      = ?,
+           personal_email    = ?,
+           picture           = ?,
+           updated_at        = ?,
+           expires_at        = ?
+       WHERE sub = ?`
     );
   }
 
@@ -175,7 +198,9 @@ function readRegisteredUser(sub) {
   let db = new Sqlitedb(database, db_options);
 
   let stmt = db.prepare(
-    `SELECT * FROM ${dbutils.registered_users_table} WHERE sub = ?`
+    `SELECT *
+     FROM ${dbutils.registered_users_table}
+     WHERE sub = ?`
   );
   let user = stmt.get(sub);
 
@@ -193,7 +218,9 @@ function readAllActiveUsers(only_active = true) {
   let db = new Sqlitedb(database, db_options);
 
   let stmt = db.prepare(
-    `SELECT * FROM ${dbutils.registered_users_table} WHERE expires_at > ?`
+    `SELECT *
+     FROM ${dbutils.registered_users_table}
+     WHERE expires_at > ?`
   );
 
   let users = stmt.all(only_active ? new Date().getTime() : 0);
@@ -221,7 +248,8 @@ function addInventoryItem(item) {
 
   try {
     let stmt = db.prepare(
-      `INSERT INTO ${dbutils.inventory_table} (name, description, category, available, last_borrowed, last_checked) VALUES (?, ?, ?, ?, ?, ?)`
+      `INSERT INTO ${dbutils.inventory_table} (name, description, category, available, last_borrowed, last_checked)
+       VALUES (?, ?, ?, ?, ?, ?)`
     );
     stmt.run(
       item.name,
@@ -250,7 +278,10 @@ function getInventoryItems() {
    */
   let db = new Sqlitedb(database, db_options);
 
-  let stmt = db.prepare(`SELECT * FROM ${dbutils.inventory_table}`);
+  let stmt = db.prepare(`SELECT *
+                         FROM ${dbutils.inventory_table}
+                         ORDER BY LOWER(name)`);
+
   let items = stmt.all();
 
   items.forEach((item) => {
@@ -273,7 +304,9 @@ function updateItemLastBorrowed(name, last_borrowed) {
   let db = new Sqlitedb(database, db_options);
 
   let stmt = db.prepare(
-    `UPDATE ${dbutils.inventory_table} SET last_borrowed = ? WHERE name = ?`
+    `UPDATE ${dbutils.inventory_table}
+     SET last_borrowed = ?
+     WHERE name = ?`
   );
   stmt.run(JSON.stringify(last_borrowed), name);
 
@@ -291,7 +324,11 @@ function updateInventoryItemBasic(old_name, new_item) {
   let db = new Sqlitedb(database, db_options);
 
   let stmt = db.prepare(
-    `UPDATE ${dbutils.inventory_table} SET name = ?, description = ?, category = ? WHERE name = ?`
+    `UPDATE ${dbutils.inventory_table}
+     SET name        = ?,
+         description = ?,
+         category    = ?
+     WHERE name = ?`
   );
   stmt.run(
     new_item.name,
@@ -313,7 +350,9 @@ function removeInventoryItem(name) {
   let db = new Sqlitedb(database, db_options);
 
   let stmt = db.prepare(
-    `DELETE FROM ${dbutils.inventory_table} WHERE name = ?`
+    `DELETE
+     FROM ${dbutils.inventory_table}
+     WHERE name = ?`
   );
   stmt.run(name);
 

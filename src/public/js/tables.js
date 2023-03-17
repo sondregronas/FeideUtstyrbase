@@ -125,3 +125,18 @@ function updateResultsCounter(
   let shownCount = shown.length - (hasHeader ? 1 : 0);
   element.innerHTML = `Viser ${shownCount} av ${totalCount} elementer`;
 }
+
+function enforceMinMax(element, min, max) {
+  /**
+   * Enforces a minimum and maximum value for an input element
+   * @param element - The input element
+   * @param min - The minimum value
+   * @param max - The maximum value
+   * @returns {void} - Sets the value of the input element to the min or max if it is out of bounds
+   */
+  if (element.value < min) {
+    element.value = min;
+  } else if (element.value > max) {
+    element.value = max;
+  }
+}

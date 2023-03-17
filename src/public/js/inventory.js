@@ -1,6 +1,12 @@
-let new_items = [];
+let used_names = [];
 
 let table_id = "inventory-table";
+
+let edit_item_modal_id = "edit_item";
+let add_item_modal_id = "add_item";
+let print_label_modal_id = "print_label";
+
+let search_input_id = "search";
 
 let edit_item_name = "edit-item-name";
 let edit_item_name_old = "edit-item-name_old";
@@ -15,25 +21,30 @@ let add_item_name = "add-item-name";
 let add_item_description = "add-item-description";
 let add_item_category = "add-item-category";
 let add_item_response_message = "add-item-response-message";
+let add_item_label_variant = "add-item-label-variant";
+let add_item_label_amount = "add-item-label-amount";
 let add_item_default_response_message_text = document.getElementById(
   add_item_response_message
 ).innerHTML;
 
 // TODO: This is a bit messy, but it works
-function updateEditItemModal(name, description, category) {
+function updateEditItemModal(item) {
   /**
    * Updates the edit item modal with the item's data
-   * @param name - The name of the item
-   * @param description - The description of the item
-   * @param category - The category of the item
+   * @param item - The item to update the modal with
    * @returns {void} - Updates the modal
    */
   let edit_name = document.getElementById(edit_item_name);
-  edit_name.value = name;
+
+  let id = decodeURIComponent(item.name);
+  let name = decodeURIComponent(item.description);
+  let category = decodeURIComponent(item.category);
+
+  edit_name.value = id;
   edit_name.removeAttribute("aria-invalid");
   edit_name.removeAttribute("aria-describedby");
-  document.getElementById(edit_item_name_old).value = name;
-  document.getElementById(edit_item_description).value = description;
+  document.getElementById(edit_item_name_old).value = id;
+  document.getElementById(edit_item_description).value = name;
   document.getElementById(edit_item_category).value = category;
   let response_message = document.getElementById(edit_item_response_message);
   response_message.innerHTML = edit_item_default_response_message_text;
@@ -66,15 +77,13 @@ function resetAddItemModal() {
   response_message.classList.remove("error");
 }
 
-function checkUniqueItemName(input, used_names) {
+function checkUniqueItemName(input) {
   /**
    * Checks if the input is a valid name, and that the name is not already in use.
    * @param {HTMLInputElement} input
    * @param {Array} used_names - Array of names that are already in use
    * @returns {Boolean} - Returns true if input is valid, false if input is invalid, and sets aria-invalid and aria-describedby attributes on input
    */
-  used_names = used_names.concat(new_items.map((item) => item.name));
-
   // If the input is the same as the old name, it is valid
   if (input.value === document.getElementById(edit_item_name_old).value) {
     input.setAttribute("aria-invalid", "false");
@@ -200,10 +209,9 @@ async function saveEditChanges() {
 
   if (!_verifyItemForm(name, description, category, response_message)) return;
 
-  _removeFromTable(old_item_name);
-  _addToTable(new_item);
   await _updateItemInDB(old_item_name, new_item, response_message);
 
+  updateTable();
   response_message.classList.add("success");
   response_message.innerHTML = `Lagret endringer for '${new_item.name}'`;
 }
@@ -265,43 +273,81 @@ async function _removeItemFromDB(name) {
   });
   let data = await response.json();
   if (data.success) {
-    _removeFromTable(name);
-  }
-}
-
-function _removeFromTable(name) {
-  /**
-   * Removes an item from the table, user should still refresh the page to see the changes
-   * @param name - The name of the item to remove
-   * @returns {void} - Removes the item from the table (NOTE: Does not remove the item from the database)
-   * @type {HTMLElement}
-   */
-  let table = document.getElementById(table_id);
-  for (let i = 0; i < table.rows.length; i++) {
-    if (table.rows[i].cells[0].innerHTML.toLowerCase() === name.toLowerCase()) {
-      table.deleteRow(i);
-      break;
-    }
+    updateTable();
   }
 }
 
 function _addToTable(item) {
   /**
-   * Adds an item to the table, user should still refresh the page to see the changes
-   * @param item - The item object
-   * @returns {void} - Adds the item to the table (NOTE: Does not add the item to the database)
+   * Adds an item to the table
+   * @param item - The item to add to the table
+   * @returns {HTMLTableRowElement} - Returns the row element that was added to the table
    */
   let table = document.getElementById(table_id);
-  let row = table.insertRow(-1);
+  let tbody = table.getElementsByTagName("tbody")[0];
+  let row = tbody.insertRow(-1);
+
+  let last_borrowed = "Aldri";
+  if (item.last_borrowed) {
+    let date = new Date(item.last_borrowed.date).toLocaleDateString(locale, {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+    last_borrowed = `${item.last_borrowed.name} (${item.last_borrowed.classroom}) - ${date}`;
+  }
+
+  let parameters = JSON.stringify({
+    name: encodeURIComponent(item.name),
+    description: encodeURIComponent(item.description),
+    category: encodeURIComponent(item.category),
+  });
+  parameters = parameters.replace(/"/g, "&quot;");
+
+  // Edit button
+  let options = `<a onclick="updateEditItemModal(${parameters}); openModal('${edit_item_modal_id}');">Rediger</a>`;
+  // Print button
+  options = `${options}&nbsp;|&nbsp<a onclick="updatePrintModal(${parameters}); openModal('${print_label_modal_id}');">Etikett</a>`;
+  // Register as available button
+  if (item.available) {
+    options = `${options}&nbsp;|&nbsp<a href="#Not-Implemented"'>Lever</a>`;
+  }
+
   row.insertCell(0).innerHTML = item.name;
   row.insertCell(1).innerHTML = item.description;
   row.insertCell(2).innerHTML = item.category;
-  row.insertCell(3).innerHTML = "Ukjent";
-  row.insertCell(4).innerHTML = "Nylig endret";
+  row.insertCell(3).innerHTML = last_borrowed;
+  row.insertCell(4).innerHTML = options;
+}
+
+function updateTable() {
+  /**
+   * Updates the table with the items from the database, and updates the results counter
+   * Call this function after adding, modifying or removing an item
+   */
+  fetch("/inventory/fetch")
+    .then((response) => response.json())
+    .then((data) => {
+      let table = document.getElementById(table_id);
+      let tbody = table.getElementsByTagName("tbody")[0];
+      tbody.innerHTML = "";
+      used_names = [];
+      data.forEach((item) => {
+        used_names.push(item.name);
+        _addToTable(item);
+      });
+      updateResultsCounter(`#${table_id} tr`);
+      searchTable(document.getElementById(search_input_id).value, table_id);
+    });
 }
 
 // TODO: This function does too much, split it up?
 async function addItem() {
+  /**
+   * Adds an item to the database, provided the form is valid, then updates the table
+   * also prints a label for the item if the user specified an amount
+   * @returns {Promise<void>} - Adds the item to the database, and updates the table
+   */
   let name = document.getElementById(add_item_name);
   let description = document.getElementById(add_item_description);
   let category = document.getElementById(add_item_category);
@@ -317,24 +363,36 @@ async function addItem() {
     available: true,
   };
 
-  let response = await fetch("/inventory/add", {
+  let result = await fetch("/inventory/add", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
     body: JSON.stringify(item),
   });
-  let data = await response.json();
-  if (data.success) {
-    response_message.classList.add("success");
-    response_message.innerHTML = data.message;
-    new_items.push(item);
-    _addToTable(item);
-    name.value = "";
-    description.value = "";
-    category.value = "";
-  } else {
-    response_message.classList.add("error");
-    response_message.innerHTML = data.message;
-  }
+  result.json().then(
+    (data) => {
+      response_message.classList.add("success");
+      response_message.innerHTML = data.message;
+      // Print label if amount is specified
+      if (document.getElementById(add_item_label_amount).value) {
+        response_message.innerHTML = `${response_message.innerHTML} - sender jobb til printer...`;
+        printLabel(
+          add_item_name,
+          add_item_description,
+          add_item_label_variant,
+          add_item_label_amount
+        );
+      }
+      // Clear form & update table
+      name.value = "";
+      description.value = "";
+      category.value = "";
+      updateTable();
+    },
+    (error) => {
+      response_message.classList.add("error");
+      response_message.innerHTML = data.message;
+    }
+  );
 }

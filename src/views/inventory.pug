@@ -9,7 +9,6 @@ block main
     - let edit_item_modal_id = "edit_item";
     - let add_item_modal_id = "add_item";
     - let print_label_modal_id = "print_label";
-    - let existing_items = inventory.map(item => `'${item.name}'`).join(", ");
 
     h1 Inventar
     p Obs: Dersom du redigerer eller legger til elementer er det lurt å oppdatere siden, da det kan være at noe ikke fungerer som det skal.
@@ -39,31 +38,9 @@ block main
                 th!=`<a onclick="sortTable(3, '${inventory_table_id}')">Sist lånt</a>`
                 th!=`<a onclick="sortTable(4, '${inventory_table_id}')">Rediger</a>`
         tbody
-            if !inventory
-                tr
-                    td Her var det helt tomt 😢
-                    td
-                    td
-                    td
-                    td
-            else
-                for item in inventory
-                    tr
-                        td= item.name
-                        td= item.description
-                        td= item.category
-                        td
-                            if item.last_borrowed
-                                = `${item.last_borrowed.name} (${item.last_borrowed.classroom}) - ${new Date(item.last_borrowed.date).toLocaleDateString(locale, {year: "numeric", month: "long", day: "numeric"})}`
-                            else
-                                = "Aldri"
-                        td
-                            - let itemstr = `"${item.name}","${item.description}","${item.category}"`;
-                            a(onclick=`updateEditItemModal(${itemstr}); openModal('${edit_item_modal_id}');`) Rediger
-                            span &nbsp;|&nbsp;
-                            a(onclick=`updatePrintModal(${itemstr}); openModal('${print_label_modal_id}');`) Etikett
-                            if !item.available
-                                a(href="#" + item.id) &nbsp;|&nbsp;Levert
+            tr
+                td(colspan=5)
+                    p(style="text-align:center;") Laster...
 
     center
         p#search_results_text
@@ -78,7 +55,7 @@ block main
     // Sort table on page load
     script
         != `window.onload = function (){`
-        != `sortTable(0, "${inventory_table_id}");`
+        != `updateTable();`
         != `updateResultsCounter("#${inventory_table_id} tr");`
         != `updateLabelPreview();`
         != `}`
