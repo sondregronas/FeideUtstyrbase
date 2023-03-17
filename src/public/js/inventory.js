@@ -375,7 +375,7 @@ async function addItem() {
       response_message.classList.add("success");
       response_message.innerHTML = data.message;
       // Print label if amount is specified
-      if (document.getElementById(add_item_label_amount).value) {
+      if (document.getElementById(add_item_label_amount).value > 0) {
         response_message.innerHTML = `${response_message.innerHTML} - sender jobb til printer...`;
         printLabel(
           add_item_name,
