@@ -1,7 +1,7 @@
 .modal-content
     h2 Rediger
     .modal-close
-        a(onclick=`if(confirm('Vil du lagre endringene dine?')) saveEditChanges('${edit_item_modal_id}'); closeEditModal('${edit_item_modal_id}')`) ×
+        a(onclick=`closeEditModal('${edit_item_modal_id}')`) ×
 
     label(for="edit-item-name") ID
     input(type="text" id="edit-item-name" placeholder="ID" required oninput=`checkUniqueItemName(this, [${existing_items}]);`)
