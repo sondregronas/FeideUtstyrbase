@@ -45,7 +45,8 @@ app.get("/login", (req, res) => {
 
 if (secrets.kiosk_enabled) {
   app.get("/kiosk", (req, res) => {
-    if (req.session.logged_in) {
+    let valid_r = secrets.kiosk_use_fqdn && req.hostname !== secrets.kiosk_fqdn;
+    if (req.session.logged_in || valid_r) {
       res.redirect("/");
       return;
     }
@@ -53,7 +54,8 @@ if (secrets.kiosk_enabled) {
   });
 
   app.post("/kiosk_login", async (req, res) => {
-    if (req.session.logged_in) {
+    let valid_r = secrets.kiosk_use_fqdn && req.hostname !== secrets.kiosk_fqdn;
+    if (req.session.logged_in || valid_r) {
       res.redirect("/");
       return;
     }

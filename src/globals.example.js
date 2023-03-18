@@ -24,6 +24,9 @@ const session_secret = hash("R@nd0mStr1ng"); // This is a random string, be sure
 const devmode = false;
 
 const kiosk_enabled = false;
+const kiosk_use_fqdn = false; // If true, kiosk login will only be available on the FQDN specified below,
+const kiosk_fqdn = "localhost"; // allowing access to be limited through a proxy or similar.
+
 const kiosk_username = "kiosk";
 const kiosk_password = hash("kiosk");
 
@@ -49,6 +52,8 @@ module.exports = {
   transporter_options,
   mail_user,
   hash,
+  kiosk_use_fqdn,
+  kiosk_fqdn,
   kiosk_username,
   kiosk_password,
   kiosk_enabled,
