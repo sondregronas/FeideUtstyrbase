@@ -1,6 +1,6 @@
 .modal-content
     .modal-close
-        a(onclick="if(confirm('Er du sikker på at du vil lukke vinduet?')) closeModal('user-select')") ×
+        a(onclick="closeModal('user-select')") ×
 
     input(id="user-search" type="text" placeholder="Søk etter elev" oninput="filterStudents(this.value)")
     #user-list

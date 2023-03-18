@@ -1,0 +1,11 @@
+extends layout
+
+block main
+	hgroup
+		h1 Utstyrsbooking
+		h2 En ny plattform for å håndtere utstyrsbooking på skolen
+	form(method="post" action="/kiosk_login")
+		input(type="text" name="username" placeholder="Brukernavn")
+		input(type="password" name="password" placeholder="Passord")
+		input(type="submit" value="Logg inn")
+		p.error #{error || ""}

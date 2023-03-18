@@ -6,6 +6,10 @@ const feide = require("./feide");
 const db = require("./database");
 const router_utils = require("./router_utils");
 
+let protected_routes = ["/edugear", "/register"];
+const employee_routes = ["/inventory", "/inventory/*"];
+protected_routes = protected_routes.concat(employee_routes);
+
 function getExpressApp() {
   let app = express();
 
@@ -26,8 +30,11 @@ function getExpressApp() {
 
   // Ensure that the user is logged in before accessing the protected routes
   if (!secrets.devmode) {
-    const protected_routes = ["/edugear", "/register"];
     app.use(protected_routes, async (req, res, next) => {
+      if (req.session.kiosk_logged_in) {
+        next();
+        return;
+      }
       try {
         res.locals.openid = await feide.getClientInfo(req.session.token, true);
       } catch (e) {
@@ -40,11 +47,15 @@ function getExpressApp() {
     });
 
     // Employees only routes
-    const employee_routes = ["/edugear", "/inventory", "/inventory/*"];
     app.use(employee_routes, async (req, res, next) => {
-      let affiliation = await db.readFeideUser(res.locals.openid.sub)
-        .affiliation;
-      if (affiliation !== "employee") {
+      if (req.session.kiosk_logged_in) {
+        next();
+        return;
+      }
+
+      let sub = res.locals.openid.sub;
+      let affiliation = (await db.readFeideUser(sub).affiliation) || undefined;
+      if (affiliation !== "employee" && !req.session.kiosk_logged_in) {
         res.status(403).render("403", { ...router_utils.getUserStatus(req) });
         return;
       }

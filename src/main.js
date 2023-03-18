@@ -28,6 +28,7 @@ app.get("/auth", async (req, res) => {
 
     // Save the access token in the session
     req.session.token = accessToken;
+    req.session.logged_in = true;
 
     // Redirect the user to the correct page, based on their affiliation
     res.redirect(router_utils.getRedirectPath(affiliation));
@@ -42,8 +43,47 @@ app.get("/login", (req, res) => {
   res.redirect(feide.OAuthURL);
 });
 
+if (secrets.kiosk_enabled) {
+  app.get("/kiosk", (req, res) => {
+    if (req.session.logged_in) {
+      res.redirect("/");
+      return;
+    }
+    res.render("kiosk_login");
+  });
+
+  app.post("/kiosk_login", async (req, res) => {
+    if (req.session.logged_in) {
+      res.redirect("/");
+      return;
+    }
+
+    let { username, password } = req.body;
+    username = username.toLowerCase();
+    password = secrets.hash(password);
+
+    if (
+      password !== secrets.kiosk_password ||
+      username !== secrets.kiosk_username
+    ) {
+      res.render("kiosk_login", { error: "Feil brukernavn eller passord" });
+      return;
+    }
+
+    req.session.kiosk_logged_in = true;
+    req.session.logged_in = true;
+    res.redirect("/edugear");
+  });
+}
+
 app.get("/logout", async (req, res) => {
+  let kiosk = !!req.session.kiosk_logged_in;
   req.session.destroy();
+
+  if (kiosk) {
+    res.redirect("/");
+    return;
+  }
   res.redirect(`https://auth.dataporten.no/openid/endsession`);
 });
 
@@ -55,6 +95,8 @@ app.get("/register", async (req, res) => {
     feideUser = await db.readFeideUser(res.locals.openid.sub);
   } catch (e) {
     console.log("Error reading feide user: " + e);
+    res.redirect("/");
+    return;
   }
   res.render("register", {
     feide: feideUser,

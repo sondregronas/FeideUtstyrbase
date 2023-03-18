@@ -23,6 +23,10 @@ const redirect_uri = "http://localhost:3000/auth";
 const session_secret = hash("R@nd0mStr1ng"); // This is a random string, be sure to have it be obscure and unique! (The longer and more obscure the better)
 const devmode = false;
 
+const kiosk_enabled = false;
+const kiosk_username = "kiosk";
+const kiosk_password = hash("kiosk");
+
 const mail_user = "";
 let mail_password = "";
 
@@ -44,4 +48,8 @@ module.exports = {
   devmode,
   transporter_options,
   mail_user,
+  hash,
+  kiosk_username,
+  kiosk_password,
+  kiosk_enabled,
 };

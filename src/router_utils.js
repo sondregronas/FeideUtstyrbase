@@ -9,14 +9,14 @@ function getRedirectPath(affiliation) {
     case "student":
       return "/register";
     case "employee":
-      return "/register";
+      return "/edugear";
   }
   return "/logout";
 }
 
 function getUserStatus(req) {
   return {
-    logged_in: !!req.session.token,
+    logged_in: !!req.session.kiosk_logged_in || !!req.session.token,
   };
 }
 
