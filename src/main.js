@@ -5,8 +5,10 @@ let secrets = require("./globals");
 let express_utils = require("./express_utils");
 
 let { getExpressApp } = express_utils;
+let { sendMail } = require("./mail");
 
 let app = getExpressApp();
+let pug = require("pug");
 
 app.get("/", (req, res) => {
   res.render("index", { ...router_utils.getUserStatus(req) });
@@ -134,6 +136,24 @@ app.get("/lend", async (req, res) => {
     inventory: await db.getInventoryItems(),
     ...router_utils.getUserStatus(req),
     users: db.readAllActiveUsers(),
+  });
+});
+
+// Temporary as get, should be post
+app.get("/mail/send", async (req, res) => {
+  let template = `views/mail/${req.query.template}.pug`;
+  let to = req.query.to;
+  let subject = `[UTSTYRSBASE] ${req.query.subject}`;
+  let text = pug.renderFile(template);
+
+  if (!to || !subject || !text) {
+    res.send("error");
+    return;
+  }
+
+  await sendMail(to, subject, text).catch((e) => {
+    console.log(e);
+    res.send("error");
   });
 });
 
