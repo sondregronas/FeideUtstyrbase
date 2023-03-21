@@ -53,9 +53,9 @@ block main
         include modals/print_label
 
     // Sort table on page load
-    script
-        != `window.onload = function (){`
-        != `updateTable();`
-        != `updateResultsCounter("#${inventory_table_id} tr");`
-        != `updateLabelPreview();`
-        != `}`
+    script.
+        window.onload = function (){
+            updateTable();
+            updateResultsCounter("#${inventory_table_id} tr");
+            updateLabelPreview();
+        }

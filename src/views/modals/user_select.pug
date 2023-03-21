@@ -14,8 +14,7 @@
                         a(onclick=`selectStudent("${user.name}", "${user.classroom || 'Ansatt'}"); closeModal('user-select')`)=text
                     if(user.banned)
                         a.banned= text
-                        span
-                            = ` (Utestengt siden ${new Date(user.last_banned_at).toDateString()}) ${user.banned_reason}`
+                        span= ` (Utestengt siden ${new Date(user.last_banned_at).toDateString()}) ${user.banned_reason}`
     br
     button(type="button" onclick="closeModal('user-select')") Lukk
 
