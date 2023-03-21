@@ -91,11 +91,16 @@ function searchTable(searchValue, tableID = null) {
     let td = tr[i].getElementsByTagName("td")[0];
     let td1 = tr[i].getElementsByTagName("td")[1];
     let td2 = tr[i].getElementsByTagName("td")[2];
-    if (td || td1 || td2) {
+    let td3 = tr[i].getElementsByTagName("td")[3];
+    let td4 = tr[i].getElementsByTagName("td")[4];
+
+    if (td || td1 || td2 || td3 || td4) {
       if (
         td.innerHTML.toLowerCase().indexOf(filter) > -1 ||
         td1.innerHTML.toLowerCase().indexOf(filter) > -1 ||
-        td2.innerHTML.toLowerCase().indexOf(filter) > -1
+        td2.innerHTML.toLowerCase().indexOf(filter) > -1 ||
+        td3.innerHTML.toLowerCase().indexOf(filter) > -1 ||
+        td4.innerHTML.toLowerCase().indexOf(filter) > -1
       ) {
         tr[i].style.display = "";
       } else {

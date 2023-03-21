@@ -1,7 +1,7 @@
 let Sqlitedb = require("better-sqlite3");
 
 const database = "database.sqlite";
-const db_options = { verbose: console.log };
+const db_options = {verbose: console.log};
 
 const feide_table = "feide_data";
 const classrooms_table = "classrooms";
@@ -43,6 +43,9 @@ const registeredUsersQuery = `CREATE TABLE IF NOT EXISTS ${registered_users_tabl
                                   banned            BOOLEAN  NOT NULL DEFAULT 0,
                                   banned_reason     TEXT,
                                   last_banned_at    DATETIME,
+                                  last_borrowed_at  DATETIME,
+                                  times_borrowed    INTEGER  NOT NULL DEFAULT 0,
+                                  days_overdue      INTEGER  NOT NULL DEFAULT 0,
                                   sub               TEXT     NOT NULL,
                                   UNIQUE (sub)
                               );`;

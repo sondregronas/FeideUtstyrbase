@@ -1,7 +1,9 @@
 a(href="/edugear") Hjem
-a(href="/inventory") Inventar
-a(href="/lend") Lån utstyr
-a(href="/return") Levert utstyr
-a(href="/history") Historikk
-if(logged_in)
+
+if(logged_in || true)
+	a(href="/inventory") Inventar
+	a(href="/lend") Lån utstyr
+	a(href="/return") Levert utstyr
+	a(href="/users") Brukere
+	a(href="/history") Historikk
 	a(href="/logout") Logg ut

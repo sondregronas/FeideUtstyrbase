@@ -1,0 +1,46 @@
+.modal-content
+    h2 Rediger
+    .modal-close
+        a(onclick=`closeEditModal()`) ×
+
+    input(type="text" name="edit-user-sub" id="edit-user-sub" value="" hidden)
+
+    label(for="edit-user-name") Fullt navn
+    input(type="text" name="edit-user-name" id="edit-user-name" value='' disabled)
+
+    label(for="edit-user-classroom") Klasse
+    select(name="classroom" id="edit-user-classroom" required)
+        include ../conf/classroom_teachers_selector
+
+    label(for="edit-user-personal-email") Personlig e-post
+    input(type="email" name="edit-user-email" id="edit-user-personal-email" value='' placeholder="Personlig epost (valgfritt)")
+
+    label(for="classroom_teacher_disabled") Kontaktlærer
+    input(type="text" name="classroom_teacher_disabled" id="classroom_teacher_disabled" placeholder="Mangler klasse" disabled)
+    input(type="hidden" name="classroom_teacher" id="classroom_teacher" readonly="readonly")
+
+    label(for="edit-user-banned" style="display: inline-block; margin-right: 1rem;") Bannlyst
+    input(type="checkbox" name="edit-user-banned" id="edit-user-banned" value="false")
+
+    br
+    br
+
+    label(for="edit-user-banned-reason") Bannlysningsgrunn
+    input(type="text" name="edit-user-banned-reason" id="edit-user-banned-reason" placeholder="Bannlysningsgrunn (la stå tomt hvis ikke bannlyst))")
+
+    button.btn-danger(type="button" onclick=`deactivateUserWithConfirm();`) Deaktiver
+    button(type="button" onclick=`saveEditChanges();`) Lagre
+    button(type="button" onclick=`closeEditModal();`) Avslutt
+
+    script.
+        document.getElementById("edit-user-classroom").addEventListener("change", function () {
+            let teacher = document.getElementById("classroom_teacher");
+            let teacher_disabled = document.getElementById("classroom_teacher_disabled");
+
+            let classroom_data = this.options[this.selectedIndex].getAttribute(
+                    "data-classroom_teacher"
+            );
+
+            teacher.value = classroom_data;
+            teacher_disabled.value = classroom_data;
+        });

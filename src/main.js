@@ -4,14 +4,14 @@ let db = require("./database");
 let secrets = require("./globals");
 let express_utils = require("./express_utils");
 
-let { getExpressApp } = express_utils;
-let { sendMail } = require("./mail");
+let {getExpressApp} = express_utils;
+let {sendMail} = require("./mail");
 
 let app = getExpressApp();
 let pug = require("pug");
 
 app.get("/", (req, res) => {
-  res.render("index", { ...router_utils.getUserStatus(req) });
+  res.render("index", {...router_utils.getUserStatus(req)});
 });
 
 app.get("/auth", async (req, res) => {
@@ -60,7 +60,7 @@ if (secrets.kiosk_enabled) {
       return;
     }
 
-    let { username, password } = req.body;
+    let {username, password} = req.body;
     username = username.toLowerCase();
     password = secrets.hash(password);
 
@@ -68,7 +68,7 @@ if (secrets.kiosk_enabled) {
       password !== secrets.kiosk_password ||
       username !== secrets.kiosk_username
     ) {
-      res.render("kiosk_login", { error: "Feil brukernavn eller passord" });
+      res.render("kiosk_login", {error: "Feil brukernavn eller passord"});
       return;
     }
 
@@ -139,7 +139,7 @@ app.get("/inventory/fetch", async (req, res) => {
 app.post("/inventory/add", (req, res) => {
   try {
     db.addInventoryItem(req.body);
-    res.send({ success: true, message: `La til ${req.body.name}` });
+    res.send({success: true, message: `La til ${req.body.name}`});
   } catch (e) {
     console.log(e);
     res.send({
@@ -152,7 +152,7 @@ app.post("/inventory/add", (req, res) => {
 app.post("/inventory/remove", (req, res) => {
   try {
     db.removeInventoryItem(req.body.name);
-    res.send({ success: true, message: `Fjernet ${req.body.name}` });
+    res.send({success: true, message: `Fjernet ${req.body.name}`});
   } catch (e) {
     console.log(e);
     res.send({
@@ -165,12 +165,49 @@ app.post("/inventory/remove", (req, res) => {
 app.post("/inventory/update", (req, res) => {
   try {
     db.updateInventoryItemBasic(req.body.old_name, req.body.new_item);
-    res.send({ success: true, message: `Oppdaterte ${req.body.old_name}` });
+    res.send({success: true, message: `Oppdaterte ${req.body.old_name}`});
   } catch (e) {
     console.log(e);
     res.send({
       success: false,
       message: `Kunne ikke oppdatere ${req.body.name}`,
+    });
+  }
+});
+
+app.get("/users", async (req, res) => {
+  res.render("users", {
+    ...router_utils.getUserStatus(req),
+  });
+});
+
+app.get("/users/fetch", async (req, res) => {
+  res.send(await db.readAllActiveUsers());
+});
+
+app.post("/users/update", async (req, res) => {
+  try {
+    console.log(req.body)
+    db.updateUser(req.body);
+    res.send({success: true, message: `Oppdaterte ${req.body.name}`});
+  } catch (e) {
+    console.log(e);
+    res.send({
+      success: false,
+      message: `Kunne ikke oppdatere ${req.body.name}`,
+    });
+  }
+});
+
+app.post("/users/deactivate", async (req, res) => {
+  try {
+    db.deactivateUser(req.body.sub);
+    res.send({success: true, message: `Deaktiverte ${req.body.sub}`});
+  } catch (e) {
+    console.log(e);
+    res.send({
+      success: false,
+      message: `Kunne ikke deaktivere ${req.body.sub}`,
     });
   }
 });

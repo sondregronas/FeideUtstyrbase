@@ -233,6 +233,65 @@ function readAllActiveUsers(only_active = true) {
   return users;
 }
 
+function updateUser(userdata) {
+  /**
+   * Updates a user in the database
+   * @param userdata - The user object
+   * @returns {void}
+   * @type {Database}
+   */
+  let db = new Sqlitedb(database, db_options);
+
+  let stmt = db.prepare(
+    `UPDATE ${dbutils.registered_users_table}
+     SET name              = ?,
+         classroom         = ?,
+         classroom_teacher = ?,
+         personal_email    = ?,
+         banned            = ?,
+         banned_reason     = ?,
+         updated_at        = ?
+     WHERE sub = ?`
+  );
+
+  let updated_at = new Date();
+
+  console.log(userdata.name)
+
+  stmt.run(
+    userdata.name,
+    userdata.classroom,
+    userdata.classroom_teacher,
+    userdata.personal_email || null,
+    userdata.banned ? 1 : 0,
+    userdata.banned_reason || null,
+    updated_at.getTime(),
+    userdata.sub
+  );
+
+  db.close();
+}
+
+function deactivateUser(sub) {
+  /**
+   * Deactivates a user
+   * @param sub - The users sub (unique id)
+   * @returns {void}
+   * @type {Database}
+   */
+  let db = new Sqlitedb(database, db_options);
+
+  let stmt = db.prepare(
+    `UPDATE ${dbutils.registered_users_table}
+     SET expires_at = ?
+     WHERE sub = ?`
+  );
+
+  stmt.run(0, sub);
+
+  db.close();
+}
+
 /*
   INVENTORY
  */
@@ -387,6 +446,8 @@ module.exports = {
   validateUser,
   readRegisteredUser,
   readAllActiveUsers,
+  updateUser,
+  deactivateUser,
   addInventoryItem,
   getInventoryItems,
   updateItemLastBorrowed,

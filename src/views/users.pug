@@ -1,0 +1,40 @@
+extends layout
+
+block single_head
+	script(src="/js/tables.js" defer)
+	script(src="/js/users.js" defer)
+
+block main
+	hgroup
+		h1 Brukere
+		h2 På denne siden kan du endre brukere sine klasser, status og varslings e-poster.
+
+	p Deaktiverte brukere er nødt til å logge inn på nytt for å bli aktivert igjen via hjemmesiden. En bruker vil automatisk bli deaktivert om sommeren, og må derfor logge inn på nytt til høsten for å bli aktivert igjen.
+
+	input(type="text" placeholder="Søk i brukere" id="search-users" oninput=`searchTable(this.value, "users-table");`)
+
+	table(id=`users-table`)
+		thead
+			tr
+				th!=`<a onclick="sortTable(0, 'users-table')">Navn</a>`
+				th!=`<a onclick="sortTable(1, 'users-table')">Klasse</a>`
+				th!=`<a onclick="sortTable(2, 'users-table')">Status</a>`
+				th!=`<a onclick="sortTable(3, 'users-table')">Kommentar</a>`
+				th!=`<a onclick="sortTable(4, 'users-table')">Rediger</a>`
+		tbody
+			tr
+				td(colspan=5)
+					p(style="text-align:center;") Laster...
+
+	center
+		p#search_results_text
+
+	.modal(id=`edit-user-modal`)
+		include modals/edit_user
+
+	// Sort table on page load
+	script.
+		window.onload = function (){
+			updateTable();
+			updateResultsCounter("#users-table tr");
+		}
