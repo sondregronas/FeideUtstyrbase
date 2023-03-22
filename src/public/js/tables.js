@@ -88,24 +88,17 @@ function searchTable(searchValue, tableID = null) {
   let tr = table.getElementsByTagName("tr");
 
   for (let i = 0; i < tr.length; i++) {
-    let td = tr[i].getElementsByTagName("td")[0];
-    let td1 = tr[i].getElementsByTagName("td")[1];
-    let td2 = tr[i].getElementsByTagName("td")[2];
-    let td3 = tr[i].getElementsByTagName("td")[3];
-    let td4 = tr[i].getElementsByTagName("td")[4];
-
-    if (td || td1 || td2 || td3 || td4) {
-      if (
-        td.innerHTML.toLowerCase().indexOf(filter) > -1 ||
-        td1.innerHTML.toLowerCase().indexOf(filter) > -1 ||
-        td2.innerHTML.toLowerCase().indexOf(filter) > -1 ||
-        td3.innerHTML.toLowerCase().indexOf(filter) > -1 ||
-        td4.innerHTML.toLowerCase().indexOf(filter) > -1
-      ) {
-        tr[i].style.display = "";
-      } else {
-        tr[i].style.display = "none";
+    let tds = tr[i].getElementsByTagName("td");
+    let show = false;
+    for (let j = 0; j < tds.length; j++) {
+      if (tds[j].innerHTML.toLowerCase().indexOf(filter) > -1) {
+        show = true;
       }
+    }
+    if (show) {
+      tr[i].style.display = "";
+    } else {
+      tr[i].style.display = "none";
     }
   }
   updateResultsCounter(`#${tableID} tr`);
@@ -120,15 +113,19 @@ function updateResultsCounter(
    * Update the counter that shows how many items are shown in the inventory table
    * @param {String} query - The query to select the table rows
    * @param {String} counterText - The ID of the element to update (where the text is shown)
-   * @param {Boolean} hasHeader - Whether or not the table has a header (as to not count the headers)
+   * @param {Boolean} hasHeader - Whether the table has a header (as to not count the headers)
    * @type {HTMLElement}
    */
   let element = document.getElementById(counterText);
   let total = document.querySelectorAll(query);
-  let shown = Array.from(total).filter((item) => item.offsetParent !== null);
+  let shown = Array.from(total).filter((item) => item.style.display !== "none");
+  let shownCount = shown.length;
   let totalCount = total.length - (hasHeader ? 1 : 0);
-  let shownCount = shown.length - (hasHeader ? 1 : 0);
-  element.innerHTML = `Viser ${shownCount} av ${totalCount} elementer`;
+  try {
+    element.innerHTML = `Viser ${shownCount} av ${totalCount} elementer`;
+  } catch (e) {
+    return;
+  }
 }
 
 function enforceMinMax(element, min, max) {

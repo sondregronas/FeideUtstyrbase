@@ -289,12 +289,22 @@ function _addToTable(item) {
 
   let last_borrowed = "Aldri";
   if (item.last_borrowed) {
-    let date = new Date(item.last_borrowed.date).toLocaleDateString(locale, {
-      year: "numeric",
-      month: "long",
+    let date = new Date(item.last_borrowed.date).toLocaleDateString("nb-NO", {
+      month: "numeric",
       day: "numeric",
     });
-    last_borrowed = `${item.last_borrowed.name} (${item.last_borrowed.classroom}) - ${date}`;
+    let due_date = new Date(item.last_borrowed.due_date).toLocaleDateString(
+      "nb-NO",
+      {
+        year: "numeric",
+        month: "numeric",
+        day: "numeric",
+      }
+    );
+    last_borrowed = `<b>${item.last_borrowed.name}</b> (${item.last_borrowed.classroom}) - <i>${date} - ${due_date}</i>`;
+    if (new Date(item.last_borrowed.due_date) < new Date()) {
+      last_borrowed = `<span class="overdue">${last_borrowed}</span>`;
+    }
   }
 
   let parameters = JSON.stringify({
@@ -309,7 +319,8 @@ function _addToTable(item) {
   // Print button
   options = `${options}&nbsp;|&nbsp<a onclick="updatePrintModal(${parameters}); openModal('${print_label_modal_id}');">Etikett</a>`;
   // Register as available button
-  if (item.available) {
+  if (!item.available) {
+    options = `<span class="not-available">Utlånt</span>`;
     options = `${options}&nbsp;|&nbsp<a href="#Not-Implemented"'>Lever</a>`;
   }
 

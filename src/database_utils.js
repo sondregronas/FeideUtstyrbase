@@ -1,7 +1,7 @@
 let Sqlitedb = require("better-sqlite3");
 
 const database = "database.sqlite";
-const db_options = {verbose: console.log};
+const db_options = { verbose: console.log };
 
 const feide_table = "feide_data";
 const classrooms_table = "classrooms";
@@ -65,12 +65,11 @@ const inventoryQuery = `CREATE TABLE IF NOT EXISTS ${inventory_table}
 
 const rentedItemsQuery = `CREATE TABLE IF NOT EXISTS ${rented_items_table}
                           (
-                              id            INTEGER PRIMARY KEY AUTOINCREMENT,
-                              item          TEXT     NOT NULL,
-                              sub           TEXT     NOT NULL,
-                              rented_at     DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                              due_at        DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                              checked_in_at DATETIME,
+                              id        INTEGER PRIMARY KEY AUTOINCREMENT,
+                              item      TEXT     NOT NULL,
+                              sub       TEXT     NOT NULL,
+                              rented_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                              due_at    DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
                               UNIQUE (item, sub)
                           );`;
 

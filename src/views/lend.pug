@@ -30,9 +30,31 @@ block main
 
     script.
         function lendGear() {
-            alert("Utstyr lånt ut til bruker");
-            // TODO: Send data to server
-            location.href = "/edugear";
+            /**
+             * Lends gear to a user
+             * @returns {void} - Alerts the user if the request was successful or not
+             */
+            // Ensure values are valid
+            if (!$('#user').val() || !$('#gear-select').val().length) {
+                alert("Du må velge en bruker og utstyr før du kan låne ut utstyr.");
+                return;
+            }
+            $.ajax({
+                url: "/api/lend",
+                type: "POST",
+                data: {
+                    sub: $('#user').val(),
+                    days: $('#days').val(),
+                    gear: $('#gear-select').val()
+                },
+                success: function (data) {
+                    alert("Utstyr lånt ut til bruker");
+                    location.href = "/edugear";
+                },
+                error: function (data) {
+                    alert("Noe gikk galt. Prøv igjen.");
+                }
+            });
         }
 
         function enforceMinMax(element, min, max) {

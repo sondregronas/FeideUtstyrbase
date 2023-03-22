@@ -38,7 +38,9 @@ function addFeideUser(data) {
     data.groups[0].displayName
   );
 
-  addAudit(`Added user ${data.openid.name} (${data.openid.sub}) to the database`)
+  addAudit(
+    `Added user ${data.openid.name} (${data.openid.sub}) to the database`
+  );
 
   db.close();
 }
@@ -81,7 +83,7 @@ function validateUser(sub) {
   return user !== undefined;
 }
 
-function getEmployeeFromName(name) {
+function getEmployeeFromSub(sub) {
   /**
    * Gets the teacher from the database
    * @param name - The teachers name
@@ -93,10 +95,10 @@ function getEmployeeFromName(name) {
   let stmt = db.prepare(
     `SELECT *
      FROM ${dbutils.feide_table}
-     WHERE name = ?
+     WHERE sub = ?
        AND affiliation = 'employee'`
   );
-  let teacher = stmt.get(name);
+  let teacher = stmt.get(sub);
 
   db.close();
 
@@ -147,7 +149,7 @@ function addRegisteredUser(sub, classroom, classroom_teacher, personal_email) {
   if (!feide_info) throw new Error("User not found in feide table");
 
   // TEMPORARILY COMMENTED OUT
-  //let teacher = getEmployeeFromName(user.classroom_teacher);
+  //let teacher = getEmployeeFromSub(sub);
   //if (!teacher) throw new Error("Teacher not found in admins table");
 
   let stmt = db.prepare(
@@ -307,8 +309,8 @@ function deactivateUser(sub) {
   let userinfo = readRegisteredUser(sub);
 
   addAudit({
-    action: `Deactivated user ${userinfo.name} (${userinfo.sub})`
-  })
+    action: `Deactivated user ${userinfo.name} (${userinfo.sub})`,
+  });
 
   db.close();
 }
@@ -347,7 +349,9 @@ function addInventoryItem(item) {
     throw e.message;
   }
 
-  addAudit(`Added item ${item.name} to inventory (category: ${item.category}), description: ${item.description}`);
+  addAudit(
+    `Added item ${item.name} to inventory (category: ${item.category}), description: ${item.description}`
+  );
 
   db.close();
 }
@@ -419,7 +423,9 @@ function updateInventoryItemBasic(old_name, new_item) {
     old_name
   );
 
-  addAudit(`Updated item ${new_item.name} in inventory. (Category: ${new_item.category}, Description: ${new_item.description})`);
+  addAudit(
+    `Updated item ${new_item.name} in inventory. (Category: ${new_item.category}, Description: ${new_item.description})`
+  );
 
   db.close();
 }
@@ -467,10 +473,7 @@ function addAudit(action) {
      VALUES (?, ?)`
   );
 
-  stmt.run(
-    action,
-    new Date().getTime(),
-  );
+  stmt.run(action, new Date().getTime());
 
   db.close();
 }
@@ -496,6 +499,55 @@ function readAudits(count, offset = 0) {
   db.close();
 
   return audits;
+}
+
+function addLend(data) {
+  /**
+   * Adds a lend to the database
+   * @param data - The lend data
+   * @returns {void}
+   * @type {Database}
+   */
+  let db = new Sqlitedb(database, db_options);
+
+  let stmt = db.prepare(
+    `INSERT INTO ${dbutils.rented_items_table} (item, sub, due_at)
+     VALUES (?, ?, ?)`
+  );
+
+  let stmt_inventory = db.prepare(
+    `UPDATE ${dbutils.inventory_table}
+     SET available     = 0,
+         last_borrowed = ?,
+         last_checked  = ?
+     WHERE name = ?`
+  );
+
+  let user_info = readRegisteredUser(data.sub) || getEmployeeFromSub(data.sub);
+  let due_at = new Date().getTime() + data.days * 24 * 60 * 60 * 1000;
+
+  //for item in data.gear
+  for (let item of data.gear) {
+    stmt.run(item, data.sub, due_at);
+    stmt_inventory.run(
+      JSON.stringify({
+        name: user_info.name,
+        date: new Date().getTime(),
+        due_date: due_at,
+        classroom: user_info.classroom || "Ansatt",
+      }),
+      new Date().getTime(),
+      item
+    );
+  }
+
+  addAudit(
+    `Lent ${data.gear.join(", ")} to ${user_info.name} (${
+      user_info.classroom || "Ansatt"
+    }) for ${data.days} days`
+  );
+
+  db.close();
 }
 
 /*
@@ -532,4 +584,5 @@ module.exports = {
   removeInventoryItem,
   addAudit,
   readAudits,
+  addLend,
 };

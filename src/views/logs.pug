@@ -1,18 +1,22 @@
 extends layout
+
+block single_head
+	script(src="/js/tables.js" defer)
+
 block main
 	hgroup
 		h1 Historikk
 		h2 Her kan du se alle hendelser. Dette er kun for administratorer.
 
-	label(for="amount") Antall hendelser per side
+	label(for="amount") Antall hendelser per side (Påvirker søk)
 	select(name="amount" id="amount" onchange="updateTable();")
-		option(value="50") 50
 		option(value="100") 100
-		option(value="250") 250
-		option(value="500") 500
-		option(value="1000") 1000
+		option(value="1000") 2000
+		option(value="5000") 5000
 
-	table
+	input(type="text" id="search" oninput="searchTable(this.value, 'table');" placeholder="Søk i hendelser (kun synlige)")
+
+	table#table
 		tr
 			th Dato
 			th Hendelse

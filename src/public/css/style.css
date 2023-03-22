@@ -10,6 +10,10 @@ a {
   color: var(--del-color);
 }
 
+.overdue {
+  color: var(--del-color);
+}
+
 .btn-danger {
   background-color: var(--del-color);
   border-color: var(--del-color);
