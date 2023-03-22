@@ -10,7 +10,7 @@ block main
 
     p Dersom du ikke finner eleven må du sjekke om eleven er utestengt, eller har glemt å registrere seg på hjemmesiden.
 
-        // onclick should focus '.select2-search__field'
+    label(for="user") Velg bruker
     select(name="user" id="user" required)
         option()
         for user in users
@@ -20,6 +20,7 @@ block main
     label(for="days") Antall dager (1-14)
     input(type="number" name="days" id="days" min="1" max="30" value="2" required onchange="enforceMinMax(this, 1, 14)")
 
+    label(for="gear-select") Velg utstyr
     select(name="gear" id="gear-select" required multiple)
         for item in inventory
             if(item.available)
@@ -74,8 +75,6 @@ block main
             $(document).on('select2:open', function (e) {
                 document.querySelector(`[aria-controls="select2-${e.target.id}-results"]`).focus();
             });
-
-            $('#user').select2('open');
 
             $(document).on('select2:close', function (e) {
                 if (e.target.id === 'user') {

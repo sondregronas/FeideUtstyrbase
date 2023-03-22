@@ -74,6 +74,7 @@ if (secrets.kiosk_enabled) {
 
     req.session.kiosk_logged_in = true;
     req.session.logged_in = true;
+    db.addAudit(`Kiosk logged in.`)
     res.redirect("/edugear");
   });
 }
@@ -220,6 +221,16 @@ app.get("/lend", async (req, res) => {
   });
 });
 
+app.get("/logs", async (req, res) => {
+  res.render("logs", {
+    ...router_utils.getUserStatus(req)
+  });
+});
+
+app.get("/logs/fetch", async (req, res) => {
+  res.send(await db.readAudits(req.query.count, req.query.offset));
+});
+
 // Temporary as get, should be post
 app.get("/mail/send", async (req, res) => {
   let template = `views/mail/${req.query.template}.pug`;
@@ -236,6 +247,7 @@ app.get("/mail/send", async (req, res) => {
     console.log(e);
     res.send("error");
   });
+  db.addAudit(`Sendte mail til ${to} (${subject})`);
 });
 
 // Start the server

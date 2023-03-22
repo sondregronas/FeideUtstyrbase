@@ -8,6 +8,7 @@ const classrooms_table = "classrooms";
 const registered_users_table = "registered_users";
 const inventory_table = "inventory";
 const rented_items_table = "rented_items";
+const audit_log_table = "audit_log";
 
 const feideQuery = `CREATE TABLE IF NOT EXISTS ${feide_table}
                     (
@@ -73,6 +74,13 @@ const rentedItemsQuery = `CREATE TABLE IF NOT EXISTS ${rented_items_table}
                               UNIQUE (item, sub)
                           );`;
 
+const auditLogQuery = `CREATE TABLE IF NOT EXISTS ${audit_log_table}
+                       (
+                           id        INTEGER PRIMARY KEY AUTOINCREMENT,
+                           event     TEXT     NOT NULL, -- Action that was performed (JSON)
+                           timestamp DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+                       );`;
+
 function _createTable(query) {
   /**
    * Creates a table, be careful with this function. It's not meant to be used outside this file
@@ -93,13 +101,14 @@ module.exports = {
   registered_users_table,
   inventory_table,
   rented_items_table,
+  audit_log_table,
   // Queries
   feideQuery,
   classroomsQuery,
   registeredUsersQuery,
   inventoryQuery,
   rentedItemsQuery,
-
+  auditLogQuery,
   // Functions
   _createTable,
 };

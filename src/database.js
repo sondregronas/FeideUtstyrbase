@@ -38,6 +38,8 @@ function addFeideUser(data) {
     data.groups[0].displayName
   );
 
+  addAudit(`Added user ${data.openid.name} (${data.openid.sub}) to the database`)
+
   db.close();
 }
 
@@ -185,6 +187,8 @@ function addRegisteredUser(sub, classroom, classroom_teacher, personal_email) {
     sub
   );
 
+  addAudit(`Added user ${feide_info.name} to the database`);
+
   db.close();
 }
 
@@ -242,6 +246,8 @@ function updateUser(userdata) {
    */
   let db = new Sqlitedb(database, db_options);
 
+  let old_user = readRegisteredUser(userdata.sub);
+
   let stmt = db.prepare(
     `UPDATE ${dbutils.registered_users_table}
      SET name              = ?,
@@ -256,8 +262,6 @@ function updateUser(userdata) {
 
   let updated_at = new Date();
 
-  console.log(userdata.name)
-
   stmt.run(
     userdata.name,
     userdata.classroom,
@@ -268,6 +272,17 @@ function updateUser(userdata) {
     updated_at.getTime(),
     userdata.sub
   );
+
+  let new_user = readRegisteredUser(userdata.sub);
+
+  let audit_message = `Updated user ${userdata.name}. Diff: `;
+  for (let key in old_user) {
+    if (key === "updated_at") continue;
+    if (old_user[key] !== new_user[key]) {
+      audit_message += `${key}: ${old_user[key]} -> ${new_user[key]}, `;
+    }
+  }
+  addAudit(audit_message);
 
   db.close();
 }
@@ -288,6 +303,12 @@ function deactivateUser(sub) {
   );
 
   stmt.run(0, sub);
+
+  let userinfo = readRegisteredUser(sub);
+
+  addAudit({
+    action: `Deactivated user ${userinfo.name} (${userinfo.sub})`
+  })
 
   db.close();
 }
@@ -325,6 +346,8 @@ function addInventoryItem(item) {
     }
     throw e.message;
   }
+
+  addAudit(`Added item ${item.name} to inventory (category: ${item.category}), description: ${item.description}`);
 
   db.close();
 }
@@ -396,6 +419,8 @@ function updateInventoryItemBasic(old_name, new_item) {
     old_name
   );
 
+  addAudit(`Updated item ${new_item.name} in inventory. (Category: ${new_item.category}, Description: ${new_item.description})`);
+
   db.close();
 }
 
@@ -415,12 +440,63 @@ function removeInventoryItem(name) {
   );
   stmt.run(name);
 
+  addAudit(`Removed item ${name} from inventory`);
+
   db.close();
 }
 
 /*
   RENTED ITEMS
  */
+
+/*
+  AUDIT LOG
+ */
+
+function addAudit(action) {
+  /**
+   * Adds an action to the audit log
+   * @param action - The action object
+   * @returns {void}
+   * @type {Database}
+   */
+  let db = new Sqlitedb(database, db_options);
+
+  let stmt = db.prepare(
+    `INSERT INTO ${dbutils.audit_log_table} (event, timestamp)
+     VALUES (?, ?)`
+  );
+
+  stmt.run(
+    action,
+    new Date().getTime(),
+  );
+
+  db.close();
+}
+
+function readAudits(count, offset = 0) {
+  /**
+   * Reads the audit log
+   * @param count - The number of audits to read
+   * @returns {object} - The audit objects
+   * @type {Database}
+   */
+  let db = new Sqlitedb(database, db_options);
+
+  let stmt = db.prepare(
+    `SELECT *
+     FROM ${dbutils.audit_log_table}
+     ORDER BY timestamp DESC
+     LIMIT ? OFFSET ?`
+  );
+
+  let audits = stmt.all(count, offset);
+
+  db.close();
+
+  return audits;
+}
 
 /*
   Initialize / Exports
@@ -436,6 +512,7 @@ function initializeAll() {
   dbutils._createTable(dbutils.registeredUsersQuery);
   dbutils._createTable(dbutils.inventoryQuery);
   dbutils._createTable(dbutils.rentedItemsQuery);
+  dbutils._createTable(dbutils.auditLogQuery);
 }
 
 module.exports = {
@@ -453,4 +530,6 @@ module.exports = {
   updateItemLastBorrowed,
   updateInventoryItemBasic,
   removeInventoryItem,
+  addAudit,
+  readAudits,
 };
