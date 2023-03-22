@@ -1,37 +1,94 @@
 extends layout
+block single_head
+    link(href="/css/select2.min.css" rel="stylesheet")
+    script(src="/js/jquery.min.js")
+    script(src="/js/select2.min.js" defer)
+
 block main
     hgroup
         h1 Utstyrslån
-        h2 Velg elev og utstyr som skal lånes ut, dersom du ikke finner eleven i listen, må du be dem om å registrere seg via hjemmesiden.
+        h2 Velg elev og utstyr som skal lånes ut. Utstyr som er utlånt vil ikke vises i listen.
 
-    // Set focus to the first input field (id="student-search")
-    button(type="button" id="selected_user--btn" onclick="openModal('user-select'); document.getElementById('user-search').focus();") Velg elev
-    input.hidden(name="selected_user" id="selected_user" required placeholder=" " disabled)
-    .modal#user-select
-        include modals/user_select
+    p Dersom du ikke finner eleven må du sjekke om eleven er utestengt, eller har glemt å registrere seg på hjemmesiden.
 
+        // onclick should focus '.select2-search__field'
+    select(name="user" id="user" required)
+        option()
+        for user in users
+            if(!user.banned)
+                option(value=user.sub)=`${user.name} (${user.classroom || "Ansatt"})`
 
-    label(for="start_date") Startdato
-    // value should be todays date
-    - let today = new Date().toISOString().split('T')[0]
-    input(type="date" name="start_date" id="start_date" value=today required min=today disabled)
+    input(type="number" name="days" id="days" min="1" max="30" placeholder="Antall dager: 1-14" required onchange="enforceMinMax(this, 1, 14)")
 
-
-    label(for="end_date") Tilbakeleveringsdato
-    // value should be todays date + 1 day
-    - let tomorrow = new Date(new Date().getTime() + 24 * 60 * 60 * 1000).toISOString().split('T')[0]
-    - let three_weeks = new Date(new Date().getTime() + 24 * 60 * 60 * 1000 * 21).toISOString().split('T')[0]
-    input(type="date" name="end_date" id="end_date" value=tomorrow required min=tomorrow max=three_weeks)
-
-    label(for="gear") Legg til utstyr
-    select(name="gear" id="gear" multiple)
+    select(name="gear" id="gear-select" required multiple)
         for item in inventory
-            option(value=item.name)=`${item.name} (${item.category} | ${item.description})`
+            if(item.available)
+                option(value=item.name)=`${item.name} (${item.category} | ${item.description})`
 
-    label(for="comment") Kommentar (valgfritt)
-    textarea(name="comment" id="comment" rows="1")
+    button(id="submit" type="button" onclick=`lendGear();`) Ferdig
 
-    button(type="button" onclick="if(confirm('Er du sikker på at du vil avbryte?')) closeModal('user-select')") Avbryt
-    button(type="button" onclick="lendGear(); closeModal('user-select')") Bekreft
+    p#status
 
-    script(src="/js/lend.js" defer)
+
+    script.
+        function lendGear() {
+            alert("Utstyr lånt ut til bruker");
+            // TODO: Send data to server
+            location.href = "/edugear";
+        }
+
+        function enforceMinMax(element, min, max) {
+            /**
+             * Enforces a minimum and maximum value for an input element
+             * @param element - The input element
+             * @param min - The minimum value
+             * @param max - The maximum value
+             * @returns {void} - Sets the value of the input element to the min or max if it is out of bounds
+             */
+            if (element.value < min) {
+                element.value = min;
+            } else if (element.value > max) {
+                element.value = max;
+            }
+        }
+
+        function clearForm() {
+            $('#user').val(null).trigger('change');
+            $('#days').val(2);
+            $('#gear-select').val(null).trigger('change');
+            $('#status').text('Låner ut...');
+        }
+
+        $(document).ready(function() {
+            $('#user').select2({
+                placeholder: "Velg bruker",
+                containerCssClass: "select2--small",
+                dropdownCssClass: "select2--small",
+            });
+
+
+            $('#gear-select').select2({
+                placeholder: "Velg utstyr",
+                containerCssClass: "select2--small",
+                dropdownCssClass: "select2--small",
+            });
+
+            $(document).on('select2:open', function (e) {
+                document.querySelector(`[aria-controls="select2-${e.target.id}-results"]`).focus();
+            });
+
+            // Select user on page load
+            $('#user').select2('open');
+
+            $(document).on('select2:close', function (e) {
+                if (e.target.id === 'user') {
+                    document.querySelector('#days').select();
+                }
+            });
+
+            $(document).on('keydown', '#days', function (e) {
+                if (e.key === 'Enter') {
+                    document.querySelector('#gear-select').focus();
+                }
+            });
+        });
