@@ -233,6 +233,14 @@ app.post("/api/lend", async (req, res) => {
   }
 });
 
+app.get("/api/loans/overdue", async (req, res) => {
+  res.send(await db.getOverdueLoans());
+});
+
+app.get("/api/loans/active", async (req, res) => {
+  res.send(await db.getActiveLoans());
+});
+
 app.get("/logs", async (req, res) => {
   res.render("logs", {
     ...router_utils.getUserStatus(req),

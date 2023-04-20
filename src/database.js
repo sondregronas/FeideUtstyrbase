@@ -451,6 +451,83 @@ function removeInventoryItem(name) {
   db.close();
 }
 
+function getItemInfo(item_name) {
+  /**
+   * Gets the item info
+   * @param item_name - The name of the item
+   * @returns {object} - The item info
+   * @type {Database}
+   */
+  let db = new Sqlitedb(database, db_options);
+
+  let stmt = db.prepare(
+    `SELECT *
+         FROM ${dbutils.inventory_table}
+         WHERE name = ?`
+  );
+  let item = stmt.get(item_name);
+
+  if (item.last_borrowed) item.last_borrowed = JSON.parse(item.last_borrowed);
+
+  db.close();
+
+  return item;
+}
+
+function getOverdueLoans() {
+  /**
+   * Gets all overdue loans
+   * @returns {object} - The overdue loans
+   * @type {Database}
+   */
+  let db = new Sqlitedb(database, db_options);
+
+  let stmt = db.prepare(
+    `SELECT *
+         FROM ${dbutils.rented_items_table}
+         WHERE due_at < ?`
+  );
+
+  let loans = stmt.all(new Date().getTime());
+
+  // Get the user & item info for each loan
+  loans.forEach((loan) => {
+    loan.user = readRegisteredUser(loan.sub) || readFeideUser(loan.sub);
+    loan.item = getItemInfo(loan.item);
+  });
+
+  db.close();
+
+  return loans;
+}
+
+function getActiveLoans() {
+  /**
+   * Gets all active loans (non-overdue)
+   * @returns {object} - The active loans
+   * @type {Database}
+   */
+  let db = new Sqlitedb(database, db_options);
+
+  let stmt = db.prepare(
+    `SELECT *
+             FROM ${dbutils.rented_items_table}
+             WHERE due_at > ?`
+  );
+
+  let loans = stmt.all(new Date().getTime());
+
+  // Get the user & item info for each loan
+  loans.forEach((loan) => {
+    loan.user = readRegisteredUser(loan.sub) || readFeideUser(loan.sub);
+    loan.item = getItemInfo(loan.item);
+  });
+
+  db.close();
+
+  return loans;
+}
+
 /*
   RENTED ITEMS
  */
@@ -579,6 +656,8 @@ module.exports = {
   deactivateUser,
   addInventoryItem,
   getInventoryItems,
+  getOverdueLoans,
+  getActiveLoans,
   updateItemLastBorrowed,
   updateInventoryItemBasic,
   removeInventoryItem,

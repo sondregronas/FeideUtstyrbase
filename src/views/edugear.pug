@@ -1,4 +1,95 @@
 extends layout
+block single_head
+    script(src="/js/tables.js" defer)
 
 block main
     h1 EduGear
+
+    h2 Overskredete utlån
+    table#overdue-loans-table
+        thead
+            tr
+                th!=`<a onclick="sortTable(0, 'active-loans-table')">Beskrivelse</a>`
+                th!=`<a onclick="sortTable(1, 'active-loans-table')">Kategori</a>`
+                th!=`<a onclick="sortTable(2, 'active-loans-table')">Låner</a>`
+                th!=`<a onclick="sortTable(3, 'active-loans-table')">Lånt til</a>`
+                th!=`<a onclick="sortTable(4, 'active-loans-table')">Lever</a>`
+        tbody
+            tr
+                td(colspan=7)
+                    p(style="text-align:center;") Laster...
+
+    h2 Aktive utlån
+    table#active-loans-table
+        thead
+            tr
+                th!=`<a onclick="sortTable(0, 'active-loans-table')">Beskrivelse</a>`
+                th!=`<a onclick="sortTable(1, 'active-loans-table')">Kategori</a>`
+                th!=`<a onclick="sortTable(2, 'active-loans-table')">Låner</a>`
+                th!=`<a onclick="sortTable(3, 'active-loans-table')">Lånt til</a>`
+                th!=`<a onclick="sortTable(4, 'active-loans-table')">Lever</a>`
+        tbody
+            tr
+                td(colspan=7)
+                    p(style="text-align:center;") Laster...
+
+    script.
+        window.onload = function (){
+            updateTables();
+        }
+
+        function getOverdueLoans(){
+            return fetch("/api/loans/overdue")
+                .then(response => response.json())
+                .then(data => {
+                    return data;
+                });
+        }
+
+        function getActiveLoans(){
+            return fetch("/api/loans/active")
+                .then(response => response.json())
+                .then(data => {
+                    return data;
+                });
+        }
+
+        function updateTables(){
+            getOverdueLoans().then(data => {
+                let table = document.getElementById("overdue-loans-table");
+                let tbody = table.getElementsByTagName("tbody")[0];
+                tbody.innerHTML = "";
+                data.forEach(loan => {
+                    let row = tbody.insertRow();
+                    let description = row.insertCell(0);
+                    let category = row.insertCell(1);
+                    let borrower = row.insertCell(2);
+                    let dueDate = row.insertCell(3);
+                    let returnDate = row.insertCell(4);
+                    description.innerHTML = loan.item.name;
+                    category.innerHTML = loan.item.category;
+                    borrower.innerHTML = loan.user.name;
+                    dueDate.innerHTML = new Date(loan.due_at).toDateString();
+                    returnDate.innerHTML = `<a href="/return/${loan._id}">Lever</a>`
+                });
+            });
+            getActiveLoans().then(data => {
+                let table = document.getElementById("active-loans-table");
+                let tbody = table.getElementsByTagName("tbody")[0];
+                tbody.innerHTML = "";
+                data.forEach(loan => {
+                    let row = tbody.insertRow();
+                    let description = row.insertCell(0);
+                    let category = row.insertCell(1);
+                    let borrower = row.insertCell(2);
+                    let dueDate = row.insertCell(3);
+                    let returnDate = row.insertCell(4);
+                    description.innerHTML = loan.item.name;
+                    category.innerHTML = loan.item.category;
+                    borrower.innerHTML = loan.user.name;
+                    dueDate.innerHTML = new Date(loan.due_at).toDateString();
+                    returnDate.innerHTML = `<a href="/return/${loan.item.name}">Lever</a>`
+                });
+            });
+        }
+
