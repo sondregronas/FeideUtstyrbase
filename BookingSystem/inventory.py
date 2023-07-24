@@ -8,6 +8,32 @@ from db import read_sql_query
 Schema for items and functions to interact with the database.
 """
 
+# TODO: Have this be adjustable from frontend
+categories = [
+    'Kamera',
+    'Objektiv',
+    'Batteri',
+    'Lader',
+    'Strømforsyning',
+    'Minnekort',
+    'Minnekortleser',
+    'Lys',
+    'Mikrofon',
+    'Stativ',
+    'Filter',
+    'Lydopptaker',
+    'Adapter',
+    'Skjerm',
+    'Gimbal',
+    'Drone',
+    'Tegnebrett',
+    'Lagringsenhet',
+    'Headset',
+    'Kabel',
+    'Diverse',
+    'Mangler kategori',
+]
+
 
 @dataclass
 class Item:
@@ -32,6 +58,7 @@ def add(item: Item) -> None:
         logger.debug(f'Added item {item.id} to database with values {item.__dict__}')
     except sqlite3.IntegrityError:
         logger.error(f'Item {item.id} already exists in database.')
+        raise ValueError(f'Item {item.id} already exists in database.')
     finally:
         con.close()
 

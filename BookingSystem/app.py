@@ -2,7 +2,7 @@ import flask
 
 import feide
 import groups
-from BookingSystem import app, logger, api
+from BookingSystem import app, logger, api, inventory
 from BookingSystem.db import init_db, add_admin
 from BookingSystem.utils import login_required
 
@@ -56,7 +56,27 @@ def klasser() -> str:
 @app.route('/inventar')
 @login_required(admin_only=True)
 def inventar() -> str:
-    return flask.render_template('inventar.html')
+    return flask.render_template('inventar.html', items=inventory.get_all())
+
+
+@app.route('/inventar/add')
+@login_required(admin_only=True)
+def inventar_add() -> str:
+    return flask.render_template('inventar_add.html', categories=inventory.categories)
+
+
+@app.route('/inventar/edit/<item_id>')
+@login_required(admin_only=True)
+def edit_item(item_id: str) -> str:
+    return inventory.get(item_id).name
+    # return flask.render_template('edit_item.html', item_id=item_id)
+
+
+@app.route('/inventar/print/<item_id>')
+@login_required(admin_only=True)
+def print_item(item_id: str) -> str:
+    return inventory.get(item_id).name
+    # return flask.render_template('print_item.html', item_id=item_id)
 
 
 if __name__ == '__main__':

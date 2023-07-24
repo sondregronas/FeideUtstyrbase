@@ -9,7 +9,8 @@ from datetime import datetime
 
 import flask
 
-from BookingSystem import inventory, DATABASE, groups
+from BookingSystem import inventory, DATABASE, groups, LABEL_SERVER
+from BookingSystem.inventory import Item
 from BookingSystem.utils import login_required, next_july
 
 api = flask.Blueprint('api', __name__)
@@ -21,6 +22,25 @@ def get_items() -> flask.Response:
     """Get all items in the database for frontend display."""
     items = inventory.get_all()
     return flask.jsonify([item for item in items])
+
+
+@api.route('/items/add', methods=['POST'])
+@login_required(admin_only=True)
+def add_item() -> flask.Response:
+    """Add an item to the database."""
+    form = flask.request.form
+    item = {key: form.get(key) for key in form.keys() if key in Item.__annotations__}
+    item = Item(**item)
+    print_label_count = int(form.get('print_label_count'))
+    print_label_type = form.get('print_label_type')
+    try:
+        inventory.add(item)
+    except ValueError as e:
+        return flask.Response(str(e), status=400)
+    if print_label_count > 0:
+        url = f'{LABEL_SERVER}/print?count={print_label_count}&variant={print_label_type}&id={item.id}&name={item.name}&category={item.category}'
+        print(url)
+    return flask.Response(f'Added {item.id} to the database.', status=201)
 
 
 @api.route('/items/<item_id>', methods=['GET'])

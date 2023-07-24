@@ -6,6 +6,61 @@
     <h2>Her kan du legge til, endre og slette inventar.</h2>
 </hgroup>
 
-{% include 'tables/items.html' %}
+<a href="{{ url_for('inventar_add') }}">Legg til nytt inventar</a>
+
+<input type="text" id="search" placeholder="Søk etter navn" onkeyup="searchTable('search', 'items-table')">
+<table id="items-table">
+    <thead>
+    <tr>
+        <th><a onclick="sortTable(0, items-table)">ID</a></th>
+        <th><a onclick="sortTable(1, items-table)">Navn</a></th>
+        <th><a onclick="sortTable(2, items-table)">Kategori</a></th>
+        <th></th>
+    </tr>
+    </thead>
+    <tbody id="items-table-items">
+    {% for item in items %}
+    <tr>
+        <td>{{ item.id }}</td>
+        <td>{{ item.name }}</td>
+        <td>{{ item.category }}</td>
+        <td>
+            {% if item.available %}
+            <a href="{{ url_for('edit_item', item_id=item.id) }}">Rediger</a>
+            |
+            <a href="{{ url_for('print_item', item_id=item.id) }}">Etikett</a>
+            {% else %}
+            Utlånt
+            {% endif %}
+        </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+<script>
+  function searchTable(inputId, tableId) {
+    var input, filter, table, tr, td, i, txtValue;
+    input = document.getElementById(inputId);
+    filter = input.value.toUpperCase();
+    table = document.getElementById(tableId);
+    tr = table.getElementsByTagName("tr");
+    for (i = 0; i < tr.length; i++) {
+      td0 = tr[i].getElementsByTagName("td")[0];
+      td1 = tr[i].getElementsByTagName("td")[1];
+      td2 = tr[i].getElementsByTagName("td")[2];
+      if (td0 || td1 || td2) {
+        txtValue0 = td0.textContent || td0.innerText;
+        txtValue1 = td1.textContent || td1.innerText;
+        txtValue2 = td2.textContent || td2.innerText;
+        if (txtValue0.toUpperCase().indexOf(filter) > -1 || txtValue1.toUpperCase().indexOf(filter) > -1 || txtValue2.toUpperCase().indexOf(filter) > -1) {
+          tr[i].style.display = "";
+        } else {
+          tr[i].style.display = "none";
+        }
+      }
+    }
+  }
+</script>
 
 {% endblock %}

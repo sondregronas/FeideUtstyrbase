@@ -5,6 +5,7 @@ from flask_session import Session
 
 # Global variables
 DATABASE = 'db.sqlite'
+LABEL_SERVER = ''
 
 # Flask app setup
 app = flask.Flask(__name__, template_folder='templates', static_folder='static')

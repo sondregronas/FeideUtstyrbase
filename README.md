@@ -25,10 +25,10 @@ copy `.env.example` to `.env`, add values from Dataporten
 - [x] Endpoint `GET /users` (All users, including expired)
 - [x] Endpoint `POST /update/student` (form in `index_student.html`)
 
+- [x] A way to add new items to the inventory
 
 ## TODO Backend
 
-- [ ] Inventory add
 - [ ] Inventory edit / delete
 - [ ] Inventory print label
 
@@ -41,6 +41,7 @@ copy `.env.example` to `.env`, add values from Dataporten
 - [ ] Kiosk mode (username/password login method, locked behind FQND / proxy)
 
 - [ ] Dockerfile
+- [ ] Split up the functions from `api.py` to their respective modules, too much responsibility per function right now (though it's not a problem yet)
 
 ## TODO Frontend
 
