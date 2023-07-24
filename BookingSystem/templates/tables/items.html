@@ -1,0 +1,71 @@
+<input type="text" id="search" placeholder="Søk etter navn" onkeyup="searchTable('search', 'items-table')">
+<table id="items-table">
+    <thead>
+    <tr>
+        <th><a onclick="sortTable(0, items-table)">ID</a></th>
+        <th><a onclick="sortTable(1, items-table)">Navn</a></th>
+        <th><a onclick="sortTable(2, items-table)">Kategori</a></th>
+        <th></th>
+    </tr>
+    </thead>
+    <tbody id="items-table-items">
+    <tr>
+        <td colspan="4">Laster...</td>
+    </tr>
+    </tbody>
+</table>
+
+<script>
+  $(document).ready(function () {
+    updateTable();
+  });
+
+  function updateTable() {
+    $.getJSON("{{url_for('api.get_items')}}", function (data) {
+      var items = [];
+      $.each(data, function (key, val) {
+        items.push("<tr>");
+        items.push("<td>" + val.id + "</td>");
+        items.push("<td>" + val.name + "</td>");
+        items.push("<td>" + val.category + "</td>");
+        if (val.available) {
+          items.push(
+            "<td>" +
+            "<a onclick=\"spawnEditModal('" + val.id + "')\">Rediger</a>" +
+            " | " +
+            "<a onclick=\"spawnPrintModal('" + val.id + "')\">Etikett</a>" +
+            "</td>"
+          );
+        } else {
+          items.push("<td>Utlånt</td>");
+        }
+        items.push("</tr>");
+      });
+      $("#items-table-items").html(items.join(""));
+    });
+  }
+
+  function searchTable(inputId, tableId) {
+    var input, filter, table, tr, td, i, txtValue;
+    input = document.getElementById(inputId);
+    filter = input.value.toUpperCase();
+    table = document.getElementById(tableId);
+    tr = table.getElementsByTagName("tr");
+    for (i = 0; i < tr.length; i++) {
+      td0 = tr[i].getElementsByTagName("td")[0];
+      td1 = tr[i].getElementsByTagName("td")[1];
+      td2 = tr[i].getElementsByTagName("td")[2];
+      if (td0 || td1 || td2) {
+        txtValue0 = td0.textContent || td0.innerText;
+        txtValue1 = td1.textContent || td1.innerText;
+        txtValue2 = td2.textContent || td2.innerText;
+        if (txtValue0.toUpperCase().indexOf(filter) > -1 || txtValue1.toUpperCase().indexOf(filter) > -1 || txtValue2.toUpperCase().indexOf(filter) > -1) {
+          tr[i].style.display = "";
+        } else {
+          tr[i].style.display = "none";
+        }
+      }
+    }
+  }
+
+</script>
