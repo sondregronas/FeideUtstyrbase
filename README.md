@@ -29,8 +29,8 @@ copy `.env.example` to `.env`, add values from Dataporten
 
 ## TODO Backend
 
-- [ ] Inventory edit / delete
-- [ ] Inventory print label
+- [x] Inventory edit / delete
+- [x] Inventory print label
 
 - [ ] Book
 - [ ] Return

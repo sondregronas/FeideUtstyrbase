@@ -8,6 +8,7 @@ import sqlite3
 from datetime import datetime
 
 import flask
+import requests
 
 from BookingSystem import inventory, DATABASE, groups, LABEL_SERVER
 from BookingSystem.inventory import Item
@@ -43,12 +44,61 @@ def add_item() -> flask.Response:
     return flask.Response(f'Added {item.id} to the database.', status=201)
 
 
+@api.route('/items/edit/<item_id>', methods=['POST'])
+@login_required(admin_only=True)
+def edit_item(item_id: str) -> flask.Response:
+    """Edit an item in the database."""
+    form = flask.request.form
+    item = {key: form.get(key) for key in form.keys() if key in Item.__annotations__}
+    item = Item(**item)
+    try:
+        inventory.edit(item_id, item)
+    except ValueError as e:
+        return flask.Response(str(e), status=400)
+    return flask.Response(f'Edited {item_id} in the database.', status=200)
+
+
+@api.route('/items/delete/<item_id>', methods=['POST'])
+@login_required(admin_only=True)
+def delete_item(item_id: str) -> flask.Response:
+    """Delete an item from the database."""
+    try:
+        inventory.delete(item_id)
+    except ValueError as e:
+        return flask.Response(str(e), status=400)
+    return flask.Response(f'Deleted {item_id} from the database.', status=200)
+
+
 @api.route('/items/<item_id>', methods=['GET'])
 @login_required(admin_only=True)
 def get_item(item_id: str) -> flask.Response:
     """Get a single item from the database."""
     item = inventory.get(item_id)
     return flask.jsonify(item)
+
+
+@api.route('/items/<item_id>/label/<variant>/preview', methods=['GET'])
+@login_required(admin_only=True)
+def get_label_preview(item_id: str, variant: str = 'qr') -> flask.Response:
+    """Get a label preview for an item."""
+    item = inventory.get(item_id)
+    url = f'{LABEL_SERVER}/preview?id={item.id}&name={item.name}&variant={variant}'
+    return flask.redirect(url)
+
+
+@api.route('/items/<item_id>/label/print', methods=['POST'])
+@login_required(admin_only=True)
+def print_label(item_id: str) -> flask.Response:
+    form = flask.request.form
+    variant = form.get('print_label_type', 'qr')
+    count = int(form.get('print_label_count', '1'))
+    item = inventory.get(item_id)
+    url = f'{LABEL_SERVER}/print?id={item.id}&name={item.name}&variant={variant}&count={count}'
+    try:
+        response = requests.post(url)
+    except Exception as e:
+        return flask.Response(str(e), status=500)
+    return flask.Response(response.text, status=response.status_code)
 
 
 @api.route('/groups', methods=['GET'])

@@ -8,10 +8,12 @@
 
 <form>
     <label for="id">Løpenummer</label>
-    <input type="text" name="id" id="id" required pattern="[a-zA-Z0-9_\s\-]+">
+    <input type="text" name="id" id="id" placeholder="Eksempel: A6500-01" required
+           pattern="^[^\s][a-zA-Z0-9_\s\-]+[^\s]">
 
     <label for="name">Navn</label>
-    <input type="text" name="name" id="name" required pattern="[a-zA-Z0-9_\s\-]+">
+    <input type="text" name="name" id="name" placeholder="Eksempel: Sony A6500" required
+           pattern="^[^\s][a-zA-Z0-9_\s\-]+[^\s]">
 
     <label for="category">Kategori</label>
     <select name="category" id="category" required>
@@ -21,8 +23,10 @@
         {% endfor %}
     </select>
 
+    <!--
     <label for="included_batteries">Batterier</label>
     <input type="number" name="included_batteries" id="included_batteries" required value="0" min="0" max="9">
+    -->
 
     <table>
         <thead>
@@ -35,8 +39,8 @@
         <td>
             <label for="print_label_type">Type</label>
             <select name="print_label_type" id="print_label_type" required>
-                <option value="QR">QR</option>
-                <option value="Barcode">Strekkode</option>
+                <option value="qr">QR</option>
+                <option value="barcode">Strekkode</option>
             </select>
         </td>
     </table>
@@ -45,6 +49,7 @@
 </form>
 
 <p id="status">Klar til å legge til gjenstander</p>
+<p id="print-status"></p>
 
 <a href="{{ url_for('inventar') }}">
     <button>Ferdig!</button>
@@ -67,6 +72,24 @@
           $('#status').css('color', 'red');
         }
       });
+
+      if ($('#print_label_count').val() > 0) {
+        url = '{{ url_for("api.print_label", item_id="REPLACE_ME") }}';
+        url = url.replace('REPLACE_ME', $('#id').val());
+        $.ajax({
+          type: 'POST',
+          url: url,
+          data: $('form').serialize(),
+          success: function (response) {
+            $('#print-status').html(response);
+            $('#print-status').css('color', 'green');
+          },
+          error: function (response) {
+            $('#print-status').html(response.responseText);
+            $('#print-status').css('color', 'red');
+          }
+        });
+      }
     });
   });
 </script>

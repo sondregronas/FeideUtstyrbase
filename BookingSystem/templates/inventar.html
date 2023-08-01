@@ -1,5 +1,9 @@
 {% extends 'layout.html' %}
 
+{% block extra_head %}
+{% include 'templates/datatables.html' %}
+{% endblock %}
+
 {% block content %}
 <hgroup>
     <h1>Inventar</h1>
@@ -8,13 +12,15 @@
 
 <a href="{{ url_for('inventar_add') }}">Legg til nytt inventar</a>
 
-<input type="text" id="search" placeholder="Søk etter navn" onkeyup="searchTable('search', 'items-table')">
+<br>
+<br>
+
 <table id="items-table">
     <thead>
     <tr>
-        <th><a onclick="sortTable(0, items-table)">ID</a></th>
-        <th><a onclick="sortTable(1, items-table)">Navn</a></th>
-        <th><a onclick="sortTable(2, items-table)">Kategori</a></th>
+        <th>ID</th>
+        <th>Navn</th>
+        <th>Kategori</th>
         <th></th>
     </tr>
     </thead>
@@ -39,28 +45,24 @@
 </table>
 
 <script>
-  function searchTable(inputId, tableId) {
-    var input, filter, table, tr, td, i, txtValue;
-    input = document.getElementById(inputId);
-    filter = input.value.toUpperCase();
-    table = document.getElementById(tableId);
-    tr = table.getElementsByTagName("tr");
-    for (i = 0; i < tr.length; i++) {
-      td0 = tr[i].getElementsByTagName("td")[0];
-      td1 = tr[i].getElementsByTagName("td")[1];
-      td2 = tr[i].getElementsByTagName("td")[2];
-      if (td0 || td1 || td2) {
-        txtValue0 = td0.textContent || td0.innerText;
-        txtValue1 = td1.textContent || td1.innerText;
-        txtValue2 = td2.textContent || td2.innerText;
-        if (txtValue0.toUpperCase().indexOf(filter) > -1 || txtValue1.toUpperCase().indexOf(filter) > -1 || txtValue2.toUpperCase().indexOf(filter) > -1) {
-          tr[i].style.display = "";
-        } else {
-          tr[i].style.display = "none";
+  $(document).ready(function () {
+    $('#items-table').DataTable({
+      "language": {
+        "lengthMenu": "Vis _MENU_ rader per side",
+        "zeroRecords": "Ingen treff",
+        "info": "Viser side _PAGE_ av _PAGES_",
+        "infoEmpty": "Ingen rader tilgjengelig",
+        "infoFiltered": "(filtrert fra _MAX_ rader totalt)",
+        "search": "Søk:",
+        "paginate": {
+          "first": "Første",
+          "last": "Siste",
+          "next": "Neste",
+          "previous": "Forrige"
         }
       }
-    }
-  }
+    });
+  });
 </script>
 
 {% endblock %}

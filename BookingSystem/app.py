@@ -68,15 +68,14 @@ def inventar_add() -> str:
 @app.route('/inventar/edit/<item_id>')
 @login_required(admin_only=True)
 def edit_item(item_id: str) -> str:
-    return inventory.get(item_id).name
-    # return flask.render_template('edit_item.html', item_id=item_id)
+    return flask.render_template('inventar_edit.html', item=inventory.get(item_id),
+                                 categories=inventory.categories)
 
 
 @app.route('/inventar/print/<item_id>')
 @login_required(admin_only=True)
 def print_item(item_id: str) -> str:
-    return inventory.get(item_id).name
-    # return flask.render_template('print_item.html', item_id=item_id)
+    return flask.render_template('inventar_print.html', item=inventory.get(item_id))
 
 
 if __name__ == '__main__':

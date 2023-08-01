@@ -63,6 +63,35 @@ def add(item: Item) -> None:
         con.close()
 
 
+def edit(old_item_id: str, new_item: Item) -> None:
+    con = sqlite3.connect(DATABASE)
+    try:
+        SQL = 'UPDATE inventory SET id=:id, name=:name, category=:category, included_batteries=:included_batteries WHERE id=:old_item_id'
+        con.execute(SQL, {**new_item.__dict__, 'old_item_id': old_item_id})
+        con.commit()
+        logger.info(f'Edited item {old_item_id} in database.')
+        logger.debug(f'Edited item {old_item_id} in database with values {new_item.__dict__}')
+    except sqlite3.IntegrityError:
+        logger.error(f'Item {new_item.id} already exists in database.')
+        raise ValueError(f'Item {new_item.id} already exists in database.')
+    finally:
+        con.close()
+
+
+def delete(item_id: str) -> None:
+    con = sqlite3.connect(DATABASE)
+    try:
+        SQL = 'DELETE FROM inventory WHERE id=:id'
+        con.execute(SQL, {'id': item_id})
+        con.commit()
+        logger.info(f'Deleted item {item_id} from database.')
+    except sqlite3.IntegrityError:
+        logger.error(f'Item {item_id} does not exist in database.')
+        raise ValueError(f'Item {item_id} does not exist in database.')
+    finally:
+        con.close()
+
+
 def get(item_id: str) -> Item:
     con = sqlite3.connect(DATABASE)
     item = Item(*con.execute(read_sql_query('get_item.sql'), {'id': item_id}).fetchone())

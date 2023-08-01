@@ -1,0 +1,78 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<hgroup>
+    <h1>Rediger inventar</h1>
+    <h2>Redigerer {{ item.id }} ({{ item.name }})</h2>
+</hgroup>
+
+<form>
+    <label for="id">Løpenummer</label>
+    <input type="text" name="id" id="id" required placeholder="Eksempel: A6500-01"
+           pattern="^[^\s][a-zA-Z0-9_\s\-]+[^\s]"
+           value="{{ item.id }}">
+
+    <label for="name">Navn</label>
+    <input type="text" name="name" id="name" required placeholder="Eksempel: Sony A6500"
+           pattern="^[^\s][a-zA-Z0-9_\s\-]+[^\s]"
+           value="{{ item.name }}">
+
+    <label for="category">Kategori</label>
+    <select name="category" id="category" required>
+        <option value="" disabled selected hidden>Velg kategori</option>
+        {% for category in categories %}
+        <option value="{{ category }}" {% if category== item.category %}selected{% endif %}>{{ category }}</option>
+        {% endfor %}
+    </select>
+
+    <label for="included_batteries">Batterier</label>
+    <input type="number" name="included_batteries" id="included_batteries" required
+           value="{{ item.included_batteries }}" min="0" max="9">
+
+    <button type="submit">Lagre</button>
+</form>
+
+<button class="red-button"
+        onclick="if (confirm('Er du sikker på at du vil slette denne gjenstanden?')) deleteItem()">
+    Slett
+</button>
+
+<p id="status"></p>
+
+
+<script>
+  function deleteItem() {
+    $.ajax({
+      type: 'POST',
+      url: '{{ url_for("api.delete_item", item_id=item.id) }}',
+      success: function (response) {
+        window.location.href = '{{ url_for("inventar") }}';
+      },
+      error: function (response) {
+        $('#status').html(response.responseText);
+        $('#status').css('color', 'red');
+      }
+    });
+  }
+
+  $(document).ready(function () {
+    $('#category').val('{{ item.category }}');
+    $('form').submit(function (event) {
+      event.preventDefault();
+      $.ajax({
+        type: 'POST',
+        url: '{{ url_for("api.edit_item", item_id=item.id) }}',
+        data: $('form').serialize(),
+        success: function (response) {
+          window.location.href = '{{ url_for("inventar") }}';
+        },
+        error: function (response) {
+          $('#status').html(response.responseText);
+          $('#status').css('color', 'red');
+        }
+      });
+    });
+  });
+</script>
+
+{% endblock %}
