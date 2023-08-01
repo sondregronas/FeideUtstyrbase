@@ -88,11 +88,16 @@
 
     $('#overdue').DataTable({
       "language": lang,
-      "order": [[3, "asc"]]
+      "order": [[3, "asc"]],
+      // display all, no pagination
+      "paging": false,
+      "info": false
     });
     $('#active').DataTable({
       "language": lang,
-      "order": [[3, "asc"]]
+      "order": [[3, "asc"]],
+      "paging": false,
+      "info": false
     });
   });
 </script>
