@@ -1,0 +1,44 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<hgroup>
+    <h1>Innlevering</h1>
+    <p>Skann enheten du skal levere inn, eventuelt skriv inn løpenummer før du trykker entertasten</p>
+</hgroup>
+
+<form>
+    <label for="id">Løpenummer</label>
+    <input type="text" name="id" id="id" placeholder="Eksempel: A6500-01" required
+           pattern="^[^\s][ÆØÅæøåa-zA-Z0-9_\s\-]+[^\s]">
+
+    <button type="submit">Lever</button>
+</form>
+
+<a href="{{ url_for('inventar') }}">
+    <button>Ferdig!</button>
+</a>
+
+<p id="status">Klar til å levere inn!</p>
+
+<script>
+  $(document).ready(function () {
+    $('#id').focus();
+    $('form').submit(function (event) {
+      event.preventDefault();
+      url = "{{ url_for('api.return_equipment', item_id='REPLACE_ME') }}";
+      url = url.replace('REPLACE_ME', $('#id').val());
+      $.ajax({
+        url: url,
+        type: 'POST',
+        success: function (result) {
+          $('#status').append('<br><span style="color: green">Leverte inn ' + $('#id').val() + '</span>');
+        },
+        error: function (result) {
+          $('#status').append('<br><span style="color: red">Kunne ikke levere inn ' + $('#id').val() + ' (' + result.responseText + ')</span>');
+        }
+      });
+    });
+  });
+</script>
+
+{% endblock %}

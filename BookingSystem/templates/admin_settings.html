@@ -1,0 +1,21 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<hgroup>
+    <h2>Klasserom</h2>
+    <h3>Et klasserom per linje, format: <b>1MEKA (Kontaktlærer)</b></h3>
+</hgroup>
+{% include 'forms/groups.html' %}
+
+<hgroup>
+    <h2>E-poster</h2>
+    <h3>Hvem skal motta e-post? En addresse per linje</h3>
+</hgroup>
+{% include 'forms/emails.html' %}
+
+<hgroup>
+    <h2>Kategorier</h2>
+    <h3>En kategori per linje</h3>
+</hgroup>
+{% include 'forms/categories.html' %}
+{% endblock %}

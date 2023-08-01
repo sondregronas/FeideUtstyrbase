@@ -7,6 +7,7 @@ CREATE TABLE IF NOT EXISTS `inventory`
     `available`          INTEGER          NOT NULL DEFAULT 1,
     `active_order`       TEXT,
     `order_due_date`     TEXT,
+    `last_seen`          TEXT,
     UNIQUE (`id`)
 );
 
@@ -30,3 +31,43 @@ CREATE TABLE IF NOT EXISTS `groups`
     `classroom` TEXT NOT NULL,
     UNIQUE (`classroom`)
 );
+
+CREATE TABLE IF NOT EXISTS `emails`
+(
+    `id`    INTEGER PRIMARY KEY AUTOINCREMENT,
+    `email` TEXT NOT NULL,
+    UNIQUE (`email`)
+);
+
+CREATE TABLE IF NOT EXISTS `categories`
+(
+    `id`   INTEGER PRIMARY KEY AUTOINCREMENT,
+    `name` TEXT NOT NULL,
+    UNIQUE (`name`)
+);
+
+
+INSERT INTO `categories` (`name`)
+SELECT t.*
+FROM (VALUES ('Kamera'),
+             ('Objektiv'),
+             ('Batteri'),
+             ('Lader'),
+             ('Minnekort'),
+             ('Minnekortleser'),
+             ('Lys'),
+             ('Mikrofon'),
+             ('Stativ'),
+             ('Filter'),
+             ('Lydopptaker'),
+             ('Adapter'),
+             ('Skjerm'),
+             ('Gimbal'),
+             ('Drone'),
+             ('Tegnebrett'),
+             ('Lagringsenhet'),
+             ('Headset'),
+             ('Kabel'),
+             ('Diverse'),
+             ('Mangler kategori')) t
+WHERE NOT EXISTS(SELECT * FROM `categories`);

@@ -1,0 +1,80 @@
+{% extends 'layout.html' %}
+
+{% block extra_head %}
+{% include 'templates/chosen.html' %}
+{% endblock %}
+
+{% block content %}
+<hgroup>
+    <h1>Booking av utstyr</h1>
+    <p>Utlån</p>
+</hgroup>
+
+<form>
+    <label for="user">Bruker</label>
+    <select name="user" id="user" data-placeholder="Velg bruker..." required>
+        <option value=""></option>
+        {% for user in all_users %}
+        <option value="{{user.name}} ({% if user.classroom %}{{user.classroom}}{%else%}Lærer{% endif %})">
+            {{user.name}} ({% if user.classroom %}{{user.classroom}}{%else%}Lærer{% endif %})
+        </option>
+        {% endfor %}
+    </select>
+
+    <label for="days">Dager</label>
+    <input type="number" name="days" id="days" min="1" max="90" value="1">
+
+    <label for="equipment">Utstyr</label>
+    <select name="equipment" id="equipment" multiple data-placeholder="Utstyr" required>
+        <option value=""></option>
+        {% for item in all_items %}
+        <option value="{{item.id}}">{{item.id}}</option>
+        {% endfor %}
+    </select>
+
+    <button type="submit">Lån ut</button>
+</form>
+
+<p id="status"></p>
+
+<script>
+  $(document).ready(function () {
+    $('#user').chosen(
+      {
+        no_results_text: 'Fant ingen brukere med navnet',
+        search_contains: true,
+        inherit_select_classes: true,
+      }
+    );
+    $('#equipment').chosen(
+      {
+        no_results_text: 'Fant ingen utstyr med navnet',
+        search_contains: true,
+        inherit_select_classes: true,
+      }
+    );
+
+    $('form').submit(function (event) {
+      event.preventDefault();
+      $.ajax({
+        url: "{{ url_for('api.book_equipment') }}",
+        type: 'POST',
+        success: function (response) {
+          if (response.status === 'success') {
+            window.location.href = "{{ url_for('index') }}";
+          } else {
+            $('#status').text('Noe gikk galt');
+            $('#status').css('color', 'red');
+          }
+        },
+        error: function (error) {
+          $('#status').text('Noe gikk galt');
+          $('#status').css('color', 'red');
+        }
+      });
+    });
+
+  });
+</script>
+
+{% endblock %}

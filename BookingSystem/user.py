@@ -1,10 +1,14 @@
+import sqlite3
 from dataclasses import dataclass
 from datetime import datetime
 
-from db import get_user
+from BookingSystem import DATABASE
+from db import get_user, read_sql_query
 from feide import get_feide_data
 
 
+# TODO: Fix User class, right now it serves as both a database model and a session model,
+#       except it doesn't really work as either.
 @dataclass
 class User:
     name: str
@@ -35,7 +39,9 @@ class User:
     @property
     def active(self) -> bool:
         """Check if the user is active."""
-        date_from_string = datetime.fromisoformat(get_user(self.userid).get('expires_at'))
+        if get_user(self.userid).get('admin'):
+            return True
+        date_from_string = datetime.fromisoformat(get_user(self.userid).get('expires_at', '1970-01-01'))
         return date_from_string > datetime.now()
 
 
@@ -47,3 +53,14 @@ class FeideUser(User):
         self.email = data['email']
         self.userid = data['userid']
         self.affiliations = data['affiliations']
+
+
+def get_all_active_users() -> list[dict]:
+    """Return a list of all active users in the database."""
+    con = sqlite3.connect(DATABASE)
+    cur = con.cursor()
+    cur.execute(read_sql_query('get_all_active_users.sql'))
+    columns = [description[0] for description in cur.description]
+    data = [{columns[i]: user[i] for i in range(len(columns))} for user in cur.fetchall()]
+    con.close()
+    return data

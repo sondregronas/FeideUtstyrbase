@@ -1,6 +1,100 @@
 {% extends 'layout.html' %}
 
+{% block extra_head %}
+{% include 'templates/datatables.html' %}
+{% endblock %}
+
 {% block content %}
-<h1>Admin {{session.user.name}}</h1>
-<p>Her kan du administrere brukere og rom.</p>
+{% if overdue %}
+<hgroup>
+    <h2 class="warning">OBS! Utstyr på overtid!</h2>
+    <h3>Følgende utstyr er overskredet utlånstiden</h3>
+</hgroup>
+<table id="overdue">
+    <thead>
+    <tr>
+        <th>Løpenummer</th>
+        <th>Utstyr</th>
+        <th>Utlånt til</th>
+        <th>Frist for levering</th>
+    </thead>
+    <tbody>
+    {% for item in overdue %}
+    <tr>
+        <td class="warning">{{ item.id }}</td>
+        <td class="warning">{{ item.name }}</td>
+        <td class="warning">{{ item.active_order }}</td>
+        <td class="warning">{{ item.order_due_date|strftime }}</td>
+    </tr>
+    {% endfor %}
+</table>
+{% else %}
+<hgroup>
+    <h2>Smooth!</h2>
+    <h3>Ikke noe utstyr som er overskredet dato</h3>
+</hgroup>
+{% endif %}
+
+<br>
+<br>
+<br>
+
+{% if active %}
+<hgroup>
+    <h2>Utlånt utstyr</h2>
+    <h3>Følgende utstyr er ute</h3>
+</hgroup>
+<table id="active">
+    <thead>
+    <tr>
+        <th>Løpenummer</th>
+        <th>Utstyr</th>
+        <th>Utlånt til</th>
+        <th>Frist for levering</th>
+    </thead>
+    <tbody>
+    {% for item in active %}
+    <tr>
+        <td>{{ item.id }}</td>
+        <td>{{ item.name }}</td>
+        <td>{{ item.active_order }}</td>
+        <td>{{ item.order_due_date|strftime }}</td>
+    </tr>
+    {% endfor %}
+</table>
+{% else %}
+<hgroup>
+    <h2>Smooth!</h2>
+    <h3>Ikke noe utstyr som er overskredet dato</h3>
+</hgroup>
+{% endif %}
+
+<script>
+  $(document).ready(function () {
+    let lang = {
+      "lengthMenu": "Vis _MENU_ rader per side",
+      "zeroRecords": "Ingen treff",
+      "info": "Viser side _PAGE_ av _PAGES_",
+      "infoEmpty": "Ingen rader tilgjengelig",
+      "infoFiltered": "(filtrert fra _MAX_ rader totalt)",
+      "search": "Søk:",
+      "paginate": {
+        "first": "Første",
+        "last": "Siste",
+        "next": "Neste",
+        "previous": "Forrige"
+      }
+    };
+
+    $('#overdue').DataTable({
+      "language": lang,
+      "order": [[3, "asc"]]
+    });
+    $('#active').DataTable({
+      "language": lang,
+      "order": [[3, "asc"]]
+    });
+  });
+</script>
+
 {% endblock %}

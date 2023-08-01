@@ -1,15 +1,20 @@
-from logging import Logger, StreamHandler, Formatter
+import os
+from logging import Logger, StreamHandler, Formatter, FileHandler
+from pathlib import Path
 
 import flask
 from flask_session import Session
 
+# Create data folder if it doesn't exist
+Path('data').mkdir(exist_ok=True)
+
 # Global variables
-DATABASE = 'db.sqlite'
-LABEL_SERVER = ''
+DATABASE = Path('data') / 'db.sqlite'
+LABEL_SERVER = os.getenv('LABEL_SERVER')
 
 # Flask app setup
 app = flask.Flask(__name__, template_folder='templates', static_folder='static')
-app.secret_key = 'super secret key'
+app.secret_key = os.getenv('SECRET_KEY')
 app.config['SESSION_TYPE'] = 'filesystem'
 Session(app)
 
@@ -18,3 +23,8 @@ logger = Logger(__name__)
 logger.setLevel('DEBUG')
 logger.addHandler(StreamHandler())
 logger.handlers[0].setFormatter(Formatter('[%(levelname)s | %(asctime)s]: %(message)s', '%Y-%m-%d %H:%M:%S'))
+
+audits = Logger('audits')
+audits.setLevel('INFO')
+audits.addHandler(FileHandler(Path('data') / 'audits.log'))
+audits.handlers[0].setFormatter(Formatter('%(asctime)s | %(message)s', '%Y-%m-%d %H:%M:%S'))

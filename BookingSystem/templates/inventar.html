@@ -21,7 +21,8 @@
         <th>ID</th>
         <th>Navn</th>
         <th>Kategori</th>
-        <th></th>
+        <th>Sist sett</th>
+        <th>Administrer</th>
     </tr>
     </thead>
     <tbody id="items-table-items">
@@ -30,6 +31,7 @@
         <td>{{ item.id }}</td>
         <td>{{ item.name }}</td>
         <td>{{ item.category }}</td>
+        <td>{{ item.last_seen }}</td>
         <td>
             {% if item.available %}
             <a href="{{ url_for('edit_item', item_id=item.id) }}">Rediger</a>
@@ -60,7 +62,10 @@
           "next": "Neste",
           "previous": "Forrige"
         }
-      }
+      },
+      "columnDefs": [
+        {"orderable": false, "targets": 4}
+      ]
     });
   });
 </script>

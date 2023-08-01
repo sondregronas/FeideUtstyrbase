@@ -9,25 +9,26 @@
 <form>
     <label for="id">Løpenummer</label>
     <input type="text" name="id" id="id" required placeholder="Eksempel: A6500-01"
-           pattern="^[^\s][a-zA-Z0-9_\s\-]+[^\s]"
+           pattern="^[^\s][ÆØÅæøåa-zA-Z0-9_\s\-]+[^\s]"
            value="{{ item.id }}">
 
     <label for="name">Navn</label>
     <input type="text" name="name" id="name" required placeholder="Eksempel: Sony A6500"
-           pattern="^[^\s][a-zA-Z0-9_\s\-]+[^\s]"
+           pattern="^[^\s][ÆØÅæøåa-zA-Z0-9_\s\-]+[^\s]"
            value="{{ item.name }}">
 
     <label for="category">Kategori</label>
     <select name="category" id="category" required>
         <option value="" disabled selected hidden>Velg kategori</option>
         {% for category in categories %}
-        <option value="{{ category }}" {% if category== item.category %}selected{% endif %}>{{ category }}</option>
+        <option value="{{ category }}">{{ category }}
+        </option>
         {% endfor %}
     </select>
 
-    <label for="included_batteries">Batterier</label>
+    <label for="included_batteries" hidden>Batterier</label>
     <input type="number" name="included_batteries" id="included_batteries" required
-           value="{{ item.included_batteries }}" min="0" max="9">
+           value="{{ item.included_batteries }}" min="0" max="9" hidden>
 
     <button type="submit">Lagre</button>
 </form>

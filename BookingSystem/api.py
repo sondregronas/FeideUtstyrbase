@@ -49,8 +49,10 @@ def add_item() -> flask.Response:
 def edit_item(item_id: str) -> flask.Response:
     """Edit an item in the database."""
     form = flask.request.form
+    print(form)
     item = {key: form.get(key) for key in form.keys() if key in Item.__annotations__}
     item = Item(**item)
+
     try:
         inventory.edit(item_id, item)
     except ValueError as e:
@@ -99,6 +101,31 @@ def print_label(item_id: str) -> flask.Response:
     except Exception as e:
         return flask.Response(str(e), status=500)
     return flask.Response(response.text, status=response.status_code)
+
+
+@api.route('/book/out', methods=['POST'])
+@login_required()
+def book_equipment() -> flask.Response:
+    """Book out equipment for a user."""
+    form = flask.request.form
+    user = form.get('user')
+    days = form.get('days')
+    item_ids = form.getlist('equipment')
+
+    for item in item_ids:
+        inventory.register_out(item_id=item, user=user, days=days)
+    return flask.Response('Booked out equipment.', status=200)
+
+
+@api.route('/return/<item_id>', methods=['POST'])
+@login_required()
+def return_equipment(item_id: str) -> flask.Response:
+    """Return equipment from a user."""
+    try:
+        inventory.register_in(item_id=item_id)
+    except ValueError as e:
+        return flask.Response(str(e), status=400)
+    return flask.Response('Returned equipment.', status=200)
 
 
 @api.route('/groups', methods=['GET'])
@@ -158,7 +185,46 @@ def update_groups() -> flask.Response:
     for group in flask.request.form.get('groups').split('\n'):
         if not group.strip():
             continue
-        cur.execute('INSERT INTO groups (classroom) VALUES (?)', (group,))
+        cur.execute('INSERT INTO groups (classroom) VALUES (?)', (group.strip(),))
+
+    con.commit()
+    con.close()
+    return flask.redirect(flask.request.referrer)
+
+
+@api.route('/update/categories', methods=['POST'], endpoint='update_categories')
+@login_required(admin_only=True)
+def update_categories() -> flask.Response:
+    """Update every category in the database."""
+    con = sqlite3.connect(DATABASE)
+    cur = con.cursor()
+    cur.execute('DELETE FROM categories')
+    con.commit()
+
+    for category in flask.request.form.get('categories').split('\n'):
+        if not category.strip():
+            continue
+        cur.execute('INSERT INTO categories (name) VALUES (?)', (category.strip(),))
+
+    con.commit()
+    con.close()
+    return flask.redirect(flask.request.referrer)
+
+
+@api.route('/update/emails', methods=['POST'], endpoint='update_emails')
+@login_required(admin_only=True)
+def update_emails() -> flask.Response:
+    """Update every email in the database."""
+    con = sqlite3.connect(DATABASE)
+    cur = con.cursor()
+    cur.execute('DELETE FROM emails')
+    con.commit()
+
+    for email in flask.request.form.get('emails').split('\n'):
+        if not email.strip():
+            continue
+        cur.execute('INSERT INTO emails (email) VALUES (?)', (email.strip(),))
+
     con.commit()
     con.close()
     return flask.redirect(flask.request.referrer)
