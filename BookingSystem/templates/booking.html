@@ -58,9 +58,11 @@
       event.preventDefault();
       $.ajax({
         url: "{{ url_for('api.book_equipment') }}",
+        data: $('form').serialize(),
         type: 'POST',
-        success: function (response) {
-          if (response.status === 'success') {
+        success: function (response, status) {
+          // alert the response code
+          if (status === 'success') {
             window.location.href = "{{ url_for('index') }}";
           } else {
             $('#status').text('Noe gikk galt');

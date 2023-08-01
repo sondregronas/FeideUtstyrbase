@@ -1,5 +1,9 @@
 {% extends 'layout.html' %}
 
+{% block extra_head %}
+{% include 'templates/chosen.html' %}
+{% endblock %}
+
 {% block content %}
 <hgroup>
     <h1>Rediger inventar</h1>
@@ -19,7 +23,7 @@
 
     <label for="category">Kategori</label>
     <select name="category" id="category" required>
-        <option value="" disabled selected hidden>Velg kategori</option>
+        <option value=""></option>
         {% for category in categories %}
         <option value="{{ category }}">{{ category }}
         </option>
@@ -58,6 +62,12 @@
 
   $(document).ready(function () {
     $('#category').val('{{ item.category }}');
+
+    $('#category').chosen({
+      no_results_text: 'Fant ingen kategorier med det navnet',
+      placeholder_text_single: 'Velg kategori'
+    });
+
     $('form').submit(function (event) {
       event.preventDefault();
       $.ajax({

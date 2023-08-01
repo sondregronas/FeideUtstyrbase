@@ -32,6 +32,7 @@
         type: 'POST',
         success: function (result) {
           $('#status').append('<br><span style="color: green">Leverte inn ' + $('#id').val() + '</span>');
+          $('#id').val('');
         },
         error: function (result) {
           $('#status').append('<br><span style="color: red">Kunne ikke levere inn ' + $('#id').val() + ' (' + result.responseText + ')</span>');
