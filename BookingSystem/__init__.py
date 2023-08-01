@@ -3,7 +3,12 @@ from logging import Logger, StreamHandler, Formatter, FileHandler
 from pathlib import Path
 
 import flask
+from dotenv import load_dotenv
 from flask_session import Session
+
+dotenv_path = Path('.env')
+if dotenv_path.exists():
+    load_dotenv(dotenv_path)
 
 # Create data folder if it doesn't exist
 Path('data').mkdir(exist_ok=True)
