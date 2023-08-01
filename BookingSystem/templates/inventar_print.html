@@ -7,13 +7,12 @@
 </hgroup>
 
 <form>
-    <img class="label-preview" src="{{ url_for('api.get_label_preview', item_id=item.id, variant='qr') }}"
-         alt="Label preview">
+    <center>
+        <img class="label-preview" src="{{ url_for('api.get_label_preview', item_id=item.id, variant='qr') }}"
+             alt="Label preview">
+    </center>
 
     <table>
-        <thead>
-        <th colspan="2">Utskrift</th>
-        </thead>
         <td>
             <label for="print_label_count">Antall etiketter</label>
             <input type="number" name="print_label_count" id="print_label_count" required value="1" min="0" max="9">
@@ -44,7 +43,7 @@
       var url = "{{ url_for('api.get_label_preview', item_id=item.id, variant='REPLACE_ME') }}";
       url = url.replace('REPLACE_ME', variant);
 
-      $('.label-preview img').attr('src', url);
+      $('.label-preview').attr('src', url);
     });
     $('form').submit(function (event) {
       event.preventDefault();
