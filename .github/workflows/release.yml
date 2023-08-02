@@ -9,21 +9,22 @@ on:
     branches: [ main ]
 
 jobs:
-  runs-on: ubuntu-latest
-  permissions:
-    contents: read
-    packages: write
-  steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
-
-    # build and push to ghcr.io/sondregronas/feideutstyrbase:latest
-    # for every platform in env.platforms
-    - name: Build and push image
-      uses: docker/build-push-action@v2
-      with:
-        context: .
-        file: ./Dockerfile
-        platforms: ${{ env.platforms }}
-        push: true
-        tags: ghcr.io/sondregronas/feideutstyrbase:latest
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+  
+      # build and push to ghcr.io/sondregronas/feideutstyrbase:latest
+      # for every platform in env.platforms
+      - name: Build and push image
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: ./Dockerfile
+          platforms: ${{ env.platforms }}
+          push: true
+          tags: ghcr.io/sondregronas/feideutstyrbase:latest
