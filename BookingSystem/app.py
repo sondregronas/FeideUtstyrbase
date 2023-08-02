@@ -1,9 +1,11 @@
+from datetime import datetime
+
 import flask
 from dateutil import parser
 
 import feide
 import groups
-from BookingSystem import app, logger, api, inventory, user
+from BookingSystem import app, logger, api, inventory, user, mail
 from BookingSystem.db import init_db, add_admin
 from BookingSystem.utils import login_required
 
@@ -17,6 +19,11 @@ def _jinja2_filter_datetime(date, fmt='%d.%m.%Y') -> str:
     return parser.parse(date).strftime(fmt)
 
 
+@app.template_filter('strfunixtime')
+def _jinja2_filter_strftime(date, fmt='%d.%m.%Y') -> str:
+    return datetime.fromtimestamp(float(date)).strftime(fmt)
+
+
 @app.errorhandler(401)
 def unauthorized(e) -> flask.Response:
     logger.warning(f'Unauthorized access: {flask.request.url} from {flask.request.remote_addr}')
@@ -28,8 +35,7 @@ def unauthorized(e) -> flask.Response:
 def index() -> str:
     if flask.session.get("user").is_admin:
         return flask.render_template('index_admin.html',
-                                     overdue=inventory.get_all_overdue(),
-                                     active=inventory.get_all_non_overdue())
+                                     unavailable_items=inventory.get_all_unavailable())
     return flask.render_template('index_student.html', all_groups=groups.get_all())
 
 
@@ -60,7 +66,8 @@ def logout() -> flask.Response:
 def admin_settings() -> str:
     return flask.render_template('admin_settings.html', all_groups=groups.get_all(),
                                  all_categories=inventory.all_categories(),
-                                 all_emails=groups.get_all_emails())
+                                 all_emails=mail.get_all_emails(),
+                                 last_sent=mail.get_last_sent())
 
 
 @app.route('/audits')
@@ -107,12 +114,6 @@ def booking() -> str:
     return flask.render_template('booking.html',
                                  all_users=user.get_all_active_users(),
                                  all_items=inventory.get_all())
-
-
-@app.route('/return')
-@login_required()
-def return_item() -> str:
-    return flask.render_template('return.html')
 
 
 if __name__ == '__main__':

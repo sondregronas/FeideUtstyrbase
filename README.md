@@ -1,8 +1,8 @@
 # UtstyrServer with Feide innlogging
 - [x] Student registration using FEIDE login
 - [x] Inventory management for rental equipment (with label printer API https://github.com/VaagenIM/EtikettServer)
-- [ ] Booking form for teachers / kiosk
-- [ ] Email warnings for overdue equipment
+- [ ] Kiosk mode with non-feide login (password)
+- [x] Email reports to teachers
 - [ ] Frontend that makes sense
 - [ ] Move off CDNs
 - [ ] Move to a proper database?

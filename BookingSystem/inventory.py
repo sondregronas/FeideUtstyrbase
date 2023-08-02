@@ -2,6 +2,8 @@ import sqlite3
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 
+from dateutil import parser
+
 from __init__ import logger, DATABASE, audits
 from db import read_sql_query
 
@@ -31,12 +33,32 @@ class Item:
     category: str
     included_batteries: int = 0
     available: int = 1
-    active_order: str = None
+    borrowed_to: str = None
     order_due_date: str = None
     last_seen: str = None
 
     def __str__(self) -> str:
-        return f'{self.id}, {self.name}, {self.category}'
+        if self.order_due_date:
+            return f'{self.lender_name}: {self.id} - {self.name} ({self.category}, {parser.parse(self.order_due_date):%d.%m.%Y})'
+        return f'{self.id} - {self.name} - {self.category}'
+
+    @property
+    def lender_name(self) -> str:
+        if self.borrowed_to is None:
+            return ''
+        return self.borrowed_to.split('(')[0].strip()
+
+    @property
+    def lender_association(self) -> str:
+        if self.borrowed_to is None:
+            return ''
+        return ''.join(self.borrowed_to.split('(')[1:]).strip(')')
+
+    @property
+    def overdue(self):
+        if self.order_due_date is None:
+            return False
+        return parser.parse(self.order_due_date) < datetime.now()
 
 
 def add(item: Item) -> None:
@@ -110,18 +132,10 @@ def get_all() -> list[Item]:
     return items
 
 
-def get_all_overdue() -> list[Item]:
-    """Return a JSON list of all overdue items in the database."""
+def get_all_unavailable() -> list[Item]:
+    """Return a JSON list of all unavailable items in the database."""
     con = sqlite3.connect(DATABASE)
-    items = [Item(*row) for row in con.execute(read_sql_query('get_all_overdue.sql'))]
-    con.close()
-    return items
-
-
-def get_all_non_overdue() -> list[Item]:
-    """Return a JSON list of all overdue items in the database."""
-    con = sqlite3.connect(DATABASE)
-    items = [Item(*row) for row in con.execute(read_sql_query('get_all_non_overdue.sql'))]
+    items = [Item(*row) for row in con.execute('SELECT * FROM inventory WHERE available=0')]
     con.close()
     return items
 
@@ -149,8 +163,8 @@ def register_out(item_id: str, user: str, days: str = 1) -> None:
 
     con = sqlite3.connect(DATABASE)
     try:
-        sql = 'UPDATE inventory SET available=0, active_order=:active_order, order_due_date=:order_due_date WHERE id=:id'
-        con.execute(sql, {'id': item_id, 'active_order': user, 'order_due_date': due_date})
+        sql = 'UPDATE inventory SET available=0, borrowed_to=:borrowed_to, order_due_date=:order_due_date WHERE id=:id'
+        con.execute(sql, {'id': item_id, 'borrowed_to': user, 'order_due_date': due_date})
         con.commit()
         logger.info(f'Item {item_id} is now unavailable.')
     except sqlite3.IntegrityError:
@@ -171,7 +185,7 @@ def register_in(item_id: str) -> None:
 
     con = sqlite3.connect(DATABASE)
     try:
-        sql = 'UPDATE inventory SET available=1, active_order=NULL, order_due_date=NULL WHERE id=:id'
+        sql = 'UPDATE inventory SET available=1, borrowed_to=NULL, order_due_date=NULL WHERE id=:id'
         con.execute(sql, {'id': item_id})
         con.commit()
         logger.info(f'Item {item_id} is now available.')

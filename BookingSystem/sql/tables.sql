@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS `inventory`
     `category`           TEXT             NOT NULL,
     `included_batteries` INTEGER          NOT NULL DEFAULT 0,
     `available`          INTEGER          NOT NULL DEFAULT 1,
-    `active_order`       TEXT,
+    `borrowed_to`        TEXT,
     `order_due_date`     TEXT,
     `last_seen`          TEXT,
     UNIQUE (`id`)

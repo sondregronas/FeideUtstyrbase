@@ -1,6 +1,14 @@
 {% extends 'layout.html' %}
 
 {% block content %}
+
+{% if last_sent %}
+<p><a href="#" onclick="sendReport()">Send rapport</a> (Sist sendt {{last_sent | strfunixtime}})</p>
+{% else %}
+<p><a href="#" onclick="sendReport()">Send rapport</a></p>
+{% endif %}
+
+
 <hgroup>
     <h2>Klasserom</h2>
     <h3>Et klasserom per linje, format: <b>1MEKA (Kontaktlærer)</b></h3>
@@ -18,4 +26,35 @@
     <h3>En kategori per linje</h3>
 </hgroup>
 {% include 'forms/categories.html' %}
+
+<script>
+  function sendReport() {
+    let last_sent = "{{last_sent}}";
+    let last_sent_day = new Date(last_sent * 1000).getDate();
+    let today = new Date().getDate();
+    if (last_sent_day === today) {
+      if (confirm("Det er allerede sendt ut rapport idag. Vil du likevel sende en ny?")) {
+        _send()
+      }
+    } else {
+      _send()
+    }
+
+  }
+
+  function _send() {
+    $.ajax({
+      url: "{{url_for('api.email_report')}}",
+      type: 'POST',
+      success: function (result) {
+        alert('Rapport sendt!');
+        location.reload();
+      },
+      error: function (result) {
+        alert(result.responseText);
+      }
+    });
+  }
+</script>
+
 {% endblock %}

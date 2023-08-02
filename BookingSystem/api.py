@@ -10,7 +10,7 @@ from datetime import datetime
 import flask
 import requests
 
-from BookingSystem import inventory, DATABASE, groups, LABEL_SERVER
+from BookingSystem import inventory, DATABASE, groups, LABEL_SERVER, mail
 from BookingSystem.inventory import Item
 from BookingSystem.utils import login_required, next_july
 
@@ -228,3 +228,10 @@ def update_emails() -> flask.Response:
     con.commit()
     con.close()
     return flask.redirect(flask.request.referrer)
+
+
+@api.route('/email/report', methods=['POST'], endpoint='email_report')
+@login_required(admin_only=True)
+def email_report() -> flask.Response:
+    """Emails a report to all users in the emails table."""
+    return mail.send_report()

@@ -1,24 +1,12 @@
-{% extends 'layout.html' %}
-
-{% block content %}
-<hgroup>
-    <h1>Innlevering</h1>
-    <p>Skann enheten du skal levere inn, eventuelt skriv inn løpenummer før du trykker entertasten</p>
-</hgroup>
-
 <form>
-    <label for="id">Løpenummer</label>
-    <input type="text" name="id" id="id" placeholder="Eksempel: A6500-01" required
+    <label for="id">Innlevering</label>
+    <input type="text" name="id" id="id" placeholder="Skann (eller tast inn) løpenummeret for å levere inn" required
            pattern="^[^\s][ÆØÅæøåa-zA-Z0-9_\s\-]+[^\s]">
 
     <button type="submit">Lever</button>
 </form>
 
-<a href="{{ url_for('inventar') }}">
-    <button>Ferdig!</button>
-</a>
-
-<p id="status">Klar til å levere inn!</p>
+<p id="status"></p>
 
 <script>
   $(document).ready(function () {
@@ -32,14 +20,15 @@
         type: 'POST',
         success: function (result) {
           $('#status').append('<br><span style="color: green">Leverte inn ' + $('#id').val() + '</span>');
+          $('#active tr').filter(function () {
+            return $(this).find('td').eq(0).text() === $('#id').val();
+          }).remove();
           $('#id').val('');
         },
         error: function (result) {
-          $('#status').append('<br><span style="color: red">Kunne ikke levere inn ' + $('#id').val() + ' (' + result.responseText + ')</span>');
+          $('#status').append('<br><span style="color: red">Klarte ikke å levere inn ' + $('#id').val() + ' (' + result.responseText + ')</span>');
         }
       });
     });
   });
 </script>
-
-{% endblock %}
