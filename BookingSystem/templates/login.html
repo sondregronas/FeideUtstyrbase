@@ -3,7 +3,7 @@
 {% block content %}
 <hgroup>
     <h2>Logg inn</h2>
-    <h3>For å kunne låne (eller leie ut) utstyr, må du autentisere med Feide</h3>
+    <h3>For å kunne låne utstyr må du først logge inn med din Feide bruker</h3>
 </hgroup>
 
 <a href="{{url_for('feide.login')}}">
@@ -11,4 +11,13 @@
         Logg inn med Feide
     </button>
 </a>
+
+<br>
+
+<center>
+    <a href="{{url_for('privacy')}}" target="_blank">
+        Personvernerklæring
+    </a>
+</center>
+
 {% endblock %}
