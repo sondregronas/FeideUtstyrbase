@@ -7,6 +7,7 @@ services:
       - "5000:5000"
     volumes:
       - ./data:/app/data
+      - #./responsibility.html:/app/templates/user/responsibility.html
     environment:
       # Feide client settings (Get from https://dashboard.dataporten.no)
       # FEIDE_REDIRECT_URI must be set to <fqdn>/login/feide/callback in dataporten

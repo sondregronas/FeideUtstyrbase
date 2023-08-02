@@ -137,6 +137,11 @@ def innlevering() -> str:
                                  unavailable_items=inventory.get_all_unavailable())
 
 
+@app.route('/ansvarsavtale')
+def responsibility() -> str:
+    return flask.render_template('responsibility.html')
+
+
 if __name__ == '__main__':
     init_db()
     app.run(host='0.0.0.0')

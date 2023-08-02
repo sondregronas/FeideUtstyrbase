@@ -20,9 +20,23 @@
         <option value="{{classroom}}">{{classroom}}</option>
         {% endfor %}
     </select>
-    <input type="checkbox" name="eula" id="eula" required>
-    <label for="eula">EULA tekst her</label>
-    <br><br>
+    <input type="checkbox" name="responsibility" id="responsibility" required>
+    <label for="responsibility">Jeg har lest og godtar ansvar for utstyr i henhold til <a
+            href="{{url_for('responsibility')}}" target="_blank">ansvarsavtalen</a>
+    </label>
+
+    <br>
+    <input type="checkbox" name="responsibility" id="age" required>
+    <label for="age">Jeg er over 18 år, eller har fått foresattes tillatelse til å bruke utstyrsrommet.</label>
+
+    <blockquote>
+        <hgroup>
+            <h3>Obs!</h3>
+            <h4>Ansvarsavtalen inkluderer økonomisk ansvar for utstyr som blir ødelagt eller mistet, i henhold til
+                avtalen.
+            </h4></hgroup>
+    </blockquote>
+
     <input type="submit" value="Bekreft">
 </form>
 
