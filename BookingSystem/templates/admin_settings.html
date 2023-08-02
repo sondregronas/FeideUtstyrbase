@@ -1,0 +1,69 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+
+<hgroup>
+    <h2>Admin innstillinger</h2>
+    <h3>Dersom du er forvirret av denne siden, så kan du trygt forlate den :)</h3>
+</hgroup>
+
+{% if last_sent %}
+<a href="#" onclick="sendReport()">
+    <button>Send rapport (Sist sendt {{last_sent | strfunixtime}})</button>
+</a>
+{% else %}
+<a href="#" onclick="sendReport()">
+    <button>Send rapport</button>
+</a>
+{% endif %}
+
+
+<hgroup>
+    <h2>Klasserom</h2>
+    <h3>Et klasserom per linje, format: <b>1MEKA (Kontaktlærer)</b></h3>
+</hgroup>
+{% include 'forms/groups.html' %}
+
+<hgroup>
+    <h2>E-poster</h2>
+    <h3>Hvem skal motta e-post? En addresse per linje</h3>
+</hgroup>
+{% include 'forms/emails.html' %}
+
+<hgroup>
+    <h2>Kategorier</h2>
+    <h3>En kategori per linje</h3>
+</hgroup>
+{% include 'forms/categories.html' %}
+
+<script>
+  function sendReport() {
+    let last_sent = "{{last_sent}}";
+    let last_sent_day = new Date(last_sent * 1000).getDate();
+    let today = new Date().getDate();
+    if (last_sent_day === today) {
+      if (confirm("Det er allerede sendt ut rapport idag. Vil du likevel sende en ny?")) {
+        _send()
+      }
+    } else {
+      _send()
+    }
+
+  }
+
+  function _send() {
+    $.ajax({
+      url: "{{url_for('api.email_report')}}",
+      type: 'POST',
+      success: function (result) {
+        alert('Rapport sendt!');
+        location.reload();
+      },
+      error: function (result) {
+        alert(result.responseText);
+      }
+    });
+  }
+</script>
+
+{% endblock %}

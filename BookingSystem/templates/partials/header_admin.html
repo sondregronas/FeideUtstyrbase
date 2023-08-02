@@ -1,0 +1,21 @@
+<nav>
+    <li><a href="{{ url_for('index') }}">Utstyrbase</a></li>
+    <ul>
+        <li><a href="{{ url_for('innlevering') }}">Innlevering</a></li>
+        <li><a href="{{ url_for('booking') }}">Booking</a></li>
+        <li><a href="{{ url_for('inventar') }}">Inventar</a></li>
+        <div class="dropdown">
+            <li><a class="dropbtn" href="{{ url_for('admin_settings') }}">
+                <i class="fa fa-cogs" aria-hidden="true"></i>
+            </a></li>
+            <div class="dropdown-content">
+                <a href="{{ url_for('admin_settings') }}">Adminpanel</a>
+                <a href="{{ url_for('audits') }}">Audits</a>
+                <a href="https://github.com/sondregronas/FeideUtstyrbase" target="_blank">Kildekode</a>
+                <a href="{{ url_for('logout') }}">Logg ut</a>
+            </div>
+        </div>
+    </ul>
+</nav>
+
+

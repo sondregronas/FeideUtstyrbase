@@ -1,0 +1,40 @@
+<script src="/static/js/chosen.jquery.min.js"></script>
+<link rel="stylesheet" href="/static/css/chosen.min.css"/>
+
+<style>
+  .chosen-container *, .chosen-container a {
+    background: var(--form-element-background-color) !important;
+    color: var(--form-element-color) !important;
+    font-family: var(--font-family);
+    line-height: var(--line-height) !important;
+    font-size: var(--font-size) !important;
+    border-color: var(--form-element-border-color) !important;
+    box-shadow: none !important;
+    border-radius: var(--border-radius);
+  }
+
+  .chosen-container {
+    margin-bottom: var(--spacing);
+  }
+
+  .chosen-single, .chosen-choices {
+    min-height: calc(1rem * var(--line-height) + var(--form-element-spacing-vertical) * 2 + var(--border-width) * 2) !important;
+  }
+
+  .chosen-single span {
+    padding-left: 0.5rem;
+    padding-top: 0.65rem;
+  }
+
+  .chosen-container-multi ul {
+    padding-left: 0.5rem !important;
+    padding-top: 0.15rem !important;
+  }
+
+  .search-choice-close:before {
+    content: '✕';
+    font-size: .5rem;
+    position: relative;
+    top: -.2rem;
+  }
+</style>

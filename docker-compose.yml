@@ -1,0 +1,37 @@
+version: "3.7"
+services:
+  app:
+    # build: .
+    image: ghcr.io/sondregronas/feideutstyrbase:latest
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./data:/app/data
+    environment:
+      # Feide client settings (Get from https://dashboard.dataporten.no)
+      # FEIDE_REDIRECT_URI must be set to <fqdn>/login/feide/callback in dataporten
+      - FEIDE_REDIRECT_URI='https://<fqdn>/login/feide/callback'
+      - FEIDE_CLIENT_ID=''
+      - FEIDE_CLIENT_SECRET=''
+
+      # Label server FQDN (https://github.com/VaagenIM/EtikettServer)
+      - LABEL_SERVER='https://<fqdn-label>'
+
+      # SMTP settings for email reports (overdue items)
+      - SMTP_SERVER=''
+      - SMTP_PORT='587'
+      - SMTP_USERNAME=''
+      - SMTP_PASSWORD=''
+      - SMTP_FROM='UtstyrBase'
+
+      # Reverse proxy for kiosk mode (No login, all visitors are administrators
+      # If you don't know what this is, leave it blank
+      # Ensure access list only allows your kiosk client, or you will have a bad time
+      - KIOSK_FQDN=''
+
+      # Debug only responds to "True", don't use in production
+      - DEBUG='False'
+
+      # Set timezone to your local timezone
+      - TZ='Europe/Oslo'
+    restart: unless-stopped

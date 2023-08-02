@@ -1,0 +1,34 @@
+<form>
+    <label for="id">Innlevering</label>
+    <input type="text" name="id" id="id" placeholder="Skann (eller tast inn) løpenummeret for å levere inn" required
+           pattern="^[^\s][ÆØÅæøåa-zA-Z0-9_\s\-]+[^\s]">
+
+    <button type="submit">Lever</button>
+</form>
+
+<p id="status" style="min-height: 2rem;"></p>
+
+<script>
+  $(document).ready(function () {
+    $('#id').focus();
+    $('form').submit(function (event) {
+      event.preventDefault();
+      url = "{{ url_for('api.return_equipment', item_id='REPLACE_ME') }}";
+      url = url.replace('REPLACE_ME', $('#id').val());
+      $.ajax({
+        url: url,
+        type: 'POST',
+        success: function (result) {
+          $('#status').append('<br><span style="color: green">Leverte inn ' + $('#id').val() + '</span>');
+          $('#active tr').filter(function () {
+            return $(this).find('td').eq(0).text() === $('#id').val();
+          }).remove();
+          $('#id').val('');
+        },
+        error: function (result) {
+          $('#status').append('<br><span style="color: red">Klarte ikke å levere inn ' + $('#id').val() + ' (' + result.responseText + ')</span>');
+        }
+      });
+    });
+  });
+</script>

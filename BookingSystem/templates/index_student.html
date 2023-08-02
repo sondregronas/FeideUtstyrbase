@@ -1,0 +1,42 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<hgroup>
+    <h2>Hei {{session.user.name}}!</h2>
+    <h3>Velkommen til utstyrsrommet! Før du kan bruke utstyrsrommet må du velge klassen og kontaktlæreren din fra listen
+        under.</h3>
+</hgroup>
+
+<form action="{{url_for('api.update_student')}}" method="post">
+    <select name="classroom" id="classroom_select">
+        <option value="" disabled selected>
+            {% if session.user.classroom %}
+            Nåværende: {{session.user.classroom}}
+            {% else %}
+            Velg klasse
+            {% endif %}
+        </option>
+        {% for classroom in all_groups %}
+        <option value="{{classroom}}">{{classroom}}</option>
+        {% endfor %}
+    </select>
+    <input type="checkbox" name="eula" id="eula" required>
+    <label for="eula">EULA tekst her</label>
+    <br><br>
+    <input type="submit" value="Bekreft">
+</form>
+
+{% if session.user.active %}
+<div style="color: green">
+    Status: Du er klar til å bruke utstyrsrommet!
+</div>
+{% else %}
+<div style="color: red">
+    <b>Status:</b>
+    Du må oppdatere klassen din for å kunne bruke utstyrsrommet i år.
+</div>
+{% endif %}
+
+{% endblock %}
+
+

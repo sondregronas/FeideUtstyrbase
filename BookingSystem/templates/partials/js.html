@@ -1,0 +1,12 @@
+<script src="/static/js/jquery-3.7.0.min.js"></script>
+
+<script>
+  $(document).ready(function () {
+    // Dropdown menu
+    $('.dropdown').hover(function () {
+      $(this).find('.dropdown-content').first().stop(true, true).slideDown(150);
+    }, function () {
+      $(this).find('.dropdown-content').first().stop(true, true).slideUp(105)
+    });
+  });
+</script>

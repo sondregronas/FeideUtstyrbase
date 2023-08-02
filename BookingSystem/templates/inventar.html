@@ -1,0 +1,77 @@
+{% extends 'layout.html' %}
+
+{% block extra_head %}
+{% include 'templates/datatables.html' %}
+{% endblock %}
+
+{% block content %}
+<hgroup>
+    <h2>Inventar</h2>
+    <h3>Her kan du legge til og endre inventaren. Du kan også skrive ut etiketter.</h3>
+</hgroup>
+
+<a href="{{ url_for('inventar_add') }}">
+    <button>Legg til nytt inventar</button>
+</a>
+
+<br>
+<br>
+
+<table id="items-table">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Navn</th>
+        <th>Kategori</th>
+        <th>Sist sett</th>
+        <th>Administrer</th>
+    </tr>
+    </thead>
+    <tbody id="items-table-items">
+    {% for item in items %}
+    <tr>
+        <td>{{ item.id }}</td>
+        <td>{{ item.name }}</td>
+        <td>{{ item.category }}</td>
+        <td>{{ item.last_seen }}</td>
+        <td>
+            {% if item.available %}
+            <a href="{{ url_for('edit_item', item_id=item.id) }}">Rediger</a>
+            |
+            <a href="{{ url_for('print_item', item_id=item.id) }}">Etikett</a>
+            {% else %}
+            Utlånt
+            {% endif %}
+        </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+<script>
+  $(document).ready(function () {
+    $('#items-table').DataTable({
+      "language": {
+        "lengthMenu": "Vis _MENU_ rader per side",
+        "zeroRecords": "Ingen treff",
+        "info": "Viser side _PAGE_ av _PAGES_",
+        "infoEmpty": "Ingen rader tilgjengelig",
+        "infoFiltered": "(filtrert fra _MAX_ rader totalt)",
+        "search": "Søk:",
+        "paginate": {
+          "first": "Første",
+          "last": "Siste",
+          "next": "Neste",
+          "previous": "Forrige"
+        }
+      },
+      "columnDefs": [
+        {"orderable": false, "targets": 4}
+      ],
+      "pageLength": 25,
+      "lengthMenu": [[25, 50, -1], [25, 50, "Alle"]],
+    });
+  });
+</script>
+
+{% endblock %}

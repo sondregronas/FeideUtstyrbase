@@ -1,0 +1,29 @@
+{% extends 'layout.html' %}
+
+{% block extra_head %}
+{% include 'templates/datatables.html' %}
+{% endblock %}
+
+{% block content %}
+
+
+<hgroup>
+    <h2>Vågen Utstyrbase</h2>
+    <h3>Velkommen! Her kan du <a href="{{ url_for('innlevering') }}">levere inn</a> og <a
+            href="{{ url_for('booking') }}">låne bort utstyr</a>!
+    </h3>
+</hgroup>
+
+<br>
+
+<a href="{{url_for('booking')}}">
+    <button>Låne ut utstyr</button>
+</a>
+<a href="{{url_for('innlevering')}}">
+    <button>Levere inn utstyr</button>
+</a>
+<a href="{{url_for('inventar')}}">
+    <button>Administrere utstyr</button>
+</a>
+
+{% endblock %}

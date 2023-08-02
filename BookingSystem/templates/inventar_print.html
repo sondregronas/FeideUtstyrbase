@@ -1,0 +1,66 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<hgroup>
+    <h2>Skriv ut etikett</h2>
+    <h3>For {{ item.id }} ({{ item.name }})</h3>
+</hgroup>
+
+<form>
+    <center>
+        <img class="label-preview" src="{{ url_for('api.get_label_preview', item_id=item.id, variant='qr') }}"
+             alt="Label preview">
+    </center>
+
+    <table>
+        <td>
+            <label for="print_label_count">Antall etiketter</label>
+            <input type="number" name="print_label_count" id="print_label_count" required value="1" min="0" max="9">
+        </td>
+        <td>
+            <label for="print_label_type">Type</label>
+            <select name="print_label_type" id="print_label_type" required>
+                <option value="qr">QR</option>
+                <option value="barcode">Strekkode</option>
+            </select>
+        </td>
+    </table>
+
+    <button type="submit">Skriv ut</button>
+</form>
+
+<p id="status">Klar til å skrive ut etikett</p>
+
+<a href="{{ url_for('inventar') }}">
+    <button>Tilbake</button>
+</a>
+
+<script>
+  $(document).ready(function () {
+    $('#print_label_type').change(function () {
+      var variant = $('#print_label_type').val();
+
+      var url = "{{ url_for('api.get_label_preview', item_id=item.id, variant='REPLACE_ME') }}";
+      url = url.replace('REPLACE_ME', variant);
+
+      $('.label-preview').attr('src', url);
+    });
+    $('form').submit(function (event) {
+      event.preventDefault();
+      $.ajax({
+        type: 'POST',
+        url: '{{ url_for("api.print_label", item_id=item.id) }}',
+        data: $('form').serialize(),
+        success: function (response) {
+          window.location.href = '{{ url_for("inventar") }}';
+        },
+        error: function (response) {
+          $('#status').html(response.responseText);
+          $('#status').css('color', 'red');
+        }
+      });
+    });
+  });
+</script>
+
+{% endblock %}
