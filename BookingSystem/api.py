@@ -13,6 +13,7 @@ import requests
 import groups
 import inventory
 import mail
+import user
 from __init__ import DATABASE, LABEL_SERVER
 from inventory import Item
 from utils import login_required, next_july
@@ -238,3 +239,11 @@ def update_emails() -> flask.Response:
 def email_report() -> flask.Response:
     """Emails a report to all users in the emails table."""
     return mail.send_report()
+
+
+@api.route('/users/prune_inactive', methods=['POST'], endpoint='prune_inactive_users')
+@login_required(admin_only=True)
+def prune_inactive_users() -> flask.Response:
+    """Prune users that have not been updated in a while."""
+    user.prune_inactive()
+    return flask.Response('Inaktive brukere ble fjernet.', status=200)

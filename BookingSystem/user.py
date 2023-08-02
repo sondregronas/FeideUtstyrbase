@@ -72,3 +72,12 @@ def get_all_active_users() -> list[dict]:
     data = [{columns[i]: user[i] for i in range(len(columns))} for user in cur.fetchall()]
     con.close()
     return data
+
+
+def prune_inactive() -> None:
+    """Remove all inactive users from the database."""
+    con = sqlite3.connect(DATABASE)
+    cur = con.cursor()
+    cur.execute(read_sql_query('prune_old_users.sql'))
+    con.commit()
+    con.close()

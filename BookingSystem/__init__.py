@@ -23,6 +23,7 @@ KIOSK_FQDN = os.getenv('KIOSK_FQDN')
 app = flask.Flask(__name__, template_folder='templates', static_folder='static')
 app.secret_key = os.getenv('SECRET_KEY')
 app.config['SESSION_TYPE'] = 'filesystem'
+app.config['PERMANENT_SESSION_LIFETIME'] = 3600
 if os.getenv('DEBUG') == 'True':
     app.debug = True
 
