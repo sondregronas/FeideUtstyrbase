@@ -3,11 +3,15 @@ from datetime import datetime
 import flask
 from dateutil import parser
 
+import api
 import feide
 import groups
-from BookingSystem import app, logger, api, inventory, user, mail, KIOSK_FQDN
-from BookingSystem.db import init_db, add_admin
-from BookingSystem.utils import login_required
+import inventory
+import mail
+import user
+from __init__ import app, logger, KIOSK_FQDN
+from db import init_db, add_admin
+from utils import login_required
 
 app.register_blueprint(api.api)
 app.register_blueprint(feide.feide)

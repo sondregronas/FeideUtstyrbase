@@ -3,7 +3,7 @@ import os
 import flask
 import requests
 
-from BookingSystem import logger
+from __init__ import logger
 
 """
 Upon successful authentication, the user's data is saved in the session.

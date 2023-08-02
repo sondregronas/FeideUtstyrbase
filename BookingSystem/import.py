@@ -11,7 +11,7 @@ import sqlite3
 
 import requests
 
-from BookingSystem import DATABASE, LABEL_SERVER
+from __init__ import DATABASE, LABEL_SERVER
 
 
 def get_items_from_label_server() -> list:

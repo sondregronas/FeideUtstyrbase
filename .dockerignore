@@ -1,0 +1,5 @@
+BookingSystem/data
+BookingSystem/flask_session
+BookingSystem/.env
+BookingSystem/.env.example
+BookingSystem/__pycache__/

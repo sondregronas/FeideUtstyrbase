@@ -1,6 +1,6 @@
 import sqlite3
 
-from BookingSystem import DATABASE
+from __init__ import DATABASE
 
 
 def get_all() -> list[str]:

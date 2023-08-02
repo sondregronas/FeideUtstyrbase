@@ -3,7 +3,7 @@ from functools import wraps
 
 import flask
 
-from BookingSystem.feide import get_feide_data
+from feide import get_feide_data
 from user import User, FeideUser, KioskUser
 
 

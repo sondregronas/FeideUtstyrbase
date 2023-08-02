@@ -10,9 +10,12 @@ from datetime import datetime
 import flask
 import requests
 
-from BookingSystem import inventory, DATABASE, groups, LABEL_SERVER, mail
-from BookingSystem.inventory import Item
-from BookingSystem.utils import login_required, next_july
+import groups
+import inventory
+import mail
+from __init__ import DATABASE, LABEL_SERVER
+from inventory import Item
+from utils import login_required, next_july
 
 api = flask.Blueprint('api', __name__)
 
@@ -41,7 +44,7 @@ def add_item() -> flask.Response:
     if print_label_count > 0:
         url = f'{LABEL_SERVER}/print?count={print_label_count}&variant={print_label_type}&id={item.id}&name={item.name}&category={item.category}'
         print(url)
-    return flask.Response(f'Added {item.id} to the database.', status=201)
+    return flask.Response(f'La til {item.id} i databasen.', status=201)
 
 
 @api.route('/items/edit/<item_id>', methods=['POST'])
@@ -57,7 +60,7 @@ def edit_item(item_id: str) -> flask.Response:
         inventory.edit(item_id, item)
     except ValueError as e:
         return flask.Response(str(e), status=400)
-    return flask.Response(f'Edited {item_id} in the database.', status=200)
+    return flask.Response(f'Redigerte {item_id} i databasen.', status=200)
 
 
 @api.route('/items/delete/<item_id>', methods=['POST'])
@@ -68,7 +71,7 @@ def delete_item(item_id: str) -> flask.Response:
         inventory.delete(item_id)
     except ValueError as e:
         return flask.Response(str(e), status=400)
-    return flask.Response(f'Deleted {item_id} from the database.', status=200)
+    return flask.Response(f'Slettet {item_id} fra databasen.', status=200)
 
 
 @api.route('/items/<item_id>', methods=['GET'])
@@ -114,7 +117,7 @@ def book_equipment() -> flask.Response:
 
     for item in item_ids:
         inventory.register_out(item_id=item, user=user, days=days)
-    return flask.Response('Booked out equipment.', status=200)
+    return flask.Response('Utstyr ble utlevert.', status=200)
 
 
 @api.route('/return/<item_id>', methods=['POST'])
@@ -125,7 +128,7 @@ def return_equipment(item_id: str) -> flask.Response:
         inventory.register_in(item_id=item_id)
     except ValueError as e:
         return flask.Response(str(e), status=400)
-    return flask.Response('Returned equipment.', status=200)
+    return flask.Response('Utstyr ble innlevert.', status=200)
 
 
 @api.route('/groups', methods=['GET'])

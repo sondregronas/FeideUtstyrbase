@@ -4,7 +4,7 @@ from datetime import datetime
 
 from flask import request
 
-from BookingSystem import DATABASE, KIOSK_FQDN
+from __init__ import DATABASE, KIOSK_FQDN
 from db import get_user, read_sql_query
 from feide import get_feide_data
 

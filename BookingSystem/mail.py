@@ -5,7 +5,8 @@ from datetime import datetime
 
 import flask
 
-from BookingSystem import DATABASE, inventory, logger
+import inventory
+from __init__ import DATABASE, logger
 
 SMTP_SERVER = os.getenv('SMTP_SERVER')
 SMTP_PORT = int(os.getenv('SMTP_PORT')) if os.getenv('SMTP_PORT') else 587
