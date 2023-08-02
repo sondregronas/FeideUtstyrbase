@@ -6,11 +6,13 @@
 
 {% block content %}
 <hgroup>
-    <h1>Inventar</h1>
-    <h2>Her kan du legge til, endre og slette inventar.</h2>
+    <h2>Inventar</h2>
+    <h3>Her kan du legge til og endre inventaren. Du kan også skrive ut etiketter.</h3>
 </hgroup>
 
-<a href="{{ url_for('inventar_add') }}">Legg til nytt inventar</a>
+<a href="{{ url_for('inventar_add') }}">
+    <button>Legg til nytt inventar</button>
+</a>
 
 <br>
 <br>

@@ -1,4 +1,7 @@
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.classless.min.css">
+<link rel="shortcut icon" href="/static/favicon.ico" type="image/x-icon">
+<link rel="stylesheet" href="/static/css/pico.classless.min.css">
+<link rel="stylesheet" href="/static/css/font-awesome.min.css">
+
 <style>
   .red-button {
     background-color: red;
@@ -23,5 +26,19 @@
   header, main, footer {
     padding-top: 1rem !important;
     padding-bottom: 1rem !important;
+  }
+
+  .dropdown {
+    position: relative;
+    display: inline-block;
+  }
+
+  .dropdown-content {
+    display: none;
+    position: absolute;
+    border: 1px solid #ddd;
+    background-color: var(--background-color);
+    min-width: 12ch;
+    padding: 1rem;
   }
 </style>

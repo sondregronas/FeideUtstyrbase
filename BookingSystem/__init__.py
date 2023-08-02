@@ -16,11 +16,18 @@ Path('data').mkdir(exist_ok=True)
 # Global variables
 DATABASE = Path('data') / 'db.sqlite'
 LABEL_SERVER = os.getenv('LABEL_SERVER')
+KIOSK_FQDN = os.getenv('KIOSK_FQDN')
 
 # Flask app setup
 app = flask.Flask(__name__, template_folder='templates', static_folder='static')
 app.secret_key = os.getenv('SECRET_KEY')
 app.config['SESSION_TYPE'] = 'filesystem'
+if os.getenv('DEBUG') == 'True':
+    app.debug = True
+
+# We're behind a reverse proxy, so we need to fix the scheme and host
+app.wsgi_app = flask.proxy_fix.ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
+
 Session(app)
 
 # Logger setup

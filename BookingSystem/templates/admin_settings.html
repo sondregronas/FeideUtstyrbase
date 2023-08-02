@@ -2,10 +2,19 @@
 
 {% block content %}
 
+<hgroup>
+    <h2>Admin innstillinger</h2>
+    <h3>Dersom du er forvirret av denne siden, så kan du trygt forlate den :)</h3>
+</hgroup>
+
 {% if last_sent %}
-<p><a href="#" onclick="sendReport()">Send rapport</a> (Sist sendt {{last_sent | strfunixtime}})</p>
+<a href="#" onclick="sendReport()">
+    <button>Send rapport (Sist sendt {{last_sent | strfunixtime}})</button>
+</a>
 {% else %}
-<p><a href="#" onclick="sendReport()">Send rapport</a></p>
+<a href="#" onclick="sendReport()">
+    <button>Send rapport</button>
+</a>
 {% endif %}
 
 

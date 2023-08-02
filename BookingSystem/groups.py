@@ -1,10 +1,6 @@
 import sqlite3
 
-import flask
-
 from BookingSystem import DATABASE
-
-groups = flask.Blueprint('groups', __name__)
 
 
 def get_all() -> list[str]:

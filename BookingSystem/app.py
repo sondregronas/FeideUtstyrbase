@@ -5,13 +5,12 @@ from dateutil import parser
 
 import feide
 import groups
-from BookingSystem import app, logger, api, inventory, user, mail
+from BookingSystem import app, logger, api, inventory, user, mail, KIOSK_FQDN
 from BookingSystem.db import init_db, add_admin
 from BookingSystem.utils import login_required
 
 app.register_blueprint(api.api)
 app.register_blueprint(feide.feide)
-app.register_blueprint(groups.groups)
 
 
 @app.template_filter('strftime')
@@ -30,17 +29,29 @@ def unauthorized(e) -> flask.Response:
     return flask.redirect(flask.url_for('login'))
 
 
+@app.errorhandler(403)
+def unauthorized(e) -> flask.Response:
+    flask.session.clear()
+    logger.warning(f'Unauthorized access: {flask.request.url} from {flask.request.remote_addr}')
+    return flask.redirect(flask.url_for('login'))
+
+
 @app.route('/')
 @login_required()
 def index() -> str:
     if flask.session.get("user").is_admin:
-        return flask.render_template('index_admin.html',
-                                     unavailable_items=inventory.get_all_unavailable())
+        return flask.render_template('index_admin.html')
     return flask.render_template('index_student.html', all_groups=groups.get_all())
 
 
 @app.route('/login')
-def login() -> str:
+def login() -> str | flask.Response:
+    if KIOSK_FQDN and flask.request.headers.get('Host') == KIOSK_FQDN:
+        flask.session['method'] = 'kiosk'
+        r = flask.request.referrer
+        if r != flask.url_for('login'):
+            return flask.redirect(r)
+        return flask.redirect(flask.url_for('index'))
     return flask.render_template('login.html')
 
 
@@ -55,7 +66,6 @@ def register() -> flask.Response:
 
 
 @app.route('/logout')
-@login_required()
 def logout() -> flask.Response:
     flask.session.clear()
     return flask.redirect(flask.url_for('index'))
@@ -109,14 +119,20 @@ def print_item(item_id: str) -> str:
 
 
 @app.route('/booking')
-@login_required()
+@login_required(admin_only=True)
 def booking() -> str:
     return flask.render_template('booking.html',
                                  all_users=user.get_all_active_users(),
                                  all_items=inventory.get_all())
 
 
+@app.route('/innlevering')
+@login_required(admin_only=True)
+def innlevering() -> str:
+    return flask.render_template('innlevering.html',
+                                 unavailable_items=inventory.get_all_unavailable())
+
+
 if __name__ == '__main__':
     init_db()
-    app.debug = True
     app.run(host='0.0.0.0')

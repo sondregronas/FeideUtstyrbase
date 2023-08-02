@@ -6,13 +6,13 @@
 
 {% block content %}
 <hgroup>
-    <h1>Booking av utstyr</h1>
-    <p>Utlån</p>
+    <h2>Lån ut utstyr</h2>
+    <h3>Dersom du ikke finner eleven i listen, må eleven logge inn på nettstedet og fullføre registreringen.</h3>
 </hgroup>
 
 <form>
-    <label for="user">Bruker</label>
-    <select name="user" id="user" data-placeholder="Velg bruker..." required>
+    <label for="user">Hvem låner?</label>
+    <select name="user" id="user" data-placeholder="Søk etter bruker..." required>
         <option value=""></option>
         {% for user in all_users %}
         <option value="{{user.name}} ({% if user.classroom %}{{user.classroom}}{%else%}Lærer{% endif %})">
@@ -21,11 +21,12 @@
         {% endfor %}
     </select>
 
-    <label for="days">Dager</label>
-    <input type="number" name="days" id="days" min="1" max="90" value="1">
+    <label for="days">Hvor lenge (antall dager, maks 14)</label>
+    <input type="number" name="days" id="days" min="1" max="90" value="1" required>
 
-    <label for="equipment">Utstyr</label>
-    <select name="equipment" id="equipment" multiple data-placeholder="Utstyr" required>
+    <label for="equipment">Liste over utstyr</label>
+    <select name="equipment" id="equipment" multiple data-placeholder="Marker dette feltet før du bruker skanneren!"
+            required>
         <option value=""></option>
         {% for item in all_items %}
         <option value="{{item.id}}">{{item.id}}</option>

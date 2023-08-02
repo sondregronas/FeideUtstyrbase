@@ -4,7 +4,7 @@ from functools import wraps
 import flask
 
 from BookingSystem.feide import get_feide_data
-from user import User, FeideUser
+from user import User, FeideUser, KioskUser
 
 
 def user_factory() -> User | None:
@@ -12,6 +12,8 @@ def user_factory() -> User | None:
     match flask.session.get('method'):
         case 'feide':
             return FeideUser(**get_feide_data())
+        case 'kiosk':
+            return KioskUser(name='Kiosk', email='', userid='kiosk', affiliations=[])
         case _:
             return None
 

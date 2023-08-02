@@ -104,7 +104,7 @@ def print_label(item_id: str) -> flask.Response:
 
 
 @api.route('/book/out', methods=['POST'])
-@login_required()
+@login_required(admin_only=True)
 def book_equipment() -> flask.Response:
     """Book out equipment for a user."""
     form = flask.request.form
@@ -118,7 +118,7 @@ def book_equipment() -> flask.Response:
 
 
 @api.route('/return/<item_id>', methods=['POST'])
-@login_required()
+@login_required(admin_only=True)
 def return_equipment(item_id: str) -> flask.Response:
     """Return equipment from a user."""
     try:
@@ -150,7 +150,7 @@ def get_users() -> flask.Response:
 
 
 @api.route('/update/student', methods=['POST'], endpoint='update_student')
-@login_required()
+@login_required(admin_only=True)
 def update_student() -> flask.Response:
     """Update a class in the database."""
     con = sqlite3.connect(DATABASE)

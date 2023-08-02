@@ -2,7 +2,9 @@ import sqlite3
 from dataclasses import dataclass
 from datetime import datetime
 
-from BookingSystem import DATABASE
+from flask import request
+
+from BookingSystem import DATABASE, KIOSK_FQDN
 from db import get_user, read_sql_query
 from feide import get_feide_data
 
@@ -53,6 +55,12 @@ class FeideUser(User):
         self.email = data['email']
         self.userid = data['userid']
         self.affiliations = data['affiliations']
+
+
+class KioskUser(User):
+    @property
+    def is_admin(self) -> bool:
+        return request.headers.get('Host') == KIOSK_FQDN
 
 
 def get_all_active_users() -> list[dict]:
