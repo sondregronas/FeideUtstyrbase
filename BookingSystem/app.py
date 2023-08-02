@@ -9,7 +9,7 @@ import groups
 import inventory
 import mail
 import user
-from __init__ import app, logger, KIOSK_FQDN
+from __init__ import app, logger, KIOSK_FQDN, LABEL_SERVER
 from db import init_db, add_admin
 from utils import login_required
 
@@ -53,7 +53,7 @@ def login() -> str | flask.Response:
     if KIOSK_FQDN and flask.request.headers.get('Host') == KIOSK_FQDN:
         flask.session['method'] = 'kiosk'
         r = flask.request.referrer
-        if r != flask.url_for('login'):
+        if r and r != flask.url_for('login'):
             return flask.redirect(r)
         return flask.redirect(flask.url_for('index'))
     return flask.render_template('login.html')
@@ -135,6 +135,12 @@ def booking() -> str:
 def innlevering() -> str:
     return flask.render_template('innlevering.html',
                                  unavailable_items=inventory.get_all_unavailable())
+
+
+@app.route('/etikettserver')
+@login_required(admin_only=True)
+def labelserver() -> str:
+    return flask.render_template('labelserver.html', labelserver_url=LABEL_SERVER)
 
 
 @app.route('/ansvarsavtale')
