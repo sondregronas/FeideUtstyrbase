@@ -1,10 +1,14 @@
 {% extends 'layout.html' %}
 
 {% block content %}
-<h1>Logg inn</h1>
+<hgroup>
+    <h2>Logg inn</h2>
+    <h3>For å kunne låne (eller leie ut) utstyr, må du autentisere med Feide</h3>
+</hgroup>
+
 <a href="{{url_for('feide.login')}}">
     <button>
-        Feide
+        Logg inn med Feide
     </button>
 </a>
 {% endblock %}

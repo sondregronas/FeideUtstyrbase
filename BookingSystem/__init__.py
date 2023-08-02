@@ -5,6 +5,7 @@ from pathlib import Path
 import flask
 from dotenv import load_dotenv
 from flask_session import Session
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 dotenv_path = Path('.env')
 if dotenv_path.exists():
@@ -26,7 +27,7 @@ if os.getenv('DEBUG') == 'True':
     app.debug = True
 
 # We're behind a reverse proxy, so we need to fix the scheme and host
-app.wsgi_app = flask.proxy_fix.ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
+app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
 
 Session(app)
 
