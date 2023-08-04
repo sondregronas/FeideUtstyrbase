@@ -72,6 +72,7 @@ def send_report() -> flask.Response:
     """Send an email to all emails in the database."""
     items = [item for item in inventory.get_all_unavailable() if item.overdue]
     if not items:
+        update_last_sent()
         return flask.Response('Ikke sendt (intet å rapportere!)', status=400)
 
     title = f'[UtstyrServer] Rapport for overskredet utstyr {datetime.now().strftime("%d.%m.%Y")}'

@@ -1,0 +1,3 @@
+# Send report at 8:15 every monday, excluding in the month of july
+# Only works when used on the kiosk FQDN, as it uses the kiosk cookie to authenticate
+15 8 * 1-6,8-12 MON curl -c utstyr.cookie --head -L https://<kiosk-fqdn>/login && curl -b utstyr.cookie https://<kiosk-fqdn>/email/report?interval=1

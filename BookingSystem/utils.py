@@ -26,7 +26,7 @@ def refresh_user() -> None:
         flask.session['user'] = user_factory()
 
 
-def login_required(admin_only: bool = False):
+def login_required(admin_only: bool = False) -> callable:
     """Decorator to check if the user is logged in."""
 
     def decorator(func: callable) -> callable:
