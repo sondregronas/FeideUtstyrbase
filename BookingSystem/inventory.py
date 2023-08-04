@@ -55,7 +55,7 @@ class Item:
         return ''.join(self.borrowed_to.split('(')[1:]).strip(')')
 
     @property
-    def overdue(self):
+    def overdue(self) -> bool:
         if self.order_due_date is None:
             return False
         return parser.parse(self.order_due_date) < datetime.now()
@@ -83,8 +83,8 @@ def edit(old_item_id: str, new_item: Item) -> None:
     old = get(old_item_id)
     con = sqlite3.connect(DATABASE)
     try:
-        SQL = 'UPDATE inventory SET id=:id, name=:name, category=:category, included_batteries=:included_batteries WHERE id=:old_item_id'
-        con.execute(SQL, {**new_item.__dict__, 'old_item_id': old_item_id})
+        sql = 'UPDATE inventory SET id=:id, name=:name, category=:category, included_batteries=:included_batteries WHERE id=:old_item_id'
+        con.execute(sql, {**new_item.__dict__, 'old_item_id': old_item_id})
         con.commit()
         logger.info(f'Redigerte utstyr {old_item_id} i databasen.')
         logger.debug(f'Redigerte utstyr {old_item_id} i databasen med verdiene {new_item.__dict__}')
@@ -104,8 +104,8 @@ def delete(item_id: str) -> None:
     """Delete the item with the given ID from the database."""
     con = sqlite3.connect(DATABASE)
     try:
-        SQL = 'DELETE FROM inventory WHERE id=:id'
-        con.execute(SQL, {'id': item_id})
+        sql = 'DELETE FROM inventory WHERE id=:id'
+        con.execute(sql, {'id': item_id})
         con.commit()
         logger.info(f'Slettet utstyr {item_id} fra databasen.')
     except sqlite3.IntegrityError:
@@ -152,8 +152,8 @@ def _update_last_seen(item_id: str) -> None:
     """Update the last_seen column of the item with the given ID."""
     con = sqlite3.connect(DATABASE)
     try:
-        SQL = 'UPDATE inventory SET last_seen=datetime("now") WHERE id=:id'
-        con.execute(SQL, {'id': item_id})
+        sql = "UPDATE inventory SET last_seen=DATETIME('now','localtime') WHERE id=:id"
+        con.execute(sql, {'id': item_id})
         con.commit()
     except sqlite3.IntegrityError:
         print(f'{item_id} eksisterer ikke i databasen.')
