@@ -45,7 +45,7 @@
     {% for item in overdue_items %}
     <tr class="item-row item-row--overdue">
         <td>{{ item.id }}</td>
-        <td>{{ item.name }}</td>
+        <td>{{ item.name }} ({{ item.category }})</td>
         <td>{{ item.borrowed_to }}</td>
         <td>{{ item.order_due_date|strftime }}</td>
     </tr>
