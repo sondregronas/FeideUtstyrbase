@@ -29,8 +29,8 @@ ENV DEBUG='False'
 
 WORKDIR /app
 COPY requirements.txt requirements.txt
-COPY BookingSystem .
 RUN pip install -r requirements.txt
+COPY BookingSystem .
 
 VOLUME /app/data
 EXPOSE 5000
