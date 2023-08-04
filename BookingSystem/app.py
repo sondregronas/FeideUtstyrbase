@@ -44,7 +44,7 @@ def unauthorized(e) -> flask.Response:
 @login_required()
 def index() -> str:
     if flask.session.get("user").is_admin:
-        return flask.render_template('index_admin.html')
+        return flask.render_template('index_admin.html', overdue_items=inventory.get_all_overdue())
     return flask.render_template('index_student.html', all_groups=groups.get_all())
 
 

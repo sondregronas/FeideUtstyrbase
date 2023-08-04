@@ -26,4 +26,56 @@
     <button>Administrere utstyr</button>
 </a>
 
+{% if overdue_items %}
+<br><br>
+<center>
+    <h4>
+        Overskredet utstyr:
+    </h4>
+</center>
+<table id="active">
+    <thead>
+    <tr>
+        <th>Løpenummer</th>
+        <th>Utstyr</th>
+        <th>Utlånt til</th>
+        <th>Frist for levering</th>
+    </thead>
+    <tbody>
+    {% for item in overdue_items %}
+    <tr class="item-row item-row--overdue">
+        <td>{{ item.id }}</td>
+        <td>{{ item.name }}</td>
+        <td>{{ item.borrowed_to }}</td>
+        <td>{{ item.order_due_date|strftime }}</td>
+    </tr>
+    {% endfor %}
+</table>
+{% endif %}
+
+<script>
+  $(document).ready(function () {
+    let lang = {
+      "lengthMenu": "Vis _MENU_ rader per side",
+      "zeroRecords": "Ingen treff",
+      "info": "Viser side _PAGE_ av _PAGES_",
+      "infoEmpty": "Ingen rader tilgjengelig",
+      "infoFiltered": "(filtrert fra _MAX_ rader totalt)",
+      "search": "Søk:",
+      "paginate": {
+        "first": "Første",
+        "last": "Siste",
+        "next": "Neste",
+        "previous": "Forrige"
+      }
+    };
+    $('#active').DataTable({
+      "language": lang,
+      "order": [[3, "asc"]],
+      "pageLength": 25,
+      "lengthMenu": [[25, 50, -1], [25, 50, "Alle"]],
+    });
+  });
+</script>
+
 {% endblock %}

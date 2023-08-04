@@ -140,6 +140,14 @@ def get_all_unavailable() -> list[Item]:
     return items
 
 
+def get_all_overdue() -> list[Item]:
+    """Return a JSON list of all overdue items in the database."""
+    con = sqlite3.connect(DATABASE)
+    items = [Item(*row) for row in con.execute(read_sql_query('get_all_overdue.sql'))]
+    con.close()
+    return items
+
+
 def _update_last_seen(item_id: str) -> None:
     """Update the last_seen column of the item with the given ID."""
     con = sqlite3.connect(DATABASE)
