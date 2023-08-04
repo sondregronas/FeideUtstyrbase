@@ -59,10 +59,13 @@ def formatted_overdue_items() -> str:
                                        if item2.lender_association == item.lender_association]
              for item in items}
     sorted_pairs = {key: pairs[key] for key in sorted(pairs) if pairs[key]}
-    strings = [f'<table class="association"><tr><th>{key}</th></tr>\n' +
-               '\n'.join([f'<tr><td>{item}</td></tr>'
+    w = '<td width="10" style="width: 10px;"></td>'
+    wh = '<th width="10" style="width: 10px; line-height: 1px;"></th>'
+    h = '<tr><td height="10" style="height: 10px; line-height: 1px;"></td></tr>'
+    strings = [f'<table class="association"><tr>{wh}<th><b>{key or "Ansatt"}</b></th>{wh}</tr>{h}\n' +
+               '\n'.join([f'<tr>{w}<td>{item}</td>{w}</tr>'
                           for item in sorted_pairs[key]]) +
-               '</table><br><br>'
+               f'{h}</table><br><br>'
                for key in sorted_pairs.keys()]
 
     return '\n'.join(strings)
@@ -88,9 +91,8 @@ Subject: {title}
 Content-Type: text/html; charset=utf-8
 
 <style>
-table {{width: 80%;border-collapse: collapse;border: 1px solid #ddd;padding: 8px;}}
-table th {{padding: 12px;text-align: left;background-color: #333;color: white;}}
-table tr:nth-child(even) {{background-color: #f2f2f2;}}
+table {{width: 80%;border-collapse: collapse;border: 1px solid #ddd;}}
+table th {{text-align: left; background-color: #333;color: white; height: 30px; vertical-align: middle;}}
 </style>
 
 <h1>Rapport for utlånt utstyr</h1>
@@ -103,7 +105,7 @@ table tr:nth-child(even) {{background-color: #f2f2f2;}}
 <p>Dersom du kjenner igjen utlåneren, vennligst få dem til å levere utstyret tilbake ASAP.</p>
 
 <p>Med vennlig hilsen,
-<br>UtstyrServer</p>
+<br>{SMTP_FROM}</p>
 """.encode('utf-8')
             server.sendmail(SMTP_USERNAME, recipients, message)
     except Exception as e:
