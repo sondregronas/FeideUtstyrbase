@@ -28,6 +28,22 @@ def get_items() -> flask.Response:
     return flask.jsonify([item.__dict__ for item in items])
 
 
+@api.route('/items/unavailable', methods=['GET'])
+@login_required(admin_only=True, api=True)
+def get_items_unavailable() -> flask.Response:
+    """Get all items in the database for frontend display."""
+    items = inventory.get_all_unavailable()
+    return flask.jsonify([item.__dict__ for item in items])
+
+
+@api.route('/items/overdue', methods=['GET'])
+@login_required(admin_only=True, api=True)
+def get_items_overdue() -> flask.Response:
+    """Get all items in the database for frontend display."""
+    items = inventory.get_all_overdue()
+    return flask.jsonify([item.__dict__ for item in items])
+
+
 @api.route('/items/add', methods=['POST'])
 @login_required(admin_only=True)
 def add_item() -> flask.Response:
