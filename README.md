@@ -1,8 +1,8 @@
 # Feide Utstyrbase
-For Vågen VGS, might be possible to use for other schools with some modifications - for now this fits our needs, but will most likely not fit yours.
+For Vågen VGS, might be possible to use for other schools with some modifications - for now this fits our needs, but will most likely not fit yours. (Work in progress, this is NOT plug and play)
 
 ## Setup
-README coming soon.
+Proper README coming soon.
 
 - Register app at Dataporten
 - Set callback url to `https://<your-domain>/login/feide/callback`
@@ -30,3 +30,5 @@ Some endpoints can be accessed without login using the specified `?token=<token>
 - [ ] Tests
 - [ ] Documentation
 - [ ] Docker
+- [ ] Better README
+- [ ] Code cleanup / refactoring, it's a bit inconsistent right now.
