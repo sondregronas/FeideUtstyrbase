@@ -3,6 +3,7 @@ from functools import wraps
 
 import flask
 
+from __init__ import API_TOKEN
 from feide import get_feide_data
 from user import User, FeideUser, KioskUser
 
@@ -26,12 +27,15 @@ def refresh_user() -> None:
         flask.session['user'] = user_factory()
 
 
-def login_required(admin_only: bool = False) -> callable:
+def login_required(admin_only: bool = False, api: bool = False) -> callable:
     """Decorator to check if the user is logged in."""
 
     def decorator(func: callable) -> callable:
         @wraps(func)
         def wrapper(*args, **kwargs) -> callable:
+            if api and API_TOKEN:
+                if flask.request.args.get('token') == API_TOKEN:
+                    return func(*args, **kwargs)
             refresh_user()
             user = flask.session.get('user')
             if not user:

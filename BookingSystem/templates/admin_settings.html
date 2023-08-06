@@ -16,9 +16,6 @@
     <button>Send rapport</button>
 </a>
 {% endif %}
-<a href="" onclick="pruneInactiveUsers()">
-    <button>Slett inaktive brukere (Kjør ved skolestart)</button>
-</a>
 
 <hgroup>
     <h2>Klasserom</h2>
@@ -50,16 +47,6 @@
     } else {
       _send()
     }
-  }
-
-  function pruneInactiveUsers() {
-    $.ajax({
-      url: "{{url_for('api.prune_inactive_users')}}",
-      type: 'POST',
-      success: function (result) {
-        alert(result);
-      }
-    });
   }
 
   function _send() {

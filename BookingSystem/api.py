@@ -22,7 +22,7 @@ api = flask.Blueprint('api', __name__)
 
 
 @api.route('/items', methods=['GET'])
-@login_required(admin_only=True)
+@login_required(admin_only=True, api=True)
 def get_items() -> flask.Response:
     """Get all items in the database for frontend display."""
     items = inventory.get_all()
@@ -234,30 +234,33 @@ def update_emails() -> flask.Response:
     return flask.redirect(flask.request.referrer)
 
 
-@api.route('/email/report', methods=['POST', 'GET'], endpoint='email_report')
-@login_required(admin_only=True)
+@api.route('/email/report', methods=['POST'], endpoint='email_report')
+@login_required(admin_only=True, api=True)
 def email_report() -> flask.Response:
     """Emails a report to all users in the emails table.
 
     Can be used with a cron job to send reports automatically, e.g.:
-    15 8 * 1-6,8-12 MON curl -c utstyr.cookie --head -L http://localhost:5000/email/report?interval=7 && curl -b utstyr.cookie http://localhost:5000/email/report?interval=7
-    (Note, only works locally or over the kiosk FQDN)
+    15 8 * 1-6,8-12 MON curl -X POST "http://localhost:5000/email/report?interval=7&token=<token>"
 
     If the interval parameter is set, the report will only be sent
     if the last report was sent more than interval days ago.
     """
     interval = flask.request.args.get('interval')
     if interval:
-        last_sent = datetime.fromtimestamp(float(mail.get_last_sent()))
-
-        if last_sent and (datetime.now() - last_sent).days < int(interval):
-            return flask.Response(f'Rapport ble ikke sendt. (Sist sendt {last_sent})', status=200)
+        last_sent = datetime.fromtimestamp(float(mail.get_last_sent())).date()
+        current_date = datetime.now().date()
+        if last_sent and (current_date - last_sent).days < int(interval):
+            return flask.Response(f'Ikke sendt - mindre enn {interval} dager siden forrige rapport.', status=200)
     return mail.send_report()
 
 
 @api.route('/users/prune_inactive', methods=['POST'], endpoint='prune_inactive_users')
-@login_required(admin_only=True)
+@login_required(admin_only=True, api=True)
 def prune_inactive_users() -> flask.Response:
-    """Prune users that have not been updated in a while."""
+    """Prune users that have not been updated in a while.
+
+    Example cronjob:
+    0 1 1 7 * curl -X POST "http://localhost:5000/users/prune_inactive?token=<token>"
+    """
     user.prune_inactive()
     return flask.Response('Inaktive brukere ble fjernet.', status=200)

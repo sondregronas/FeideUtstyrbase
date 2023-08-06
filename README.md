@@ -14,9 +14,16 @@ Must be accessed through a reverse proxy, as the server does not support https. 
 
 If you need a kiosk mode, set up a separate reverse proxy with a valid access control (see NgixnProxyManager) and set the `KIOSK_MODE` environment variable to the FQDN of the proxy.
 
+## API Endpoints:
+Some endpoints can be accessed without login using the specified `?token=<token>` parameter.
+
+- `GET /items` - Get all items in the database as JSON.
+- `POST /email/report (params: interval=<days>` - Send out an email report to all specified emails (in admin panel), see `cron_examples.txt` for an example use case.
+- `POST /users/prune_inactive` - Remove all inactive users from the database (regular users expire in July, admins never expire).
+
 ## TODO:
 - [ ] Prettier frontend (`booking.html` needs more work)
 - [ ] Move to a proper database?
 - [ ] Tests
-- [ ] Docs
+- [ ] Documentation
 - [ ] Docker

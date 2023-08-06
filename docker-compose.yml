@@ -33,6 +33,9 @@ services:
       # Debug only responds to "True", don't use in production
       - DEBUG='False'
 
+      # API Token (for API access, see documentation for endpoints, send automatic email reports etc)
+      - API_TOKEN=''
+
       # Set timezone to your local timezone
       - TZ='Europe/Oslo'
     restart: unless-stopped

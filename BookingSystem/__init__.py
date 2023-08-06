@@ -18,6 +18,7 @@ Path('data').mkdir(exist_ok=True)
 DATABASE = Path('data') / 'db.sqlite'
 LABEL_SERVER = os.getenv('LABEL_SERVER')
 KIOSK_FQDN = os.getenv('KIOSK_FQDN')
+API_TOKEN = os.getenv('API_TOKEN')
 
 # Flask app setup
 app = flask.Flask(__name__, template_folder='templates', static_folder='static')

@@ -24,6 +24,9 @@ ENV SMTP_FROM='UtstyrBase'
 # Kiosk (Admin access without login) (FQDN)
 ENV KIOSK_FQDN=''
 
+# API token
+ENV API_TOKEN=''
+
 # Debug mode
 ENV DEBUG='False'
 
