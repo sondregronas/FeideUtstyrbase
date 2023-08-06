@@ -1,4 +1,7 @@
 # Feide Utstyrbase
+[![Build Status](https://img.shields.io/github/actions/workflow/status/sondregronas/FeideUtstyrbase/CI.yml?branch=main)](https://github.com/sondregronas/FeideUtstyrbase/)
+[![codecov](https://codecov.io/gh/sondregronas/FeideUtstyrbase/branch/main/graph/badge.svg?token=JNLY5WWC3X)](https://codecov.io/gh/sondregronas/FeideUtstyrbase)
+
 For Vågen VGS, might be possible to use for other schools with some modifications - for now this fits our needs, but will most likely not fit yours. (Work in progress, this is NOT plug and play)
 
 ## Setup
