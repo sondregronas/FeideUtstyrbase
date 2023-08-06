@@ -150,6 +150,14 @@ def get_all() -> list[Item]:
     return items
 
 
+def get_all_available() -> list[Item]:
+    """Return a JSON list of all available items in the database."""
+    con = sqlite3.connect(DATABASE)
+    items = [Item(*row) for row in con.execute('SELECT * FROM inventory WHERE available=1')]
+    con.close()
+    return items
+
+
 def get_all_unavailable() -> list[Item]:
     """Return a JSON list of all unavailable items in the database."""
     con = sqlite3.connect(DATABASE)
@@ -179,7 +187,7 @@ def _update_last_seen(item_id: str) -> None:
         con.close()
 
 
-def register_out(item_id: str, user: str, days: str = 1) -> None:
+def register_out(item_id: str, userid: str, days: str = 1) -> None:
     """Set the item with the given ID to unavailable and register the order details."""
     due_date = datetime.now() + timedelta(days=datetime.strptime(days, '%d').day)
 
@@ -190,7 +198,7 @@ def register_out(item_id: str, user: str, days: str = 1) -> None:
     con = sqlite3.connect(DATABASE)
     try:
         sql = 'UPDATE inventory SET available=0, borrowed_to=:borrowed_to, order_due_date=:order_due_date WHERE id=:id'
-        con.execute(sql, {'id': item_id, 'borrowed_to': user, 'order_due_date': due_date})
+        con.execute(sql, {'id': item_id, 'borrowed_to': userid, 'order_due_date': due_date})
         con.commit()
         logger.info(f'{item_id} er ikke lenger tilgjengelig.')
     except sqlite3.IntegrityError:

@@ -9,11 +9,11 @@
 <body>
 <header>
     {% block header %}
-    {% if session.user and session.user.is_admin %}
-    {% include 'partials/header_admin.html' %}
-    {% else %}
-    {% include 'partials/header.html' %}
-    {% endif %}
+        {% if session.user and session.user.is_admin %}
+            {% include 'partials/header_admin.html' %}
+        {% else %}
+            {% include 'partials/header.html' %}
+        {% endif %}
     {% endblock %}
 </header>
 <main>
@@ -21,11 +21,11 @@
 </main>
 <footer>
     {% block footer %}
-    {% if session.user and session.user.is_admin %}
-    {% include 'partials/footer_admin.html' %}
-    {% else %}
-    {% include 'partials/footer.html' %}
-    {% endif %}
+        {% if session.user and session.user.is_admin %}
+            {% include 'partials/footer_admin.html' %}
+        {% else %}
+            {% include 'partials/footer.html' %}
+        {% endif %}
     {% endblock %}
 </footer>
 </body>

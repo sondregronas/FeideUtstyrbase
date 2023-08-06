@@ -1,115 +1,115 @@
 {% extends 'layout.html' %}
 
 {% block extra_head %}
-{% include 'templates/chosen.html' %}
+    {% include 'templates/chosen.html' %}
 {% endblock %}
 
 {% block content %}
-<hgroup>
-    <h2>Legg til nytt inventar</h2>
-    <h3>Her kan du legge til nytt inventar. Legg gjerne til flere, så forlater du bare siden når du er ferdig</h3>
-</hgroup>
+    <hgroup>
+        <h2>Legg til nytt inventar</h2>
+        <h3>Her kan du legge til nytt inventar. Legg gjerne til flere, så forlater du bare siden når du er ferdig</h3>
+    </hgroup>
 
-<form>
-    <label for="id">Løpenummer</label>
-    <input type="text" name="id" id="id" placeholder="Eksempel: A6500-01" required
-           pattern="^[^\s][ÆØÅæøåa-zA-Z0-9_\s\-]+[^\s]">
+    <form>
+        <label for="id">Løpenummer</label>
+        <input type="text" name="id" id="id" placeholder="Eksempel: A6500-01" required
+               pattern="^[^\s][ÆØÅæøåa-zA-Z0-9_\s\-]+[^\s]">
 
-    <label for="name">Navn</label>
-    <input type="text" name="name" id="name" placeholder="Eksempel: Sony A6500" required
-           pattern="^[^\s][ÆØÅæøåa-zA-Z0-9_\s\-]+[^\s]">
+        <label for="name">Navn</label>
+        <input type="text" name="name" id="name" placeholder="Eksempel: Sony A6500" required
+               pattern="^[^\s][ÆØÅæøåa-zA-Z0-9_\s\-]+[^\s]">
 
-    <label for="category">Kategori</label>
-    <select name="category" id="category" required>
-        <option value=""></option>
-        {% for category in categories %}
-        <option value="{{ category }}">{{ category }}</option>
-        {% endfor %}
-    </select>
+        <label for="category">Kategori</label>
+        <select name="category" id="category" required>
+            <option value=""></option>
+            {% for category in categories %}
+                <option value="{{ category }}">{{ category }}</option>
+            {% endfor %}
+        </select>
 
-    <!--
-    <label for="included_batteries">Batterier</label>
-    <input type="number" name="included_batteries" id="included_batteries" required value="0" min="0" max="9">
-    -->
+        <!--
+        <label for="included_batteries">Batterier</label>
+        <input type="number" name="included_batteries" id="included_batteries" required value="0" min="0" max="9">
+        -->
 
-    <table>
-        <thead>
-        <th colspan="2">Utskrift</th>
-        </thead>
-        <td>
-            <label for="print_label_count">Antall etiketter</label>
-            <input type="number" name="print_label_count" id="print_label_count" required value="1" min="0" max="9">
-        </td>
-        <td>
-            <label for="print_label_type">Type</label>
-            <select name="print_label_type" id="print_label_type" required>
-                <option value="qr">QR</option>
-                <option value="barcode">Strekkode</option>
-            </select>
-        </td>
-    </table>
+        <table>
+            <thead>
+            <th colspan="2">Utskrift</th>
+            </thead>
+            <td>
+                <label for="print_label_count">Antall etiketter</label>
+                <input type="number" name="print_label_count" id="print_label_count" required value="1" min="0" max="9">
+            </td>
+            <td>
+                <label for="print_label_type">Type</label>
+                <select name="print_label_type" id="print_label_type" required>
+                    <option value="qr">QR</option>
+                    <option value="barcode">Strekkode</option>
+                </select>
+            </td>
+        </table>
 
-    <button type="submit">Legg til</button>
-</form>
+        <button type="submit">Legg til</button>
+    </form>
 
-<a href="{{ url_for('inventar') }}">
-    <button>Ferdig!</button>
-</a>
+    <a href="{{ url_for('app.inventar') }}">
+        <button>Ferdig!</button>
+    </a>
 
-<script>
-  $(document).ready(function () {
-    $('#category').chosen({
-      no_results_text: 'Fant ingen kategorier med det navnet',
-      placeholder_text_single: 'Velg kategori'
-    });
+    <script>
+      $(document).ready(function () {
+        $('#category').chosen({
+          no_results_text: 'Fant ingen kategorier med det navnet',
+          placeholder_text_single: 'Velg kategori'
+        });
 
-    $('form').submit(function (event) {
-      event.preventDefault();
-      $.ajax({
-        type: 'POST',
-        url: '{{ url_for("api.add_item") }}',
-        data: $('form').serialize(),
-        success: function (response) {
-          iziToast.success({
-            title: 'Suksess!',
-            message: response,
-          })
-        },
-        error: function (response) {
-          iziToast.error({
-            title: 'Feil!',
-            message: response.responseText,
-          })
-        }
-      });
-
-      if ($('#print_label_count').val() > 0) {
-        url = '{{ url_for("api.print_label", item_id="REPLACE_ME") }}';
-        url = url.replace('REPLACE_ME', $('#id').val());
-        $.ajax({
-          type: 'POST',
-          url: url,
-          data: $('form').serialize(),
-          success: function (response) {
-            iziToast.info({
-              title: 'Utskrift',
-              message: response,
-            })
-          },
-          error: function (response) {
-            var msg = response.responseText;
-            if (response.status === 502) {
-              msg = "Klarte ikke koble til etikett tjeneren.";
+        $('form').submit(function (event) {
+          event.preventDefault();
+          $.ajax({
+            type: 'POST',
+            url: '{{ url_for("api.add_item") }}',
+            data: $('form').serialize(),
+            success: function (response) {
+              iziToast.success({
+                title: 'Suksess!',
+                message: response,
+              })
+            },
+            error: function (response) {
+              iziToast.error({
+                title: 'Feil!',
+                message: response.responseText,
+              })
             }
-            iziToast.error({
-              title: 'Utskrift',
-              message: msg,
-            })
+          });
+
+          if ($('#print_label_count').val() > 0) {
+            url = '{{ url_for("api.print_label", item_id="REPLACE_ME") }}';
+            url = url.replace('REPLACE_ME', $('#id').val());
+            $.ajax({
+              type: 'POST',
+              url: url,
+              data: $('form').serialize(),
+              success: function (response) {
+                iziToast.info({
+                  title: 'Utskrift',
+                  message: response,
+                })
+              },
+              error: function (response) {
+                var msg = response.responseText;
+                if (response.status === 502) {
+                  msg = "Klarte ikke koble til etikett tjeneren.";
+                }
+                iziToast.error({
+                  title: 'Utskrift',
+                  message: msg,
+                })
+              }
+            });
           }
         });
-      }
-    });
-  });
-</script>
+      });
+    </script>
 
 {% endblock %}

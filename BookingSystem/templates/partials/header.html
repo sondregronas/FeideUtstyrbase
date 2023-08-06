@@ -1,9 +1,9 @@
 <nav>
-    <li><a href="{{ url_for('index') }}">Utstyrbase</a></li>
+    <li><a href="{{ url_for('app.index') }}">Utstyrbase</a></li>
     <ul>
-        <li><a href="{{url_for('privacy')}}">Personvern</a></li>
+        <li><a href="{{url_for('app.privacy')}}">Personvern</a></li>
         <li>
-            <a href="{{ url_for('logout') }}">
+            <a href="{{ url_for('app.logout') }}">
                 Logg ut
             </a>
         </li>

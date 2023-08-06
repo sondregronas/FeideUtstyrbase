@@ -4,7 +4,7 @@ NOTE: Don't run this, unless you really need to (i.e. you've deleted the databas
 This script imports all items from the label server into the database, if they don't already exist.
 
 You shouldn't really need this script, but it's here just in case. Whenever you print a label, the label server
-keeps track of it in it's audit log. This script reads the audit log and imports all items into the database.
+keeps track of it in its audit log. This script reads the audit log and imports all items into the database.
 """
 
 import sqlite3
@@ -19,8 +19,8 @@ def get_items_from_label_server() -> list:
     response = requests.get(f'{LABEL_SERVER}/audits')
     json = response.json()
     filtered = []
-    for item in [{key: value.strip() for key, value in item.items()} for item in json]:
-        if item['id'] not in [i['id'] for i in filtered]:
+    for i in [{key: value.strip() for key, value in i.items()} for i in json]:
+        if i['id'] not in [ii['id'] for ii in filtered]:
             filtered.append(item)
     return filtered
 

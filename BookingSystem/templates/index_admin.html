@@ -1,81 +1,81 @@
 {% extends 'layout.html' %}
 
 {% block extra_head %}
-{% include 'templates/datatables.html' %}
+    {% include 'templates/datatables.html' %}
 {% endblock %}
 
 {% block content %}
 
 
-<hgroup>
-    <h2>Vågen Utstyrbase</h2>
-    <h3>Velkommen! Her kan du <a href="{{ url_for('innlevering') }}">levere inn</a> og <a
-            href="{{ url_for('booking') }}">låne bort utstyr</a>!
-    </h3>
-</hgroup>
+    <hgroup>
+        <h2>Vågen Utstyrbase</h2>
+        <h3>Velkommen! Her kan du <a href="{{ url_for('app.innlevering') }}">levere inn</a> og <a
+                href="{{ url_for('app.booking') }}">låne bort utstyr</a>!
+        </h3>
+    </hgroup>
 
-<br>
+    <br>
 
-<a href="{{url_for('booking')}}">
-    <button>Låne ut utstyr</button>
-</a>
-<a href="{{url_for('innlevering')}}">
-    <button>Levere inn utstyr</button>
-</a>
-<a href="{{url_for('inventar')}}">
-    <button>Administrere utstyr</button>
-</a>
+    <a href="{{ url_for('app.booking') }}">
+        <button>Låne ut utstyr</button>
+    </a>
+    <a href="{{ url_for('app.innlevering') }}">
+        <button>Levere inn utstyr</button>
+    </a>
+    <a href="{{ url_for('app.inventar') }}">
+        <button>Administrere utstyr</button>
+    </a>
 
-{% if overdue_items %}
-<br><br>
-<center>
-    <h4>
-        Overskredet utstyr:
-    </h4>
-</center>
-<table id="active">
-    <thead>
-    <tr>
-        <th>Løpenummer</th>
-        <th>Utstyr</th>
-        <th>Utlånt til</th>
-        <th>Frist for levering</th>
-    </thead>
-    <tbody>
-    {% for item in overdue_items %}
-    <tr class="item-row item-row--overdue">
-        <td>{{ item.id }}</td>
-        <td>{{ item.name }} ({{ item.category }})</td>
-        <td>{{ item.lender }}</td>
-        <td>{{ item.order_due_date|strftime }}</td>
-    </tr>
-    {% endfor %}
-</table>
-{% endif %}
+    {% if overdue_items %}
+        <br><br>
+        <center>
+            <h4>
+                Overskredet utstyr:
+            </h4>
+        </center>
+        <table id="active">
+            <thead>
+            <tr>
+                <th>Løpenummer</th>
+                <th>Utstyr</th>
+                <th>Utlånt til</th>
+                <th>Frist for levering</th>
+            </thead>
+            <tbody>
+            {% for item in overdue_items %}
+                <tr class="item-row item-row--overdue">
+                    <td>{{ item.id }}</td>
+                    <td>{{ item.name }} ({{ item.category }})</td>
+                    <td>{{ item.lender }}</td>
+                    <td>{{ item.order_due_date|strftime }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    {% endif %}
 
-<script>
-  $(document).ready(function () {
-    let lang = {
-      "lengthMenu": "Vis _MENU_ rader per side",
-      "zeroRecords": "Ingen treff",
-      "info": "Viser side _PAGE_ av _PAGES_",
-      "infoEmpty": "Ingen rader tilgjengelig",
-      "infoFiltered": "(filtrert fra _MAX_ rader totalt)",
-      "search": "Søk:",
-      "paginate": {
-        "first": "Første",
-        "last": "Siste",
-        "next": "Neste",
-        "previous": "Forrige"
-      }
-    };
-    $('#active').DataTable({
-      "language": lang,
-      "order": [[3, "asc"]],
-      "pageLength": 25,
-      "lengthMenu": [[25, 50, -1], [25, 50, "Alle"]],
-    });
-  });
-</script>
+    <script>
+      $(document).ready(function () {
+        let lang = {
+          "lengthMenu": "Vis _MENU_ rader per side",
+          "zeroRecords": "Ingen treff",
+          "info": "Viser side _PAGE_ av _PAGES_",
+          "infoEmpty": "Ingen rader tilgjengelig",
+          "infoFiltered": "(filtrert fra _MAX_ rader totalt)",
+          "search": "Søk:",
+          "paginate": {
+            "first": "Første",
+            "last": "Siste",
+            "next": "Neste",
+            "previous": "Forrige"
+          }
+        };
+        $('#active').DataTable({
+          "language": lang,
+          "order": [[3, "asc"]],
+          "pageLength": 25,
+          "lengthMenu": [[25, 50, -1], [25, 50, "Alle"]],
+        });
+      });
+    </script>
 
 {% endblock %}

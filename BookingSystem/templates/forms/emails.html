@@ -1,5 +1,6 @@
-<form action="{{url_for('api.update_emails')}}" method="post"
+<form action="{{ url_for('api.update_emails') }}" method="post"
       onclick="cueAlert('Sukksess!', 'E-postene ble oppdatert.', 'success')">
-    <textarea name="emails" id="emails" cols="30" rows="10" placeholder="Eksempel: olanordmann@skole.rogfk.no">{{'\n'.join(all_emails)}}</textarea>
+    <textarea name="emails" id="emails" cols="30" rows="10"
+              placeholder="Eksempel: olanordmann@skole.rogfk.no">{{ '\n'.join(all_emails) }}</textarea>
     <input type="submit" value="Oppdater">
 </form>

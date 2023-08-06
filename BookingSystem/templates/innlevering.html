@@ -1,74 +1,74 @@
 {% extends 'layout.html' %}
 
 {% block extra_head %}
-{% include 'templates/datatables.html' %}
+    {% include 'templates/datatables.html' %}
 {% endblock %}
 
 {% block content %}
 
 
-<hgroup>
-    <h2>Aktive ordre</h2>
-    <h3>Sjekk at alt er med - bruk søkefeltet under til å dobbeltsjekke alle aktive ordre!</h3>
-</hgroup>
+    <hgroup>
+        <h2>Aktive ordre</h2>
+        <h3>Sjekk at alt er med - bruk søkefeltet under til å dobbeltsjekke alle aktive ordre!</h3>
+    </hgroup>
 
-<br>
+    <br>
 
-{% include 'forms/return.html' %}
+    {% include 'forms/return.html' %}
 
-{% if unavailable_items %}
-<table id="active">
-    <thead>
-    <tr>
-        <th>Løpenummer</th>
-        <th>Utstyr</th>
-        <th>Utlånt til</th>
-        <th>Frist for levering</th>
-    </thead>
-    <tbody>
-    {% for item in unavailable_items %}
-    {% if item.overdue %}
-    <tr class="item-row item-row--overdue">
-        {% else %}
-    <tr class="item-row">
-        {% endif %}
-        <td>{{ item.id }}</td>
-        <td>{{ item.name }} ({{ item.category }})</td>
-        <td>{{ item.lender }}</td>
-        <td>{{ item.order_due_date|strftime }}</td>
-    </tr>
-    {% endfor %}
-</table>
-{% else %}
-<hgroup>
-    <h2>Smooth!</h2>
-    <h3>Alt utstyr ligger inne.</h3>
-</hgroup>
-{% endif %}
+    {% if unavailable_items %}
+        <table id="active">
+            <thead>
+            <tr>
+                <th>Løpenummer</th>
+                <th>Utstyr</th>
+                <th>Utlånt til</th>
+                <th>Frist for levering</th>
+            </thead>
+            <tbody>
+            {% for item in unavailable_items %}
+                {% if item.overdue %}
+                    <tr class="item-row item-row--overdue">
+                        {% else %}
+                    <tr class="item-row">
+                {% endif %}
+            <td>{{ item.id }}</td>
+            <td>{{ item.name }} ({{ item.category }})</td>
+            <td>{{ item.lender }}</td>
+            <td>{{ item.order_due_date|strftime }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    {% else %}
+        <hgroup>
+            <h2>Smooth!</h2>
+            <h3>Alt utstyr ligger inne.</h3>
+        </hgroup>
+    {% endif %}
 
-<script>
-  $(document).ready(function () {
-    let lang = {
-      "lengthMenu": "Vis _MENU_ rader per side",
-      "zeroRecords": "Ingen treff",
-      "info": "Viser side _PAGE_ av _PAGES_",
-      "infoEmpty": "Ingen rader tilgjengelig",
-      "infoFiltered": "(filtrert fra _MAX_ rader totalt)",
-      "search": "Søk:",
-      "paginate": {
-        "first": "Første",
-        "last": "Siste",
-        "next": "Neste",
-        "previous": "Forrige"
-      }
-    };
-    $('#active').DataTable({
-      "language": lang,
-      "order": [[3, "asc"]],
-      "pageLength": 25,
-      "lengthMenu": [[25, 50, -1], [25, 50, "Alle"]],
-    });
-  });
-</script>
+    <script>
+      $(document).ready(function () {
+        let lang = {
+          "lengthMenu": "Vis _MENU_ rader per side",
+          "zeroRecords": "Ingen treff",
+          "info": "Viser side _PAGE_ av _PAGES_",
+          "infoEmpty": "Ingen rader tilgjengelig",
+          "infoFiltered": "(filtrert fra _MAX_ rader totalt)",
+          "search": "Søk:",
+          "paginate": {
+            "first": "Første",
+            "last": "Siste",
+            "next": "Neste",
+            "previous": "Forrige"
+          }
+        };
+        $('#active').DataTable({
+          "language": lang,
+          "order": [[3, "asc"]],
+          "pageLength": 25,
+          "lengthMenu": [[25, 50, -1], [25, 50, "Alle"]],
+        });
+      });
+    </script>
 
 {% endblock %}

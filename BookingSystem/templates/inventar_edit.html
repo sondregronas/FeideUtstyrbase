@@ -1,93 +1,93 @@
 {% extends 'layout.html' %}
 
 {% block extra_head %}
-{% include 'templates/chosen.html' %}
+    {% include 'templates/chosen.html' %}
 {% endblock %}
 
 {% block content %}
-<hgroup>
-    <h2>Rediger inventar</h2>
-    <h3>Redigerer {{ item.id }} ({{ item.name }})</h3>
-</hgroup>
+    <hgroup>
+        <h2>Rediger inventar</h2>
+        <h3>Redigerer {{ item.id }} ({{ item.name }})</h3>
+    </hgroup>
 
-<form>
-    <label for="id">Løpenummer</label>
-    <input type="text" name="id" id="id" required placeholder="Eksempel: A6500-01"
-           pattern="^[^\s][ÆØÅæøåa-zA-Z0-9_\s\-]+[^\s]"
-           value="{{ item.id }}">
+    <form>
+        <label for="id">Løpenummer</label>
+        <input type="text" name="id" id="id" required placeholder="Eksempel: A6500-01"
+               pattern="^[^\s][ÆØÅæøåa-zA-Z0-9_\s\-]+[^\s]"
+               value="{{ item.id }}">
 
-    <label for="name">Navn</label>
-    <input type="text" name="name" id="name" required placeholder="Eksempel: Sony A6500"
-           pattern="^[^\s][ÆØÅæøåa-zA-Z0-9_\s\-]+[^\s]"
-           value="{{ item.name }}">
+        <label for="name">Navn</label>
+        <input type="text" name="name" id="name" required placeholder="Eksempel: Sony A6500"
+               pattern="^[^\s][ÆØÅæøåa-zA-Z0-9_\s\-]+[^\s]"
+               value="{{ item.name }}">
 
-    <label for="category">Kategori</label>
-    <select name="category" id="category" required>
-        <option value=""></option>
-        {% for category in categories %}
-        <option value="{{ category }}">{{ category }}
-        </option>
-        {% endfor %}
-    </select>
+        <label for="category">Kategori</label>
+        <select name="category" id="category" required>
+            <option value=""></option>
+            {% for category in categories %}
+                <option value="{{ category }}">{{ category }}
+                </option>
+            {% endfor %}
+        </select>
 
-    <label for="included_batteries" hidden>Batterier</label>
-    <input type="number" name="included_batteries" id="included_batteries" required
-           value="{{ item.included_batteries }}" min="0" max="9" hidden>
+        <label for="included_batteries" hidden>Batterier</label>
+        <input type="number" name="included_batteries" id="included_batteries" required
+               value="{{ item.included_batteries }}" min="0" max="9" hidden>
 
-    <button type="submit">Lagre</button>
-</form>
+        <button type="submit">Lagre</button>
+    </form>
 
-<button class="red-button"
-        onclick="if (confirm('Er du sikker på at du vil slette denne gjenstanden?')) deleteItem()">
-    Slett
-</button>
+    <button class="red-button"
+            onclick="if (confirm('Er du sikker på at du vil slette denne gjenstanden?')) deleteItem()">
+        Slett
+    </button>
 
 
-<script>
-  function deleteItem() {
-    $.ajax({
-      type: 'POST',
-      url: '{{ url_for("api.delete_item", item_id=item.id) }}',
-      success: function (response) {
-        cueAlert('Sukksess!', `${$('#id').val()} ble slettet.`, 'success');
-        window.location.href = '{{ url_for("inventar") }}';
-      },
-      error: function (response) {
-        iziToast.error({
-          title: 'Feil!',
-          message: response.responseText,
+    <script>
+      function deleteItem() {
+        $.ajax({
+          type: 'POST',
+          url: '{{ url_for("api.delete_item", item_id=item.id) }}',
+          success: function (response) {
+            cueAlert('Sukksess!', `${$('#id').val()} ble slettet.`, 'success');
+            window.location.href = '{{ url_for("app.inventar") }}';
+          },
+          error: function (response) {
+            iziToast.error({
+              title: 'Feil!',
+              message: response.responseText,
+            });
+          }
         });
       }
-    });
-  }
 
-  $(document).ready(function () {
-    $('#category').val('{{ item.category }}');
+      $(document).ready(function () {
+        $('#category').val('{{ item.category }}');
 
-    $('#category').chosen({
-      no_results_text: 'Fant ingen kategorier med det navnet',
-      placeholder_text_single: 'Velg kategori'
-    });
+        $('#category').chosen({
+          no_results_text: 'Fant ingen kategorier med det navnet',
+          placeholder_text_single: 'Velg kategori'
+        });
 
-    $('form').submit(function (event) {
-      event.preventDefault();
-      $.ajax({
-        type: 'POST',
-        url: '{{ url_for("api.edit_item", item_id=item.id) }}',
-        data: $('form').serialize(),
-        success: function (response) {
-          cueAlert('Sukksess!', `${$('#id').val()} ble oppdatert.`, 'success');
-          window.location.href = '{{ url_for("inventar") }}';
-        },
-        error: function (response) {
-          iziToast.error({
-            title: 'Feil!',
-            message: response.responseText,
+        $('form').submit(function (event) {
+          event.preventDefault();
+          $.ajax({
+            type: 'POST',
+            url: '{{ url_for("api.edit_item", item_id=item.id) }}',
+            data: $('form').serialize(),
+            success: function (response) {
+              cueAlert('Sukksess!', `${$('#id').val()} ble oppdatert.`, 'success');
+              window.location.href = '{{ url_for("app.inventar") }}';
+            },
+            error: function (response) {
+              iziToast.error({
+                title: 'Feil!',
+                message: response.responseText,
+              });
+            }
           });
-        }
+        });
       });
-    });
-  });
-</script>
+    </script>
 
 {% endblock %}

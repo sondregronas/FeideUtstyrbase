@@ -18,7 +18,7 @@ SMTP_FROM = os.getenv('SMTP_FROM')
 def get_all_emails() -> list[str]:
     """Return a list of all emails in the database."""
     con = sqlite3.connect(DATABASE)
-    emails = [row[0] for row in con.execute('SELECT email FROM emails ORDER BY email ASC')]
+    emails = [row[0] for row in con.execute('SELECT email FROM emails ORDER BY email')]
     con.close()
     return emails
 
@@ -72,7 +72,7 @@ def formatted_overdue_items() -> str:
 
 
 def send_report() -> flask.Response:
-    """Send an email to all emails in the database."""
+    """Send an e-mail to all emails in the database."""
     items = [item for item in inventory.get_all_unavailable() if item.overdue]
     if not items:
         update_last_sent()

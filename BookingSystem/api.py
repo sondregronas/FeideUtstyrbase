@@ -28,6 +28,14 @@ def get_items() -> flask.Response:
     return flask.jsonify([item.api_repr() for item in items])
 
 
+@api.route('/items/available', methods=['GET'])
+@login_required(admin_only=True, api=True)
+def get_items_available() -> flask.Response:
+    """Get all items in the database for frontend display."""
+    items = inventory.get_all_available()
+    return flask.jsonify([item.api_repr() for item in items])
+
+
 @api.route('/items/unavailable', methods=['GET'])
 @login_required(admin_only=True, api=True)
 def get_items_unavailable() -> flask.Response:
@@ -68,7 +76,6 @@ def add_item() -> flask.Response:
 def edit_item(item_id: str) -> flask.Response:
     """Edit an item in the database."""
     form = flask.request.form
-    print(form)
     item = {key: form.get(key) for key in form.keys() if key in Item.__annotations__}
     item = Item(**item)
 
@@ -119,12 +126,12 @@ def print_label(item_id: str) -> flask.Response:
 def book_equipment() -> flask.Response:
     """Book out equipment for a user."""
     form = flask.request.form
-    user = form.get('user')
+    userid = form.get('user')
     days = form.get('days')
     item_ids = form.getlist('equipment')
 
     for item in item_ids:
-        inventory.register_out(item_id=item, user=user, days=days)
+        inventory.register_out(item_id=item, userid=userid, days=days)
     return flask.Response('Utstyr ble utlevert.', status=200)
 
 
@@ -179,6 +186,7 @@ def update_groups() -> flask.Response:
     """Update a class in the database."""
     con = sqlite3.connect(DATABASE)
     cur = con.cursor()
+    # noinspection SqlWithoutWhere
     cur.execute('DELETE FROM groups')
     con.commit()
 
@@ -198,6 +206,7 @@ def update_categories() -> flask.Response:
     """Update every category in the database."""
     con = sqlite3.connect(DATABASE)
     cur = con.cursor()
+    # noinspection SqlWithoutWhere
     cur.execute('DELETE FROM categories')
     con.commit()
 
@@ -217,6 +226,7 @@ def update_emails() -> flask.Response:
     """Update every email in the database."""
     con = sqlite3.connect(DATABASE)
     cur = con.cursor()
+    # noinspection SqlWithoutWhere
     cur.execute('DELETE FROM emails')
     con.commit()
 

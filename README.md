@@ -23,6 +23,7 @@ If you need a kiosk mode, set up a separate reverse proxy with a valid access co
 Some endpoints can be accessed without login using the specified `?token=<token>` parameter. This isn't strictly necessary, but a few endpoints are useful for cron jobs and such.
 
 - `GET /items` - Get all items in the database as JSON.
+- `GET /items/available` - Get all available items as JSON.
 - `GET /items/unavailable` - Get all unavailable items as JSON.
 - `GET /items/overdue` - Get all overdue items as JSON.
 - `GET /user/<userid>` - Get user info as JSON (userid is from `/items`, `borrowed_to`).

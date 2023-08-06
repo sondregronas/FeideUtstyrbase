@@ -1,57 +1,57 @@
 {% extends 'layout.html' %}
 
 {% block extra_head %}
-{% include 'templates/datatables.html' %}
+    {% include 'templates/datatables.html' %}
 {% endblock %}
 
 {% block content %}
-<hgroup>
-    <h2>Logg</h2>
-    <h3>Her kan du søke i loggen etter forlatt utstyr, hva skjedde med det?</h3>
-</hgroup>
+    <hgroup>
+        <h2>Logg</h2>
+        <h3>Her kan du søke i loggen etter forlatt utstyr, hva skjedde med det?</h3>
+    </hgroup>
 
-<table>
-    <thead>
-    <tr>
-        <th>Timestamp</th>
-        <th>Event</th>
-        <th>Message</th>
-    </tr>
-    </thead>
-    <tbody>
-    {% for audit in audits %}
-    <tr>
-        <td>{{ audit.timestamp }}</td>
-        <td>{{ audit.event }}</td>
-        <td>{{ audit.message }}</td>
-    </tr>
-    {% endfor %}
-    </tbody>
-</table>
+    <table>
+        <thead>
+        <tr>
+            <th>Timestamp</th>
+            <th>Event</th>
+            <th>Message</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for audit in audits %}
+            <tr>
+                <td>{{ audit.timestamp }}</td>
+                <td>{{ audit.event }}</td>
+                <td>{{ audit.message }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
 
-<script>
-  $(document).ready(function () {
-    let lang = {
-      "lengthMenu": "Vis _MENU_ rader per side",
-      "zeroRecords": "Ingen treff",
-      "info": "Viser side _PAGE_ av _PAGES_",
-      "infoEmpty": "Ingen rader tilgjengelig",
-      "infoFiltered": "(filtrert fra _MAX_ rader totalt)",
-      "search": "Søk:",
-      "paginate": {
-        "first": "Første",
-        "last": "Siste",
-        "next": "Neste",
-        "previous": "Forrige"
-      }
-    };
-    $('table').DataTable({
-      "order": [[0, "desc"]],
-      "pageLength": 25,
-      "lengthMenu": [[25, 50, -1], [25, 50, "Alle"]],
-      "language": lang
-    });
-  });
-</script>
+    <script>
+      $(document).ready(function () {
+        let lang = {
+          "lengthMenu": "Vis _MENU_ rader per side",
+          "zeroRecords": "Ingen treff",
+          "info": "Viser side _PAGE_ av _PAGES_",
+          "infoEmpty": "Ingen rader tilgjengelig",
+          "infoFiltered": "(filtrert fra _MAX_ rader totalt)",
+          "search": "Søk:",
+          "paginate": {
+            "first": "Første",
+            "last": "Siste",
+            "next": "Neste",
+            "previous": "Forrige"
+          }
+        };
+        $('table').DataTable({
+          "order": [[0, "desc"]],
+          "pageLength": 25,
+          "lengthMenu": [[25, 50, -1], [25, 50, "Alle"]],
+          "language": lang
+        });
+      });
+    </script>
 
 {% endblock %}

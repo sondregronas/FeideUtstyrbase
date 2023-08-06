@@ -1,23 +1,23 @@
 {% extends 'layout.html' %}
 
 {% block content %}
-<hgroup>
-    <h2>Logg inn</h2>
-    <h3>For å kunne låne utstyr må du først logge inn med din Feide bruker</h3>
-</hgroup>
+    <hgroup>
+        <h2>Logg inn</h2>
+        <h3>For å kunne låne utstyr må du først logge inn med din Feide bruker</h3>
+    </hgroup>
 
-<a href="{{url_for('feide.login')}}">
-    <button>
-        Logg inn med Feide
-    </button>
-</a>
-
-<br>
-
-<center>
-    <a href="{{url_for('privacy')}}" target="_blank">
-        Personvernerklæring
+    <a href="{{ url_for('feide.login') }}">
+        <button>
+            Logg inn med Feide
+        </button>
     </a>
-</center>
+
+    <br>
+
+    <center>
+        <a href="{{ url_for('app.privacy') }}" target="_blank">
+            Personvernerklæring
+        </a>
+    </center>
 
 {% endblock %}
