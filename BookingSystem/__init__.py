@@ -5,7 +5,7 @@ from pathlib import Path
 from dotenv import load_dotenv
 
 dotenv_path = Path('.env')
-if dotenv_path.exists():
+if dotenv_path.exists():  # pragma: no cover
     load_dotenv(dotenv_path)
 
 # Create data folder if it doesn't exist
