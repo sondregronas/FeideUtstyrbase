@@ -5,7 +5,7 @@ from __init__ import DATABASE, logger
 
 
 def read_sql_query(sql_name) -> str:
-    return Path(f'sql/{sql_name}').read_text()
+    return Path(f'{Path(__file__).parent}/sql/{sql_name}').read_text()
 
 
 def add_admin(data_dict: dict) -> None:

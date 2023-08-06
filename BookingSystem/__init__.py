@@ -2,10 +2,7 @@ import os
 from logging import Logger, StreamHandler, Formatter, FileHandler
 from pathlib import Path
 
-import flask
 from dotenv import load_dotenv
-from flask_session import Session
-from werkzeug.middleware.proxy_fix import ProxyFix
 
 dotenv_path = Path('.env')
 if dotenv_path.exists():
@@ -19,19 +16,6 @@ DATABASE = Path('data') / 'db.sqlite'
 LABEL_SERVER = os.getenv('LABEL_SERVER')
 KIOSK_FQDN = os.getenv('KIOSK_FQDN')
 API_TOKEN = os.getenv('API_TOKEN')
-
-# Flask app setup
-app = flask.Flask(__name__, template_folder='templates', static_folder='static')
-app.secret_key = os.getenv('SECRET_KEY')
-app.config['SESSION_TYPE'] = 'filesystem'
-app.config['PERMANENT_SESSION_LIFETIME'] = 3600
-if os.getenv('DEBUG') == 'True':
-    app.debug = True
-
-# We're behind a reverse proxy, so we need to fix the scheme and host
-app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
-
-Session(app)
 
 # Logger setup
 logger = Logger(__name__)
