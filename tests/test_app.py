@@ -4,10 +4,8 @@ from pathlib import Path
 import pytest
 
 sys.path.append(str(Path(__file__).parent.parent) + '\\BookingSystem')
-
-import app
-
-from db import init_db
+import BookingSystem.app as app
+from BookingSystem.db import init_db
 
 
 @pytest.fixture
