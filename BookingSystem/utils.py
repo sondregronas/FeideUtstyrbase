@@ -44,9 +44,11 @@ def login_required(admin_only: bool = False, api: bool = False) -> callable:
                 flask.abort(403)
             return func(*args, **kwargs)
 
+        # Add attributes to the wrapper function so we can check if the decorator is used on a function. (tests)
         wrapper.login_required = True
         wrapper.admin_required = admin_only
         wrapper.api_allowed = api
+        
         return wrapper
 
     return decorator
