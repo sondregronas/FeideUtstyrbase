@@ -1,6 +1,6 @@
 [run]
 omit =
-    **import.py**
+    *import.py*
 
 [report]
 exclude_lines =
