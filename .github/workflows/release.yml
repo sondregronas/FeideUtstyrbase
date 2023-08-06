@@ -4,18 +4,11 @@ env:
   platforms: linux/amd64,linux/arm64/v8,linux/arm/v7
 
 on:
-  release:
-    types: [ created ]
+  workflow_run:
+    workflows: [ test ]
     branches: [ main ]
-  push:
-    branches: [ main ]
-    paths:
-      - .dockerignore
-      - .github/workflows/release.yml
-      - Dockerfile
-      - requirements.txt
-      - BookingSystem/**
-
+    types:
+      - completed
 
 jobs:
   release:
@@ -24,6 +17,7 @@ jobs:
     permissions:
       contents: read
       packages: write
+    if: github.event.workflow_run.conclusion == 'success'
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
