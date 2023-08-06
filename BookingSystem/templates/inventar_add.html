@@ -99,7 +99,7 @@
           error: function (response) {
             var msg = response.responseText;
             if (response.status === 502) {
-              msg = "Klarte ikke koble til Etikett tjeneren.";
+              msg = "Klarte ikke koble til etikett tjeneren.";
             }
             iziToast.error({
               title: 'Utskrift',

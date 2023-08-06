@@ -1,6 +1,10 @@
+{% if session.user and session.user.is_admin %}
 {% include 'partials/css.html' %}
-
 {% include 'partials/js.html' %}
+{% else %}
+{% include 'partials/css_student.html' %}
+{% include 'partials/js_student.html' %}
+{% endif %}
 
 <title>Utstyrbase</title>
 
