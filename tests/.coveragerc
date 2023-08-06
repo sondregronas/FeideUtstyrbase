@@ -1,9 +1,12 @@
 [run]
 omit =
-    **import.py
+    **extra_utils/**
 
 [report]
 exclude_lines =
     pragma: no cover
     raise NotImplementedError
     if __name__ == .__main__.:
+
+omit =
+    **extra_utils/**
