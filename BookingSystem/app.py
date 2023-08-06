@@ -62,6 +62,8 @@ def create_app() -> flask.Flask:
 
     @app.route('/login')
     def login() -> str | flask.Response:
+        if flask.session.get("user"):
+            return flask.redirect(flask.url_for('index'))
         if KIOSK_FQDN and flask.request.headers.get('Host') == KIOSK_FQDN:
             flask.session['method'] = 'kiosk'
             r = flask.request.referrer
