@@ -9,12 +9,12 @@ on:
     branches: [ main ]
   push:
     branches: [ main ]
-      paths:
-        - .dockerignore
-        - .github/workflows/release.yml
-        - Dockerfile
-        - requirements.txt
-        - BookingSystem/**
+    paths:
+      - .dockerignore
+      - .github/workflows/release.yml
+      - Dockerfile
+      - requirements.txt
+      - BookingSystem/**
 
 
 jobs:
