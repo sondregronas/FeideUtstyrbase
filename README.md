@@ -38,3 +38,15 @@ Some endpoints can be accessed without login using the specified `?token=<token>
 - [ ] Docker
 - [ ] Better README
 - [ ] Code cleanup / refactoring, it's a bit inconsistent right now.
+
+## Dependencies
+Python Dependencies are listed in `requirements.txt`
+
+JS/CSS libraries are used:
+
+- [PicoCSS](https://picocss.com/) (for now)
+- [Chosen](https://harvesthq.github.io/chosen/)
+- [jQuery](https://jquery.com/)
+- [DataTables](https://datatables.net/)
+- [iziToast](https://izitoast.marcelodolza.com/)
+- [Font Awesome](https://fontawesome.com/)
