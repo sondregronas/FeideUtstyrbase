@@ -84,7 +84,7 @@ def create_app() -> flask.Flask:
     @app.route('/logout')
     def logout() -> flask.Response:
         flask.session.clear()
-        return flask.redirect(flask.url_for('index'))
+        return flask.redirect(flask.url_for('login'))
 
     @app.route('/admin')
     @login_required(admin_only=True)
