@@ -25,7 +25,7 @@ api = flask.Blueprint('api', __name__)
 def get_items() -> flask.Response:
     """Get all items in the database for frontend display."""
     items = inventory.get_all()
-    return flask.jsonify([item.__dict__ for item in items])
+    return flask.jsonify([item.api_repr() for item in items])
 
 
 @api.route('/items/unavailable', methods=['GET'])
@@ -33,7 +33,7 @@ def get_items() -> flask.Response:
 def get_items_unavailable() -> flask.Response:
     """Get all items in the database for frontend display."""
     items = inventory.get_all_unavailable()
-    return flask.jsonify([item.__dict__ for item in items])
+    return flask.jsonify([item.api_repr() for item in items])
 
 
 @api.route('/items/overdue', methods=['GET'])
@@ -41,7 +41,7 @@ def get_items_unavailable() -> flask.Response:
 def get_items_overdue() -> flask.Response:
     """Get all items in the database for frontend display."""
     items = inventory.get_all_overdue()
-    return flask.jsonify([item.__dict__ for item in items])
+    return flask.jsonify([item.api_repr() for item in items])
 
 
 @api.route('/items/add', methods=['POST'])

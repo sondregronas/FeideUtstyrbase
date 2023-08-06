@@ -6,8 +6,6 @@
     <button type="submit">Lever</button>
 </form>
 
-<p id="status" style="min-height: 2rem;"></p>
-
 <script>
   $(document).ready(function () {
     $('#id').focus();
@@ -19,14 +17,22 @@
         url: url,
         type: 'POST',
         success: function (result) {
-          $('#status').append('<br><span style="color: green">Leverte inn ' + $('#id').val() + '</span>');
+          iziToast.success({
+            title: 'Sukksess!',
+            message: `<i>${$('#id').val()}</i> ble levert`,
+          })
+          // Remove the row from the table
           $('#active tr').filter(function () {
             return $(this).find('td').eq(0).text() === $('#id').val();
           }).remove();
+          // Clear the input field
           $('#id').val('');
         },
         error: function (result) {
-          $('#status').append('<br><span style="color: red">Klarte ikke å levere inn ' + $('#id').val() + ' (' + result.responseText + ')</span>');
+          iziToast.error({
+            title: 'Feil!',
+            message: result.responseText,
+          })
         }
       });
     });

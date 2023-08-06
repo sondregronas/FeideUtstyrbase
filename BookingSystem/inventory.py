@@ -38,10 +38,16 @@ class Item:
     order_due_date: str = None
     last_seen: str = None
 
-    def __post_init__(self):
-        # TODO: included_batteries does nothing as of now
-        #       so it can just be omitted for now
-        del self.included_batteries
+    def api_repr(self) -> dict:
+        return {
+            'id': self.id,
+            'name': self.name,
+            'category': self.category,
+            'available': self.available,
+            'borrowed_to': self.borrowed_to,
+            'order_due_date': self.order_due_date,
+            'last_seen': self.last_seen
+        }
 
     def __str__(self) -> str:
         if self.order_due_date:

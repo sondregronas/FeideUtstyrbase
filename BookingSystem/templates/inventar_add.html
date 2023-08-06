@@ -52,9 +52,6 @@
     <button type="submit">Legg til</button>
 </form>
 
-<p id="status">Klar til å legge til gjenstander</p>
-<p id="print-status"></p>
-
 <a href="{{ url_for('inventar') }}">
     <button>Ferdig!</button>
 </a>
@@ -73,12 +70,16 @@
         url: '{{ url_for("api.add_item") }}',
         data: $('form').serialize(),
         success: function (response) {
-          $('#status').html(response);
-          $('#status').css('color', 'green');
+          iziToast.success({
+            title: 'Suksess!',
+            message: response,
+          })
         },
         error: function (response) {
-          $('#status').html(response.responseText);
-          $('#status').css('color', 'red');
+          iziToast.error({
+            title: 'Feil!',
+            message: response.responseText,
+          })
         }
       });
 
@@ -90,12 +91,20 @@
           url: url,
           data: $('form').serialize(),
           success: function (response) {
-            $('#print-status').html(response);
-            $('#print-status').css('color', 'green');
+            iziToast.info({
+              title: 'Utskrift',
+              message: response,
+            })
           },
           error: function (response) {
-            $('#print-status').html(response.responseText);
-            $('#print-status').css('color', 'red');
+            var msg = response.responseText;
+            if (response.status === 502) {
+              msg = "Klarte ikke koble til Etikett tjeneren.";
+            }
+            iziToast.error({
+              title: 'Utskrift',
+              message: msg,
+            })
           }
         });
       }

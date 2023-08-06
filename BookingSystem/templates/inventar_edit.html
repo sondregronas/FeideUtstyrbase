@@ -42,8 +42,6 @@
     Slett
 </button>
 
-<p id="status"></p>
-
 
 <script>
   function deleteItem() {
@@ -51,11 +49,14 @@
       type: 'POST',
       url: '{{ url_for("api.delete_item", item_id=item.id) }}',
       success: function (response) {
+        cueAlert('Sukksess!', `${$('#id').val()} ble slettet.`, 'success');
         window.location.href = '{{ url_for("inventar") }}';
       },
       error: function (response) {
-        $('#status').html(response.responseText);
-        $('#status').css('color', 'red');
+        iziToast.error({
+          title: 'Feil!',
+          message: response.responseText,
+        });
       }
     });
   }
@@ -75,11 +76,14 @@
         url: '{{ url_for("api.edit_item", item_id=item.id) }}',
         data: $('form').serialize(),
         success: function (response) {
+          cueAlert('Sukksess!', `${$('#id').val()} ble oppdatert.`, 'success');
           window.location.href = '{{ url_for("inventar") }}';
         },
         error: function (response) {
-          $('#status').html(response.responseText);
-          $('#status').css('color', 'red');
+          iziToast.error({
+            title: 'Feil!',
+            message: response.responseText,
+          });
         }
       });
     });

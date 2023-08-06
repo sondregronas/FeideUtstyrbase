@@ -54,11 +54,11 @@
       url: "{{url_for('api.email_report')}}",
       type: 'POST',
       success: function (result) {
-        alert('Rapport sendt!');
+        cueAlert('Sukksess!', 'Rapporten ble sendt ut.', 'success')
         location.reload();
       },
       error: function (result) {
-        alert(result.responseText);
+        cueAlert('Info', result.responseText, 'info')
       }
     });
   }

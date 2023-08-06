@@ -29,8 +29,6 @@
     <button type="submit">Skriv ut</button>
 </form>
 
-<p id="status">Klar til å skrive ut etikett</p>
-
 <a href="{{ url_for('inventar') }}">
     <button>Tilbake</button>
 </a>
@@ -52,11 +50,18 @@
         url: '{{ url_for("api.print_label", item_id=item.id) }}',
         data: $('form').serialize(),
         success: function (response) {
+          cueAlert('Utskrift', response.responseText, 'success')
           window.location.href = '{{ url_for("inventar") }}';
         },
         error: function (response) {
-          $('#status').html(response.responseText);
-          $('#status').css('color', 'red');
+          var msg = response.responseText;
+          if (response.status === 502) {
+            msg = "Klarte ikke koble til Etikett tjeneren.";
+          }
+          iziToast.error({
+            title: 'Utskrift',
+            message: msg,
+          })
         }
       });
     });

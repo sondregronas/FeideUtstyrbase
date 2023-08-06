@@ -1,4 +1,5 @@
 <script src="/static/js/jquery-3.7.0.min.js"></script>
+<script src="/static/js/iziToast.min.js"></script>
 
 <script>
   $(document).ready(function () {
@@ -8,5 +9,25 @@
     }, function () {
       $(this).find('.dropdown-content').first().stop(true, true).slideUp(105)
     });
+
+    // Show alert if there is one in session storage (on page load)
+    if (sessionStorage.getItem('alert_msg')) {
+      let h = sessionStorage.getItem('alert_header') || 'Melding';
+      let m = sessionStorage.getItem('alert_msg') || 'Ingen melding';
+      let t = sessionStorage.getItem('alert_type') || 'info';
+      iziToast[t]({
+        title: h,
+        message: m,
+      });
+      sessionStorage.removeItem('alert_msg');
+      sessionStorage.removeItem('alert_header');
+      sessionStorage.removeItem('alert_type');
+    }
   });
+
+  function cueAlert(header, msg, type) {
+    sessionStorage.setItem('alert_header', header);
+    sessionStorage.setItem('alert_msg', msg);
+    sessionStorage.setItem('alert_type', type);
+  }
 </script>

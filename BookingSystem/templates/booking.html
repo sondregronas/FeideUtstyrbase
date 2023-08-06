@@ -38,8 +38,6 @@
     <button type="submit">Lån ut</button>
 </form>
 
-<p id="status"></p>
-
 <script>
   $(document).ready(function () {
     $('#user').chosen(
@@ -66,15 +64,20 @@
         success: function (response, status) {
           // alert the response code
           if (status === 'success') {
+            cueAlert('Sukksess!', response, 'success')
             window.location.href = "{{ url_for('index') }}";
           } else {
-            $('#status').text('Noe gikk galt');
-            $('#status').css('color', 'red');
+            iziToast.error({
+              title: 'Feil',
+              message: 'Noe gikk galt',
+            });
           }
         },
         error: function (error) {
-          $('#status').text('Noe gikk galt');
-          $('#status').css('color', 'red');
+          iziToast.error({
+            title: 'Feil!',
+            message: 'Noe gikk galt',
+          });
         }
       });
     });
