@@ -15,7 +15,7 @@
     <select name="user" id="user" data-placeholder="Søk etter bruker..." required>
         <option value=""></option>
         {% for user in all_users %}
-        <option value="{{user.name}} ({% if user.classroom %}{{user.classroom}}{%else%}Lærer{% endif %})">
+        <option value="{{user.userid}}">
             {{user.name}} ({% if user.classroom %}{{user.classroom}}{%else%}Lærer{% endif %})
         </option>
         {% endfor %}

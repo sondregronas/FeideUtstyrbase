@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 
 from dateutil import parser
 
+import user
 from __init__ import logger, DATABASE, audits
 from db import read_sql_query
 
@@ -37,22 +38,33 @@ class Item:
     order_due_date: str = None
     last_seen: str = None
 
+    def __post_init__(self):
+        # TODO: included_batteries does nothing as of now
+        #       so it can just be omitted for now
+        del self.included_batteries
+
     def __str__(self) -> str:
         if self.order_due_date:
             return f'{self.lender_name}: {self.id} - {self.name} ({self.category}, {parser.parse(self.order_due_date):%d.%m.%Y})'
         return f'{self.id} - {self.name} - {self.category}'
 
     @property
-    def lender_name(self) -> str:
+    def user(self) -> dict:
         if self.borrowed_to is None:
-            return ''
-        return self.borrowed_to.split('(')[0].strip()
+            return {}
+        return user.get(self.borrowed_to)
+
+    @property
+    def lender_name(self) -> str:
+        return self.user.get('name')
 
     @property
     def lender_association(self) -> str:
-        if self.borrowed_to is None:
-            return ''
-        return ''.join(self.borrowed_to.split('(')[1:]).strip(')')
+        return self.user.get('classroom') or 'Lærer'
+
+    @property
+    def lender(self) -> str:
+        return f'{self.lender_name} ({self.lender_association})'
 
     @property
     def overdue(self) -> bool:

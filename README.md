@@ -18,6 +18,7 @@ If you need a kiosk mode, set up a separate reverse proxy with a valid access co
 Some endpoints can be accessed without login using the specified `?token=<token>` parameter.
 
 - `GET /items` - Get all items in the database as JSON.
+- `GET /user/<userid>` - Get user info as JSON (userid is from `/items`, `borrowed_to`).
 - `POST /email/report (params: interval=<days>` - Send out an email report to all specified emails (in admin panel), see `cron_examples.txt` for an example use case.
 - `POST /users/prune_inactive` - Remove all inactive users from the database (regular users expire in July, admins never expire).
 

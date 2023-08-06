@@ -5,7 +5,7 @@ from datetime import datetime
 from flask import request
 
 from __init__ import DATABASE, KIOSK_FQDN
-from db import get_user, read_sql_query
+from db import read_sql_query
 from feide import get_feide_data
 
 
@@ -31,19 +31,19 @@ class User:
     @property
     def exists(self) -> bool:
         """Check if the user exists in the database."""
-        return bool(get_user(self.userid))
+        return bool(get(self.userid))
 
     @property
     def classroom(self) -> str:
         """Get the classroom the user is associated with."""
-        return get_user(self.userid).get('classroom')
+        return get(self.userid).get('classroom')
 
     @property
     def active(self) -> bool:
         """Check if the user is active."""
-        if get_user(self.userid).get('admin'):
+        if get(self.userid).get('admin'):
             return True
-        date_from_string = datetime.fromisoformat(get_user(self.userid).get('expires_at', '1970-01-01'))
+        date_from_string = datetime.fromisoformat(get(self.userid).get('expires_at', '1970-01-01'))
         return date_from_string > datetime.now()
 
 
@@ -81,3 +81,16 @@ def prune_inactive() -> None:
     cur.execute(read_sql_query('prune_old_users.sql'))
     con.commit()
     con.close()
+
+
+def get(userid: str) -> dict:
+    """Load the user's information from the database."""
+    con = sqlite3.connect(DATABASE)
+    cur = con.cursor()
+    cur.execute(read_sql_query("get_user_by_id.sql"), (userid,))
+    user = cur.fetchone()
+    columns = [description[0] for description in cur.description]
+    con.close()
+    if not user:
+        return {}
+    return {columns[i]: user[i] for i in range(len(columns)) if not columns[i] == 'id'}

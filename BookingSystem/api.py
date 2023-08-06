@@ -10,7 +10,6 @@ from datetime import datetime
 import flask
 import requests
 
-import groups
 import inventory
 import mail
 import user
@@ -26,7 +25,7 @@ api = flask.Blueprint('api', __name__)
 def get_items() -> flask.Response:
     """Get all items in the database for frontend display."""
     items = inventory.get_all()
-    return flask.jsonify([item for item in items])
+    return flask.jsonify([item.__dict__ for item in items])
 
 
 @api.route('/items/add', methods=['POST'])
@@ -73,14 +72,6 @@ def delete_item(item_id: str) -> flask.Response:
     except ValueError as e:
         return flask.Response(str(e), status=400)
     return flask.Response(f'Slettet {item_id} fra databasen.', status=200)
-
-
-@api.route('/items/<item_id>', methods=['GET'])
-@login_required(admin_only=True)
-def get_item(item_id: str) -> flask.Response:
-    """Get a single item from the database."""
-    item = inventory.get(item_id)
-    return flask.jsonify(item)
 
 
 @api.route('/items/<item_id>/label/<variant>/preview', methods=['GET'])
@@ -132,25 +123,14 @@ def return_equipment(item_id: str) -> flask.Response:
     return flask.Response('Utstyr ble innlevert.', status=200)
 
 
-@api.route('/groups', methods=['GET'])
-@login_required(admin_only=True)
-def get_groups() -> flask.Response:
-    """Get all groups in the database for frontend display."""
-    return flask.jsonify([group.strip() for group in groups.get_all()])
-
-
-@api.route('/users', methods=['GET'])
-@login_required(admin_only=True)
-def get_users() -> flask.Response:
-    """Get all users in the database for frontend display."""
-    # TODO: Only return valid users
-    con = sqlite3.connect(DATABASE)
-    cur = con.cursor()
-    cur.execute('SELECT * FROM users')
-    columns = [description[0] for description in cur.description]
-    data = [{columns[i]: user[i] for i in range(len(columns))} for user in cur.fetchall()]
-    con.close()
-    return flask.jsonify(data)
+@api.route('/user/<userid>', methods=['GET'])
+@login_required(admin_only=True, api=True)
+def get_user(userid: str) -> flask.Response:
+    """Get user as JSON."""
+    u = user.get(userid)
+    if not u:
+        return flask.abort(404)
+    return flask.jsonify(u)
 
 
 @api.route('/update/student', methods=['POST'], endpoint='update_student')
