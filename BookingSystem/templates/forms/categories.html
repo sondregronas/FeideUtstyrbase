@@ -1,5 +1,5 @@
 <form action="{{ url_for('api.update_categories') }}" method="post"
-      onclick="cueToast('Sukksess!', 'Kategoriene ble oppdatert.', 'success')">
+      onclick="cueToast('Suksess!', 'Kategoriene ble oppdatert.', 'success')">
     <textarea name="categories" id="categories" cols="30" rows="10">{{ '\n'.join(all_categories) }}</textarea>
     <input type="submit" value="Oppdater">
 </form>

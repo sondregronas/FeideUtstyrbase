@@ -63,7 +63,7 @@
             type: 'POST',
             success: function (response, status) {
               if (status === 'success') {
-                cueAlert('Sukksess!', response, 'success')
+                cueAlert('Suksess!', response, 'success')
                 window.location.href = "{{ url_for('app.index') }}";
               } else {
                 iziToast.error({
