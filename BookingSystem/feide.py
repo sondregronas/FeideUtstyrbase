@@ -24,7 +24,7 @@ session['user'] = {
 """
 
 # page to redirect to after successful authentication
-POST_AUTH_PAGE = 'register'  # (flask.url_for)
+POST_AUTH_PAGE = 'app.register'  # (flask.url_for)
 
 """
 Routes / blueprint for FEIDE login.
