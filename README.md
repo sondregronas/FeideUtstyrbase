@@ -26,6 +26,7 @@ Some endpoints can be accessed without login using the specified `?token=<token>
 - `GET /items/available` - Get all available items as JSON.
 - `GET /items/unavailable` - Get all unavailable items as JSON.
 - `GET /items/overdue` - Get all overdue items as JSON.
+- `GET /items/user/<userid>` - Get all items borrowed by a user as JSON.
 - `GET /user/<userid>` - Get user info as JSON (userid is from `/items`, `borrowed_to`).
 - `POST /email/report (params: interval=<days>` - Send out an email report to all specified emails (in admin panel), see `cron_examples.txt` for an example use case.
 - `POST /users/prune_inactive` - Remove all inactive users from the database (regular users expire in July, admins never expire).
@@ -49,4 +50,5 @@ JS/CSS libraries are used:
 - [jQuery](https://jquery.com/)
 - [DataTables](https://datatables.net/)
 - [iziToast](https://izitoast.marcelodolza.com/)
+- [jquery-confirm](https://craftpip.github.io/jquery-confirm/)
 - [Font Awesome](https://fontawesome.com/)

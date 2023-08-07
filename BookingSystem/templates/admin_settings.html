@@ -8,11 +8,11 @@
     </hgroup>
 
     {% if last_sent %}
-        <a href="" onclick="sendReport()">
+        <a onclick="sendReport()">
             <button>Send rapport (Sist sendt {{ last_sent | strfunixtime }})</button>
         </a>
     {% else %}
-        <a href="" onclick="sendReport()">
+        <a onclick="sendReport()">
             <button>Send rapport</button>
         </a>
     {% endif %}
@@ -41,9 +41,7 @@
         let last_sent_day = new Date(last_sent * 1000).getDate();
         let today = new Date().getDate();
         if (last_sent_day === today) {
-          if (confirm("Det er allerede sendt ut rapport idag. Vil du likevel sende en ny?")) {
-            _send()
-          }
+          confirmMail("Bekreft utsendelse", "Det er allerede sendt ut rapport idag. Vil du likevel sende en ny?", _send)
         } else {
           _send()
         }
@@ -54,11 +52,10 @@
           url: "{{url_for('api.email_report')}}",
           type: 'POST',
           success: function (result) {
-            cueAlert('Sukksess!', 'Rapporten ble sendt ut.', 'success')
-            location.reload();
+            customAlert('Sukksess!', 'Rapporten ble sendt ut.', 'success')
           },
           error: function (result) {
-            cueAlert('Info', result.responseText, 'info')
+            customAlert('Info', result.responseText, 'info')
           }
         });
       }

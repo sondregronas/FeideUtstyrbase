@@ -74,6 +74,9 @@
                 title: 'Suksess!',
                 message: response,
               })
+              if ($('#print_label_count').val() > 0) {
+                sendToPrint();
+              }
             },
             error: function (response) {
               iziToast.error({
@@ -82,34 +85,34 @@
               })
             }
           });
-
-          if ($('#print_label_count').val() > 0) {
-            url = '{{ url_for("api.print_label", item_id="REPLACE_ME") }}';
-            url = url.replace('REPLACE_ME', $('#id').val());
-            $.ajax({
-              type: 'POST',
-              url: url,
-              data: $('form').serialize(),
-              success: function (response) {
-                iziToast.info({
-                  title: 'Utskrift',
-                  message: response,
-                })
-              },
-              error: function (response) {
-                var msg = response.responseText;
-                if (response.status === 502) {
-                  msg = "Klarte ikke koble til etikett tjeneren.";
-                }
-                iziToast.error({
-                  title: 'Utskrift',
-                  message: msg,
-                })
-              }
-            });
-          }
         });
       });
+
+      function sendToPrint() {
+        url = '{{ url_for("api.print_label", item_id="REPLACE_ME") }}';
+        url = url.replace('REPLACE_ME', $('#id').val());
+        $.ajax({
+          type: 'POST',
+          url: url,
+          data: $('form').serialize(),
+          success: function (response) {
+            iziToast.info({
+              title: 'Utskrift',
+              message: response,
+            })
+          },
+          error: function (response) {
+            var msg = response.responseText;
+            if (response.status === 502) {
+              msg = "Klarte ikke koble til etikett tjeneren.";
+            }
+            iziToast.error({
+              title: 'Utskrift',
+              message: msg,
+            })
+          }
+        });
+      }
     </script>
 
 {% endblock %}

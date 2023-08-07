@@ -37,11 +37,11 @@
                 <td>
                     {% if item.available %}
                         <a href="{{ url_for('app.edit_item', item_id=item.id) }}">Rediger</a>
-                        |
-                        <a href="{{ url_for('app.print_item', item_id=item.id) }}">Etikett</a>
                     {% else %}
                         Utlånt
                     {% endif %}
+                    |
+                    <a href="{{ url_for('app.print_item', item_id=item.id) }}">Etikett</a>
                 </td>
             </tr>
         {% endfor %}

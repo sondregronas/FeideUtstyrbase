@@ -50,7 +50,7 @@
             url: '{{ url_for("api.print_label", item_id=item.id) }}',
             data: $('form').serialize(),
             success: function (response) {
-              cueAlert('Utskrift', response.responseText, 'success')
+              cueToast('Utskrift', response.responseText, 'success')
               window.location.href = '{{ url_for("app.inventar") }}';
             },
             error: function (response) {
@@ -58,7 +58,7 @@
               if (response.status === 502) {
                 msg = "Klarte ikke koble til etikett tjeneren.";
               }
-              iziToast.error({
+              iziToast.warning({
                 title: 'Utskrift',
                 message: msg,
               })

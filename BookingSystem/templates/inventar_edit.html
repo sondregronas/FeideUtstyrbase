@@ -38,7 +38,7 @@
     </form>
 
     <button class="red-button"
-            onclick="if (confirm('Er du sikker på at du vil slette denne gjenstanden?')) deleteItem()">
+            onclick="confirmDelete('Bekreft', `Er du sikker på at du vil slette ${$('#id').val()}?`, deleteItem)">
         Slett
     </button>
 
@@ -49,7 +49,7 @@
           type: 'POST',
           url: '{{ url_for("api.delete_item", item_id=item.id) }}',
           success: function (response) {
-            cueAlert('Sukksess!', `${$('#id').val()} ble slettet.`, 'success');
+            cueToast('Sukksess!', `${$('#id').val()} ble slettet.`, 'success');
             window.location.href = '{{ url_for("app.inventar") }}';
           },
           error: function (response) {
@@ -76,7 +76,7 @@
             url: '{{ url_for("api.edit_item", item_id=item.id) }}',
             data: $('form').serialize(),
             success: function (response) {
-              cueAlert('Sukksess!', `${$('#id').val()} ble oppdatert.`, 'success');
+              cueToast('Sukksess!', `${$('#id').val()} ble oppdatert.`, 'success');
               window.location.href = '{{ url_for("app.inventar") }}';
             },
             error: function (response) {

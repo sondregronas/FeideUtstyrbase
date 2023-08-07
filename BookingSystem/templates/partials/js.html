@@ -1,6 +1,8 @@
 {% include 'partials/js_student.html' %}
 <script src="/static/js/jquery-3.7.0.min.js"></script>
 <script src="/static/js/iziToast.min.js"></script>
+<script src="/static/js/jquery-confirm.min.js"></script>
+
 
 <script>
   $(document).ready(function () {
@@ -11,24 +13,129 @@
       $(this).find('.dropdown-content').first().stop(true, true).slideUp(105)
     });
 
+    // jconfirm defaults
+    jconfirm.defaults = {
+      theme: 'modern',
+      draggable: false,
+      boxWidth: '30%',
+      useBootstrap: false,
+      escapeKey: true,
+      backgroundDismiss: true,
+    }
+
     // Show alert if there is one in session storage (on page load)
     if (sessionStorage.getItem('alert_msg')) {
       let h = sessionStorage.getItem('alert_header') || 'Melding';
       let m = sessionStorage.getItem('alert_msg') || 'Ingen melding';
       let t = sessionStorage.getItem('alert_type') || 'info';
-      iziToast[t]({
-        title: h,
-        message: m,
-      });
+      let f = sessionStorage.getItem('alert_fullscreen') || 'false';
+      if (f === 'true') {
+        customAlert(h, m, t, true);
+      } else {
+        iziToast[t]({
+          title: h,
+          message: m,
+        });
+      }
       sessionStorage.removeItem('alert_msg');
       sessionStorage.removeItem('alert_header');
       sessionStorage.removeItem('alert_type');
+      sessionStorage.removeItem('alert_fullscreen');
     }
   });
+
+  function customAlert(header, msg, type, fullscreen = false) {
+    let icon;
+    if (fullscreen) {
+      if (type === 'success') {
+        icon = 'fa fa-check-circle';
+        type = 'green';
+      } else if (type === 'warning') {
+        icon = 'fa fa-exclamation-circle';
+        type = 'orange';
+      } else if (type === 'error') {
+        icon = 'fa fa-times-circle';
+        type = 'red';
+      } else {
+        icon = 'fa fa-info-circle';
+        type = 'blue';
+      }
+      $.alert({
+        title: header,
+        content: msg,
+        type: type,
+        icon: icon,
+        buttons: {
+          confirm: {
+            text: 'Greit',
+            btnClass: 'btn-blue',
+            action: function () {
+            }
+          }
+        }
+      });
+    } else {
+      iziToast[type]({
+        title: header,
+        message: msg,
+      });
+    }
+  }
+
+  function confirmMail(title, content, func) {
+    $.confirm({
+      title: title,
+      content: content,
+      type: 'blue',
+      icon: 'fa fa-paper-plane',
+      buttons: {
+        confirm: {
+          text: 'Bekreft',
+          btnClass: 'btn-blue',
+          action: func
+        },
+        cancel: {
+          text: 'Avbryt',
+          btnClass: 'btn-red',
+          action: function () {
+          }
+        }
+      }
+    });
+  }
+
+  function confirmDelete(title, content, func) {
+    $.confirm({
+      title: title,
+      content: content,
+      type: 'red',
+      icon: 'fa fa-trash',
+      buttons: {
+        confirm: {
+          text: 'Slett',
+          btnClass: 'btn-red',
+          action: func
+        },
+        cancel: {
+          text: 'Avbryt',
+          btnClass: 'btn-blue',
+          action: function () {
+          }
+        }
+      }
+    });
+  }
+
+  function cueToast(header, msg, type) {
+    sessionStorage.setItem('alert_header', header);
+    sessionStorage.setItem('alert_msg', msg);
+    sessionStorage.setItem('alert_type', type);
+  }
 
   function cueAlert(header, msg, type) {
     sessionStorage.setItem('alert_header', header);
     sessionStorage.setItem('alert_msg', msg);
     sessionStorage.setItem('alert_type', type);
+    sessionStorage.setItem('alert_fullscreen', 'true');
   }
 </script>

@@ -52,6 +52,13 @@ def get_items_overdue() -> flask.Response:
     return flask.jsonify([item.api_repr() for item in items])
 
 
+@api.route('/items/user/<userid>', methods=['GET'])
+@login_required(admin_only=True, api=True)
+def get_items_by_userid(userid: str) -> flask.Response:
+    items = inventory.get_all_unavailable()
+    return flask.jsonify([item.api_repr() for item in items if item.borrowed_to == userid])
+
+
 @api.route('/items/add', methods=['POST'])
 @login_required(admin_only=True)
 def add_item() -> flask.Response:
@@ -132,7 +139,7 @@ def book_equipment() -> flask.Response:
 
     for item in item_ids:
         inventory.register_out(item_id=item, userid=userid, days=days)
-    return flask.Response('Utstyr ble utlevert.', status=200)
+    return flask.Response(f'Utstyret ble utlevert til {user.get(userid).get("name")}.', status=200)
 
 
 @api.route('/return/<item_id>', methods=['POST'])

@@ -33,21 +33,21 @@
             {% endfor %}
         </select>
 
-        <br><br>
-
         <button type="submit">Lån ut</button>
     </form>
 
+    <table id="user-bookings"></table>
+
     <script>
       $(document).ready(function () {
-        $('#user').chosen(
+        $("#user").chosen(
           {
             no_results_text: 'Fant ikke brukere med navnet',
             search_contains: true,
             inherit_select_classes: true,
           }
         );
-        $('#equipment').chosen(
+        $("#equipment").chosen(
           {
             no_results_text: 'Fant ikke utstyr med navnet',
             search_contains: true,
@@ -62,7 +62,6 @@
             data: $('form').serialize(),
             type: 'POST',
             success: function (response, status) {
-              // alert the response code
               if (status === 'success') {
                 cueAlert('Sukksess!', response, 'success')
                 window.location.href = "{{ url_for('app.index') }}";
@@ -81,7 +80,57 @@
             }
           });
         });
+      });
 
+      let user = $('#user');
+      user.change(function () {
+        let table = $('#user-bookings');
+        table.empty();
+
+        let url = "{{ url_for('api.get_items_by_userid', userid = 'REPLACEME') }}";
+        url = url.replace('REPLACEME', user.val());
+        $.ajax({
+          url: url,
+          data: {user: user.val()},
+          type: 'GET',
+          success: function (response, status) {
+            // Spawn table, send info toast if user has items, send warning toast if user has overdue items
+            if (response.length > 0) {
+              let any_overdue = false;
+              table.append('<tr><th><b>Løpenummer</b></th><th><b>Utstyr</b></th><th><b>Kategori</b></th><th><b>Frist for levering</b></th></tr>');
+              for (let i = 0; i < response.length; i++) {
+                let item = response[i];
+                let due_date = new Date(item.order_due_date)
+                let overdue = due_date < new Date();
+                let row = $('<tr></tr>');
+                if (overdue) {
+                  any_overdue = true;
+                  row = $('<tr class="item-row--overdue"></tr>');
+                }
+                row.append('<td>' + item.id + '</td>');
+                row.append('<td>' + item.name + '</td>');
+                row.append('<td>' + item.category + '</td>');
+                row.append('<td>' + due_date.toLocaleDateString('nb-NO', {
+                  day: '2-digit',
+                  month: '2-digit',
+                  year: 'numeric'
+                }) + '</td>');
+                table.append(row);
+              }
+              if (any_overdue) {
+                iziToast.warning({
+                  title: 'Advarsel',
+                  message: `Valgt bruker har utstyr som er over forfallsdato!`,
+                });
+              } else {
+                iziToast.info({
+                  title: 'Info',
+                  message: `Valgt bruker har aktive lån.`,
+                })
+              }
+            }
+          },
+        });
       });
     </script>
 
