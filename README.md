@@ -32,11 +32,10 @@ Some endpoints can be accessed without login using the specified `?token=<token>
 - `POST /users/prune_inactive` - Remove all inactive users from the database (regular users expire in July, admins never expire).
 
 ## TODO:
-- [ ] Prettier frontend (`booking.html` needs more work)
+- [ ] Find a way to implement included_batteries (and possibly other accessories) in a way that makes sense (omitting them for now)
 - [ ] Move to a proper database?
 - [ ] Tests
 - [ ] Documentation
-- [ ] Docker
 - [ ] Better README
 - [ ] Code cleanup / refactoring, it's a bit inconsistent right now.
 
