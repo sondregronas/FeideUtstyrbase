@@ -3,18 +3,7 @@
 {% block extra_head %}
     {% if session.user and session.user.is_admin %}
     {% else %}
-        <script src="/static/js/jquery-3.7.0.min.js"></script>
-        <script src="/static/js/jquery-confirm.min.js"></script>
-        <script>
-          jconfirm.defaults = {
-            theme: 'modern',
-            draggable: false,
-            boxWidth: '30%',
-            useBootstrap: false,
-            escapeKey: true,
-            backgroundDismiss: true,
-          }
-        </script>
+        {% include 'templates/alerts.html' %}
     {% endif %}
 {% endblock %}
 
@@ -104,55 +93,12 @@
     {% if session.user %}
         <script>
           function deleteMe() {
-            $.confirm({
-              title: 'Slett konto',
-              icon: 'fa fa-trash',
-              type: 'red',
-              content: 'Er du sikker på at du vil slette kontoen din?<br>Du kan når som helst logge inn igjen for å opprette en ny konto.',
-              buttons: {
-                confirm: {
-                  text: 'Slett',
-                  btnClass: 'btn-red',
-                  action: function () {
-                    $.ajax({
-                      type: 'POST',
-                      url: '{{ url_for("api.delete_me") }}',
-                      success: function (response) {
-                        alertDeleted();
-                      }
-                    })
-                  }
-                },
-                cancel: {
-                  text: 'Avbryt',
-                  btnClass: 'btn-blue',
-                  action: function () {
-                  }
-                }
-              }
-            });
+            confirmDelete('Slett konto', 'Er du sikker på at du vil slette kontoen din?<br>Du kan når som helst logge inn igjen for å opprette en ny konto.', deleteAction);
           }
 
-          function alertDeleted() {
-            $.confirm({
-                title: 'Konto slettet',
-                icon: 'fa fa-check-circle',
-                type: 'green',
-                content: 'Din konto er blitt slettet',
-                buttons: {
-                  cancel: {
-                    text: 'Ok',
-                    btnClass: 'btn-blue',
-                    action: function () {
-                      window.location.href = '{{ url_for("app.index") }}';
-                    }
-                  }
-                },
-                backgroundDismiss: function () {
-                  window.location.href = '{{ url_for("app.index") }}';
-                }
-              }
-            )
+          function deleteAction() {
+            cueAlert('Konto slettet!', 'Kontoen din ble slettet.', 'success');
+            window.location.href = '{{ url_for("app.index") }}';
           }
         </script>
     {% else %}
@@ -168,7 +114,7 @@
                   text: 'Logg inn',
                   btnClass: 'btn-blue',
                   action: function () {
-                    window.location.href = '{{ url_for("app.index") }}';
+                    window.location.href = '{{ url_for("app.login") }}';
                   }
                 },
                 cancel: {
