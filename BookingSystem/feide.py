@@ -37,15 +37,15 @@ FEIDE_REDIRECT_URI = os.getenv('FEIDE_REDIRECT_URI')
 feide = flask.Blueprint('feide', __name__)
 
 
-@feide.route('/login/feide', methods=['GET'], endpoint='login')
-def login_feide() -> flask.Response:
+@feide.route('/login/feide', methods=['GET'])
+def login() -> flask.Response:
     """Redirect to FEIDE's endpoint for login."""
     return flask.redirect(
         f'https://auth.dataporten.no/oauth/authorization?response_type=code&client_id={FEIDE_CLIENT_ID}&redirect_uri={FEIDE_REDIRECT_URI}')
 
 
 @feide.route('/login/feide/callback', methods=['GET'])
-def login_feide_callback() -> flask.Response:
+def callback() -> flask.Response:
     """Callback from FEIDE, save method & token in the session then redirect to register page. (Regardless of whether the user is already registered or not.)"""
     code = flask.request.args.get('code')
     if not code:

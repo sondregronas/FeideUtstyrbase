@@ -150,7 +150,7 @@ def test_public_endpoints(client):
         'app.privacy',
         'app.responsibility',
         'feide.login',
-        'feide.login_feide_callback',
+        'feide.callback',
     ]
 
     for endpoint in client.application.view_functions:
@@ -179,7 +179,7 @@ def test_user_endpoints(client):
         'app.responsibility',
         'app.register',
         'feide.login',
-        'feide.login_feide_callback',
+        'feide.callback',
         'api.delete_me',
     ]
 
