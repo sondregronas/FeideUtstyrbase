@@ -13,6 +13,16 @@
       $(this).find('.dropdown-content').first().stop(true, true).slideUp(105)
     });
 
+    // Update aria-invalid attribute on inputs and selects
+    let inputs = $('input');
+    inputs = inputs.add($('select'));
+    $(inputs).on('change', function () {
+      updateAriaInvalid(this);
+    });
+    $(inputs).each(function () {
+      updateAriaInvalid(this);
+    });
+
     // jconfirm defaults
     jconfirm.defaults = {
       theme: 'modern',
@@ -137,5 +147,15 @@
     sessionStorage.setItem('alert_msg', msg);
     sessionStorage.setItem('alert_type', type);
     sessionStorage.setItem('alert_fullscreen', 'true');
+  }
+
+  function updateAriaInvalid(object) {
+    if ($(object).val() === '') {
+      $(object).removeAttr('aria-invalid');
+    } else if ($(object).is(':invalid')) {
+      $(object).attr('aria-invalid', 'true');
+    } else {
+      $(object).attr('aria-invalid', 'false');
+    }
   }
 </script>

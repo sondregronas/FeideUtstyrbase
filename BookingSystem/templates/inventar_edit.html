@@ -13,12 +13,12 @@
     <form>
         <label for="id">Løpenummer</label>
         <input type="text" name="id" id="id" required placeholder="Eksempel: A6500-01"
-               pattern="^[^\s][ÆØÅæøåa-zA-Z0-9_\s\-]+[^\s]"
+               pattern="{{ regex_item }}"
                value="{{ item.id }}">
 
         <label for="name">Navn</label>
         <input type="text" name="name" id="name" required placeholder="Eksempel: Sony A6500"
-               pattern="^[^\s][ÆØÅæøåa-zA-Z0-9_\s\-]+[^\s]"
+               pattern="{{ regex_item }}"
                value="{{ item.name }}">
 
         <label for="category">Kategori</label>

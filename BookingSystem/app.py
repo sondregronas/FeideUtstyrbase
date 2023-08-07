@@ -3,7 +3,6 @@ from datetime import datetime
 
 import flask
 from dateutil import parser
-from flask_session import Session
 from werkzeug.middleware.proxy_fix import ProxyFix
 
 import api
@@ -11,6 +10,7 @@ import feide
 import routes
 from __init__ import logger
 from db import init_db
+from flask_session import Session
 
 
 def create_app() -> flask.Flask:
@@ -39,6 +39,10 @@ def create_app() -> flask.Flask:
     @app.template_filter('strfunixtime')
     def _jinja2_filter_strftime(date, fmt='%d.%m.%Y') -> str:
         return datetime.fromtimestamp(float(date)).strftime(fmt)
+
+    @app.context_processor
+    def regex() -> dict:
+        return dict(regex_item=r'^(?:(?![\s])[ÆØÅæøåa-zA-Z0-9_\s\-]*[ÆØÅæøåa-zA-Z0-9_\-]+)$')
 
     @app.errorhandler(401)
     def unauthorized(_) -> flask.Response:

@@ -1,7 +1,7 @@
 <form>
     <label for="id">Innlevering</label>
     <input type="text" name="id" id="id" placeholder="Skann (eller tast inn) løpenummeret for å levere inn" required
-           pattern="^[^\s][ÆØÅæøåa-zA-Z0-9_\s\-]+[^\s]">
+           pattern="{{ regex_item }}">
 
     <button type="submit">Lever</button>
 </form>
