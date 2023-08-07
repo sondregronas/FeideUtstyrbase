@@ -33,6 +33,7 @@ Some endpoints can be accessed without login using the specified `?token=<token>
 
 ## TODO:
 - [ ] Find a way to implement included_batteries (and possibly other accessories) in a way that makes sense (omitting them for now)
+- [ ] Better logging system for audits (archive, multiple logs, rotating) - ideally delete entries older than 365 days (should probably just use a table)
 - [ ] Move to a proper database?
 - [ ] Tests
 - [ ] Documentation
