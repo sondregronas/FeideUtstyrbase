@@ -206,6 +206,7 @@ def test_api_endpoints(client):
         'api.get_items_available',
         'api.get_items_unavailable',
         'api.get_items_overdue',
+        'api.get_items_by_userid',
         'api.get_user',
         'api.email_report',
         'api.prune_inactive_users'
