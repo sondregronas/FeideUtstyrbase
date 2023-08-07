@@ -180,6 +180,7 @@ def test_user_endpoints(client):
         'app.register',
         'feide.login',
         'feide.login_feide_callback',
+        'api.delete_me',
     ]
 
     for endpoint in client.application.view_functions:

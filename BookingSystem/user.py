@@ -4,7 +4,7 @@ from datetime import datetime
 
 from flask import request
 
-from __init__ import DATABASE, KIOSK_FQDN
+from __init__ import DATABASE, KIOSK_FQDN, logger
 from db import read_sql_query
 from feide import get_feide_data
 
@@ -94,3 +94,13 @@ def get(userid: str) -> dict:
     if not user:
         return {}
     return {columns[i]: user[i] for i in range(len(columns)) if not columns[i] == 'id'}
+
+
+def delete(userid: str) -> None:
+    """Delete the user from the database."""
+    con = sqlite3.connect(DATABASE)
+    cur = con.cursor()
+    cur.execute('DELETE FROM users WHERE userid = ?', (userid,))
+    logger.debug(f'Deleted user {userid}')
+    con.commit()
+    con.close()

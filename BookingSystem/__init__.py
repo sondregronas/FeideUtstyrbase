@@ -19,7 +19,10 @@ API_TOKEN = os.getenv('API_TOKEN')
 
 # Logger setup
 logger = Logger(__name__)
-logger.setLevel('DEBUG')
+if os.getenv('DEBUG') == 'True':
+    logger.setLevel('DEBUG')
+else:
+    logger.setLevel('INFO')
 logger.addHandler(StreamHandler())
 logger.handlers[0].setFormatter(Formatter('[%(levelname)s | %(asctime)s]: %(message)s', '%Y-%m-%d %H:%M:%S'))
 

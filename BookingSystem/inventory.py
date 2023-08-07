@@ -62,10 +62,14 @@ class Item:
 
     @property
     def lender_name(self) -> str:
+        if not self.user.get('name'):
+            return 'Slettet bruker'
         return self.user.get('name')
 
     @property
     def lender_association(self) -> str:
+        if not self.user.get('name'):
+            return 'Se logg'
         return self.user.get('classroom') or 'Lærer'
 
     @property

@@ -277,3 +277,13 @@ def prune_inactive_users() -> flask.Response:
     """
     user.prune_inactive()
     return flask.Response('Inaktive brukere ble fjernet.', status=200)
+
+
+@api.route('/delete/me', methods=['POST'])
+@login_required()
+def delete_me() -> flask.Response:
+    """Delete the currently logged in user."""
+    u = flask.session.get("user")
+    user.delete(u.userid)
+    flask.session.clear()
+    return flask.redirect(flask.url_for('app.login'))
