@@ -73,3 +73,17 @@ FROM (VALUES ('Kamera'),
              ('Diverse'),
              ('Mangler kategori')) t
 WHERE NOT EXISTS(SELECT * FROM `categories`);
+
+CREATE TABLE IF NOT EXISTS `audits`
+(
+    `id`        INTEGER PRIMARY KEY AUTOINCREMENT,
+    `timestamp` TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `event`     TEXT NOT NULL,
+    `message`   TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS `email_report_info`
+(
+    `id`        INTEGER PRIMARY KEY AUTOINCREMENT,
+    `timestamp` TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+);

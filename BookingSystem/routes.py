@@ -1,10 +1,10 @@
 import flask
 
+import audits
 import groups
 import inventory
 import mail
 import user
-import utils
 from __init__ import KIOSK_FQDN
 from __init__ import LABEL_SERVER
 from db import add_admin
@@ -59,10 +59,10 @@ def admin_settings() -> str:
                                  last_sent=mail.get_last_sent())
 
 
-@app.route('/audits')
+@app.route('/audits', endpoint='audits')
 @login_required(admin_only=True)
-def audits() -> str:
-    return flask.render_template('audits.html', audits=utils.get_audits())
+def view_audits() -> str:
+    return flask.render_template('audits.html', audits=audits.get_all())
 
 
 @app.route('/inventar')

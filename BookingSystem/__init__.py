@@ -1,5 +1,5 @@
 import os
-from logging import Logger, StreamHandler, Formatter, FileHandler
+from logging import Logger, StreamHandler, Formatter
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -25,8 +25,3 @@ else:
     logger.setLevel('INFO')
 logger.addHandler(StreamHandler())
 logger.handlers[0].setFormatter(Formatter('[%(levelname)s | %(asctime)s]: %(message)s', '%Y-%m-%d %H:%M:%S'))
-
-audits = Logger('audits')
-audits.setLevel('INFO')
-audits.addHandler(FileHandler(Path('data') / 'audits.log'))
-audits.handlers[0].setFormatter(Formatter('%(asctime)s | %(message)s', '%Y-%m-%d %H:%M:%S'))

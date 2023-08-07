@@ -48,7 +48,7 @@ def login_required(admin_only: bool = False, api: bool = False) -> callable:
         wrapper.login_required = True
         wrapper.admin_required = admin_only
         wrapper.api_allowed = api
-        
+
         return wrapper
 
     return decorator
@@ -60,13 +60,3 @@ def next_july() -> datetime:
     if datetime.now() > expiry_date:
         expiry_date = datetime(datetime.now().year + 1, 7, 1)
     return expiry_date
-
-
-def get_audits() -> list[dict]:
-    """Get the logs from the audit log."""
-    log = open('data/audits.log', 'r').readlines()
-    return [{
-        'timestamp': audit.split('|')[0].strip(),
-        'event': audit.split('|')[1].split(' - ')[0].strip(),
-        'message': ''.join(audit.split(' - ')[1:]).strip()
-    } for audit in log if audit.strip()]

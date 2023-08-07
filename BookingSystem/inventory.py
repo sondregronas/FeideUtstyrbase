@@ -4,8 +4,9 @@ from datetime import datetime, timedelta
 
 from dateutil import parser
 
+import audits
 import user
-from __init__ import logger, DATABASE, audits
+from __init__ import logger, DATABASE
 from db import read_sql_query
 
 """
@@ -97,7 +98,7 @@ def add(item: Item) -> None:
     finally:
         con.close()
     _update_last_seen(item.id)
-    audits.info(f'NEW - {item.id} ble lagt til i databasen. ({item})')
+    audits.audit('ITEM_NEW', f'{item.id} ble lagt til i databasen. ({item})')
 
 
 def edit(old_item_id: str, new_item: Item) -> None:
@@ -119,7 +120,10 @@ def edit(old_item_id: str, new_item: Item) -> None:
     diff = ', '.join([f'{old.__dict__[key]}->{new_item.__dict__[key]}' for key in old.__dict__
                       if old.__dict__[key] != new_item.__dict__[key]
                       and new_item.__dict__[key] is not None])
-    audits.info(f'EDITED - {old_item_id} ble redigert i databasen ({diff}).')
+    # TODO: Fix this
+    if diff == '0->0':
+        return
+    audits.audit('ITEM_EDIT', f'{old_item_id} ble redigert i databasen ({diff}).')
 
 
 def delete(item_id: str) -> None:
@@ -135,7 +139,7 @@ def delete(item_id: str) -> None:
         raise ValueError(f'{item_id} eksisterer ikke i databasen.')
     finally:
         con.close()
-    audits.info(f'REMOVED - {item_id} ble slettet fra databasen.')
+    audits.audit('ITEM_REM', f'{item_id} ble slettet fra databasen.')
 
 
 def get(item_id: str) -> Item:
@@ -212,8 +216,8 @@ def register_out(item_id: str, userid: str, days: str = 1) -> None:
         con.close()
     _update_last_seen(item_id)
     u = user.get(userid)
-    audits.info(
-        f'OUT - {item_id} ble registrert ut til {u.get("name")} ({u.get("classroom") or "Lærer"}) i {days} dager.')
+    audits.audit('REG_OUT',
+                 f'{item_id} ble registrert ut til {u.get("name")} ({u.get("classroom") or "Lærer"}) i {days} dager.')
 
 
 def register_in(item_id: str) -> None:
@@ -235,4 +239,4 @@ def register_in(item_id: str) -> None:
     finally:
         con.close()
     _update_last_seen(item_id)
-    audits.info(f'IN - {item_id} er nå tilgjengelig.')
+    audits.audit('REG_IN', f'{item_id} er nå tilgjengelig.')

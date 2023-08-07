@@ -25,16 +25,28 @@ def get_all_emails() -> list[str]:
 
 def get_last_sent() -> str | bool:
     """Return the date of the last sent email."""
-    if not os.path.exists('data/last_sent.txt'):
-        return False
-    with open('data/last_sent.txt', 'r') as file:
-        return file.read()
+    con = sqlite3.connect(DATABASE)
+    cur = con.cursor()
+    sql = 'SELECT timestamp FROM email_report_info ORDER BY timestamp DESC LIMIT 1'
+    cur.execute(sql)
+    row = cur.fetchone()
+    con.close()
+    if row:
+        return row[0]
+    return False
 
 
 def update_last_sent() -> None:
     """Write the current date to 'data/last_sent.txt'."""
-    with open('data/last_sent.txt', 'w+') as file:
-        file.write(str(datetime.now().timestamp()))
+    con = sqlite3.connect(DATABASE)
+    cur = con.cursor()
+    # noinspection SqlWithoutWhere
+    sql = 'DELETE FROM email_report_info'
+    cur.execute(sql)
+    sql = 'INSERT INTO email_report_info (timestamp) VALUES (:timestamp)'
+    cur.execute(sql, {'timestamp': datetime.now().timestamp()})
+    con.commit()
+    con.close()
 
 
 def formatted_overdue_items() -> str:
