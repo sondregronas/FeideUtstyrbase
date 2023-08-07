@@ -51,6 +51,11 @@
           "lengthMenu": [[25, 50, -1], [25, 50, "Alle"]],
           "language": lang
         });
+
+        {% if search %}
+          $('input[type=search]').val('{{ search }}');
+          $('input[type=search]').trigger('keyup');
+        {% endif  %}
       });
     </script>
 

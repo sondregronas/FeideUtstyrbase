@@ -164,8 +164,8 @@ def get_user(userid: str) -> flask.Response:
 
 
 @api.route('/users', methods=['POST'])
-@login_required(admin_only=True)
-def add_student() -> flask.Response:
+@login_required()
+def register_student() -> flask.Response:
     """Add/update a class in the database."""
     con = sqlite3.connect(DATABASE)
     cur = con.cursor()

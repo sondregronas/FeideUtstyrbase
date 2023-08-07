@@ -1,12 +1,5 @@
 {% extends 'layout.html' %}
 
-{% block extra_head %}
-    {% if session.user and session.user.is_admin %}
-    {% else %}
-        {% include 'templates/alerts.html' %}
-    {% endif %}
-{% endblock %}
-
 {% block content %}
 
     <hgroup>

@@ -1,14 +1,15 @@
+<title>Utstyrbase</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="utf-8">
+
 {% if session.user and session.user.is_admin %}
     {% include 'partials/css.html' %}
     {% include 'partials/js.html' %}
-    {% include 'templates/alerts.html' %}
 {% else %}
     {% include 'partials/css_student.html' %}
     {% include 'partials/js_student.html' %}
 {% endif %}
 
-<title>Utstyrbase</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta charset="utf-8">
+{% include 'templates/alerts.html' %}
 
 {% block extra_head %}{% endblock %}

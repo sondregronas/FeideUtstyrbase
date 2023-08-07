@@ -70,7 +70,7 @@ class Item:
     @property
     def lender_association(self) -> str:
         if not self.user.get('name'):
-            return 'Se logg'
+            return 'Sjekk historikk'
         return self.user.get('classroom') or 'Lærer'
 
     @property

@@ -1,11 +1,13 @@
 <nav>
     <li><a href="{{ url_for('app.index') }}">Utstyrbase</a></li>
     <ul>
-        <li><a href="{{url_for('app.privacy')}}">Personvern</a></li>
+        <li><a href="{{ url_for('app.privacy') }}">Personvern</a></li>
         <li>
-            <a href="{{ url_for('app.logout') }}">
-                Logg ut
-            </a>
+            {% if session.user %}
+                <a href="{{ url_for('app.logout') }}">
+                    Logg ut
+                </a>
+            {% endif %}
         </li>
     </ul>
 </nav>

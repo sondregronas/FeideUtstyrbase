@@ -42,6 +42,8 @@
                     {% endif %}
                     |
                     <a href="{{ url_for('app.print_item', item_id=item.id) }}">Etikett</a>
+                    |
+                    <a href="{{ url_for('app.audits') }}?search={{ item.id }}">Historikk</a>
                 </td>
             </tr>
         {% endfor %}

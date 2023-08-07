@@ -62,7 +62,7 @@ def admin_settings() -> str:
 @app.route('/audits', endpoint='audits')
 @login_required(admin_only=True)
 def view_audits() -> str:
-    return flask.render_template('audits.html', audits=audits.get_all())
+    return flask.render_template('audits.html', audits=audits.get_all(), search=flask.request.args.get('search'))
 
 
 @app.route('/inventar')
