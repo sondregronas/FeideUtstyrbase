@@ -207,7 +207,9 @@ def register_out(item_id: str, userid: str, days: str = 1) -> None:
     finally:
         con.close()
     _update_last_seen(item_id)
-    audits.info(f'OUT - {item_id} ble registrert ut til {user} i {days} dager.')
+    u = user.get(userid)
+    audits.info(
+        f'OUT - {item_id} ble registrert ut til {u.get("name")} ({u.get("classroom") or "Lærer"}) i {days} dager.')
 
 
 def register_in(item_id: str) -> None:
