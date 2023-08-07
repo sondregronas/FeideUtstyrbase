@@ -102,8 +102,17 @@
           }
 
           function deleteAction() {
-            cueAlert('Konto slettet!', 'Kontoen din ble slettet.', 'success');
-            window.location.href = '{{ url_for("app.index") }}';
+            $.ajax({
+              url: '{{ url_for("api.delete_me") }}',
+              type: 'POST',
+              success: function (response) {
+                cueAlert('Konto slettet!', 'Kontoen din ble slettet.', 'success');
+                window.location.href = '{{ url_for("app.index") }}';
+              },
+              error: function (response) {
+                cueAlert('Kunne ikke slette kontoen din', 'Det oppstod en feil under slettingen av kontoen din. Prøv igjen senere, eller kontakt IT.', 'error');
+              }
+            });
           }
         </script>
     {% else %}

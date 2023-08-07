@@ -286,4 +286,4 @@ def delete_me() -> flask.Response:
     u = flask.session.get("user")
     user.delete(u.userid)
     flask.session.clear()
-    return flask.redirect(flask.url_for('app.login'))
+    return flask.Response(f'Bruker {u.name} ble slettet.', status=200)
