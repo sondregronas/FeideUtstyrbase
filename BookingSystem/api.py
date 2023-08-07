@@ -59,7 +59,7 @@ def get_items_by_userid(userid: str) -> flask.Response:
     return flask.jsonify([item.api_repr() for item in items if item.borrowed_to == userid])
 
 
-@api.route('/items/add', methods=['POST'])
+@api.route('/items', methods=['POST'])
 @login_required(admin_only=True)
 def add_item() -> flask.Response:
     """Add an item to the database."""
@@ -78,7 +78,7 @@ def add_item() -> flask.Response:
     return flask.Response(f'La til {item.id} i databasen.', status=201)
 
 
-@api.route('/items/edit/<item_id>', methods=['POST'])
+@api.route('/items/<item_id>', methods=['PUT'])
 @login_required(admin_only=True)
 def edit_item(item_id: str) -> flask.Response:
     """Edit an item in the database."""
@@ -93,7 +93,7 @@ def edit_item(item_id: str) -> flask.Response:
     return flask.Response(f'Redigerte {item_id} i databasen.', status=200)
 
 
-@api.route('/items/delete/<item_id>', methods=['POST'])
+@api.route('/items/<item_id>', methods=['DELETE'])
 @login_required(admin_only=True)
 def delete_item(item_id: str) -> flask.Response:
     """Delete an item from the database."""
@@ -163,10 +163,10 @@ def get_user(userid: str) -> flask.Response:
     return flask.jsonify(u)
 
 
-@api.route('/update/student', methods=['POST'], endpoint='update_student')
+@api.route('/users', methods=['POST'])
 @login_required(admin_only=True)
-def update_student() -> flask.Response:
-    """Update a class in the database."""
+def add_student() -> flask.Response:
+    """Add/update a class in the database."""
     con = sqlite3.connect(DATABASE)
     cur = con.cursor()
 
@@ -187,7 +187,7 @@ def update_student() -> flask.Response:
     return flask.redirect(flask.request.referrer)
 
 
-@api.route('/update/groups', methods=['POST'], endpoint='update_groups')
+@api.route('/groups', methods=['POST'])
 @login_required(admin_only=True)
 def update_groups() -> flask.Response:
     """Update a class in the database."""
@@ -207,7 +207,7 @@ def update_groups() -> flask.Response:
     return flask.redirect(flask.request.referrer)
 
 
-@api.route('/update/categories', methods=['POST'], endpoint='update_categories')
+@api.route('/categories', methods=['POST'])
 @login_required(admin_only=True)
 def update_categories() -> flask.Response:
     """Update every category in the database."""
@@ -227,7 +227,7 @@ def update_categories() -> flask.Response:
     return flask.redirect(flask.request.referrer)
 
 
-@api.route('/update/emails', methods=['POST'], endpoint='update_emails')
+@api.route('/emails', methods=['POST'])
 @login_required(admin_only=True)
 def update_emails() -> flask.Response:
     """Update every email in the database."""
@@ -247,7 +247,7 @@ def update_emails() -> flask.Response:
     return flask.redirect(flask.request.referrer)
 
 
-@api.route('/email/report', methods=['POST'], endpoint='email_report')
+@api.route('/email/report', methods=['POST'])
 @login_required(admin_only=True, api=True)
 def email_report() -> flask.Response:
     """Emails a report to all users in the emails table.
@@ -279,7 +279,7 @@ def prune_inactive_users() -> flask.Response:
     return flask.Response('Inaktive brukere ble fjernet.', status=200)
 
 
-@api.route('/delete/me', methods=['POST'])
+@api.route('/users/me', methods=['DELETE'])
 @login_required()
 def delete_me() -> flask.Response:
     """Delete the currently logged in user."""

@@ -104,7 +104,7 @@
           function deleteAction() {
             $.ajax({
               url: '{{ url_for("api.delete_me") }}',
-              type: 'POST',
+              type: 'DELETE',
               success: function (response) {
                 cueAlert('Konto slettet!', 'Kontoen din ble slettet.', 'success');
                 window.location.href = '{{ url_for("app.index") }}';

@@ -38,7 +38,6 @@ Some endpoints can be accessed without login using the specified `?token=<token>
 - [ ] Documentation
 - [ ] Better README
 - [ ] Code cleanup / refactoring, it's a bit inconsistent right now.
-- [ ] Insignificant but use `DELETE` and `PATCH` where appropriate to reduce number of endpoints. (`/items/<id>` instead of `/items/delete|edit/<id>`)
 
 ## Dependencies
 Python Dependencies are listed in `requirements.txt`
