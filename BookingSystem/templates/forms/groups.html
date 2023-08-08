@@ -1,6 +1,6 @@
 <form action="{{ url_for('api.update_groups') }}" method="post"
       onclick="cueToast('Suksess!', 'Klasselisten ble oppdatert.', 'success')">
     <textarea name="groups" id="groups" cols="30" rows="10"
-              placeholder="Eksempel: 1IMA (Ola Nordmann)">{{ '\n'.join(all_groups) }}</textarea>
+              placeholder="Eksempel: 1IMA (Ola Nordmann)">{{ '\n'.join(groups) }}</textarea>
     <button type="submit">Oppdater</button>
 </form>

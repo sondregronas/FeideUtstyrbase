@@ -17,7 +17,7 @@
                     Velg klasse
                 {% endif %}
             </option>
-            {% for classroom in all_groups %}
+            {% for classroom in groups %}
                 <option value="{{ classroom }}">{{ classroom }}</option>
             {% endfor %}
         </select>

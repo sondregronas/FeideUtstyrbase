@@ -80,7 +80,7 @@
             },
             error: function (response) {
               iziToast.error({
-                title: 'Feil!',
+                title: 'Ikke tilgjengelig',
                 message: response.responseText,
               })
             }
@@ -113,6 +113,22 @@
           }
         });
       }
+
+      {% if used_ids %}
+        let used_ids = {{ used_ids | tojson | lower }};
+        let id = $('#id')
+        $(id).change(function () {
+          if (used_ids.includes($(id).val().toLowerCase())) {
+            $(id).attr('aria-describedby', 'taken');
+            iziToast.warning({
+              title: 'Ikke tilgjengelig',
+              message: `${$(id).val()} er allerede i bruk.`,
+            })
+          } else {
+            $(id).removeAttr('aria-describedby');
+          }
+        });
+      {% endif %}
     </script>
 
 {% endblock %}

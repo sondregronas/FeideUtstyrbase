@@ -14,7 +14,8 @@
         <label for="user">Hvem låner?</label>
         <select name="user" id="user" data-placeholder="Søk etter bruker..." required>
             <option value=""></option>
-            {% for user in all_users %}
+            {% for user in users %}
+
                 <option value="{{ user.userid }}">
                     {{ user.name }} ({% if user.classroom %}{{ user.classroom }}{% else %}Lærer{% endif %})
                 </option>
@@ -28,7 +29,7 @@
         <select name="equipment" id="equipment" multiple data-placeholder="Marker dette feltet før du bruker skanneren!"
                 required>
             <option value=""></option>
-            {% for item in all_items %}
+            {% for item in items | reverse %}
                 <option value="{{ item.id }}">{{ item.id }}</option>
             {% endfor %}
         </select>
@@ -50,7 +51,7 @@
         $("#equipment").chosen(
           {
             no_results_text: 'Fant ikke utstyr med navnet',
-            search_contains: true,
+            search_contains: false,
             inherit_select_classes: true,
           }
         );

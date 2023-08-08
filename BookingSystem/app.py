@@ -1,16 +1,21 @@
 import os
 from datetime import datetime
 
+import api
 import flask
 from dateutil import parser
+from flask_session import Session
 from werkzeug.middleware.proxy_fix import ProxyFix
 
-import api
+import audits
 import feide
+import groups
+import inventory
+import mail
 import routes
+import user
 from __init__ import logger
 from db import init_db
-from flask_session import Session
 
 
 def create_app() -> flask.Flask:
@@ -41,8 +46,17 @@ def create_app() -> flask.Flask:
         return datetime.fromtimestamp(float(date)).strftime(fmt)
 
     @app.context_processor
-    def regex() -> dict:
-        return dict(regex_item=r'^(?:(?![\s])[ÆØÅæøåa-zA-Z0-9_\s\-]*[ÆØÅæøåa-zA-Z0-9_\-]+)$')
+    def context_processor() -> dict:
+        return dict(regex_item=r'^(?:(?![\s])[ÆØÅæøåa-zA-Z0-9_\s\-]*[ÆØÅæøåa-zA-Z0-9_\-]+)$',
+                    groups=groups.get_all(),
+                    categories=inventory.all_categories(),
+                    emails=mail.get_all_emails(),
+                    audits=audits.get_all(),
+                    items=inventory.get_all(),
+                    used_ids=inventory.get_all_ids(),
+                    users=user.get_all_active_users(),
+                    unavailable_items=inventory.get_all_unavailable(),
+                    overdue_items=inventory.get_all_overdue())
 
     @app.errorhandler(401)
     def unauthorized(_) -> flask.Response:
