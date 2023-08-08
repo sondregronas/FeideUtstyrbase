@@ -1,0 +1,55 @@
+<script src="/static/js/tom-select.complete.min.js"></script>
+<link rel="stylesheet" href="/static/css/tom-select.css"/>
+
+<style>
+  .has-items .ts-control {
+    border: var(--border-width) solid var(--form-element-valid-border-color);
+  }
+
+  .option-text {
+    display: inline;
+    font-weight: bold;
+    text-align: left;
+  }
+
+  .option-details {
+    font-size: calc(var(--font-size) * 0.75);
+  }
+
+  .booking-option {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    align-items: center;
+  }
+
+  .booking-option > div {
+    width: 50%;
+  }
+
+  .option-inline-text {
+    font-weight: bold;
+  }
+
+  .option-inline-details {
+    text-align: right;
+    color: var(--muted-color);
+    font-size: calc(var(--font-size) * 0.75);
+    padding-right: calc(var(--spacing) + 1.5rem);
+  }
+
+  .option-inline-itemdetails {
+    text-align: right;
+    color: var(--muted-color);
+    font-size: calc(var(--font-size) * 0.75);
+  }
+
+  /* Change the height for single select to match others */
+  .ts-wrapper input, .ts-wrapper.single .ts-control {
+    height: calc(1rem * var(--line-height) + var(--form-element-spacing-vertical) * 2 + var(--border-width) * 2) !important;
+  }
+
+  .ts-dropdown.single {
+    margin-top: .6rem;
+  }
+</style>

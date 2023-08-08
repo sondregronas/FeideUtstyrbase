@@ -1,7 +1,7 @@
 {% extends 'layout.html' %}
 
 {% block extra_head %}
-    {% include 'templates/chosen.html' %}
+    {% include 'templates/tom-select.html' %}
 {% endblock %}
 
 {% block content %}
@@ -12,12 +12,12 @@
 
     <form>
         <label for="user">Hvem låner?</label>
-        <select name="user" id="user" data-placeholder="Søk etter bruker..." required>
+        <select name="user" id="user" data-placeholder="Søk etter bruker" required autocomplete="off">
             <option value=""></option>
             {% for user in users %}
-
-                <option value="{{ user.userid }}">
-                    {{ user.name }} ({% if user.classroom %}{{ user.classroom }}{% else %}Lærer{% endif %})
+                <option value="{{ user.userid }}"
+                        data-classroom="{% if user.classroom %}{{ user.classroom }}{% else %}Lærer{% endif %}">
+                    {{ user.name }}
                 </option>
             {% endfor %}
         </select>
@@ -27,10 +27,14 @@
 
         <label for="equipment">Liste over utstyr</label>
         <select name="equipment" id="equipment" multiple data-placeholder="Marker dette feltet før du bruker skanneren!"
-                required>
+                required autocomplete="off">
             <option value=""></option>
-            {% for item in items | reverse %}
-                <option value="{{ item.id }}">{{ item.id }}</option>
+            {% for item in items %}
+                <option value="{{ item.id }}"
+                        data-name="{{ item.name }}"
+                        data-category="{{ item.category }}">
+                    {{ item.id }}
+                </option>
             {% endfor %}
         </select>
 
@@ -41,20 +45,63 @@
 
     <script>
       $(document).ready(function () {
-        $("#user").chosen(
-          {
-            no_results_text: 'Fant ikke brukere med navnet',
-            search_contains: true,
-            inherit_select_classes: true,
+        let options = {
+          create: false,
+          sortField: {
+            field: 'text',
+            direction: 'asc'
+          },
+          hidePlaceholder: true,
+          closeAfterSelect: true,
+        }
+
+        new TomSelect('#user', {
+          ...options,
+          maxItems: 1,
+          searchField: ['text', 'classroom'],
+          selectOnTab: true,
+          render: {
+            option: function (data, escape) {
+              let icon = data.classroom === 'Lærer' ? 'fa-user-circle' : 'fa-user-circle-o';
+              return `<div><i class="fa ${icon}"></i>\
+<div class="option-text">${data.text}</div>\
+<div class="option-details">${data.classroom}</div></div>`
+            },
+            item: function (data, escape) {
+              let icon = data.classroom === 'Lærer' ? 'fa-user-circle' : 'fa-user-circle-o';
+              return `<div class="booking-option">\<div class="option-inline-text">${data.text}</div>\
+<div class="option-inline-details">${data.classroom}</div></div>`
+            }
+          },
+          onDropdownClose: function (dropdown) {
+            // Focus days input when user is selected
+            let days = $('#days');
+            days.focus();
+            days.select();
           }
-        );
-        $("#equipment").chosen(
-          {
-            no_results_text: 'Fant ikke utstyr med navnet',
-            search_contains: false,
-            inherit_select_classes: true,
+        });
+
+        // When enter button is pressed while #days is focused, select #equipment-ts-control
+        $('#days').keypress(function (e) {
+          if (e.which === 13) {
+            e.preventDefault();
+            $('#equipment-ts-control').focus();
           }
-        );
+        });
+
+        new TomSelect('#equipment', {
+          ...options,
+          plugins: ['remove_button'],
+          searchField: ['text'],
+          openOnFocus: false,
+          render: {
+            option: function (data, escape) {
+              return `<div class="booking-option">\
+<div class="option-inline-text">${data.text}</div>\
+<div class="option-inline-itemdetails">${data.name} (${data.category})</div></div>`
+            },
+          }
+        });
 
         $('form').submit(function (event) {
           event.preventDefault();
@@ -81,6 +128,9 @@
             }
           });
         });
+
+        // On page load, focus user input
+        $('#user-ts-control').focus();
       });
 
       let user = $('#user');

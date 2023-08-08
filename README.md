@@ -37,6 +37,7 @@ Some endpoints can be accessed without login using the specified `?token=<token>
 - [ ] Tests
 - [ ] Documentation
 - [ ] Better README
+- [ ] `booking.html` is a mess.
 - [ ] Code cleanup / refactoring, it's a bit inconsistent right now.
 
 ## Dependencies
@@ -45,16 +46,10 @@ Python Dependencies are listed in `requirements.txt`
 JS/CSS libraries are used:
 
 - [PicoCSS](https://picocss.com/) (for now)
-- [Chosen](https://harvesthq.github.io/chosen/)
+- [Chosen](https://harvesthq.github.io/chosen/) (Deprecated, might be removed)
 - [jQuery](https://jquery.com/)
 - [DataTables](https://datatables.net/)
 - [iziToast](https://izitoast.marcelodolza.com/)
 - [jquery-confirm](https://craftpip.github.io/jquery-confirm/)
 - [Font Awesome](https://fontawesome.com/)
-
-## Issue:
-The Chosen library is deprecated, and should be replaced with something else (or a custom solution), related to this issue:
-
-If the multi-select dropdown is used with a barcode scanner, the first item in the list is selected regardless if the barcode matches or not. Ideally a strict match should be required, but this is not possible with the current library. (Item-10 will always take precedence if the barcode "Item-1" was scanned, for example)
-
-Temporarily reversed the order of the items in the dropdown to work around this issue, which might be a good enough solution for now.
+- [Tom Select](https://tom-select.js.org/)
