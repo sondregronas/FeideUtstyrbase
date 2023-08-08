@@ -10,6 +10,7 @@ from datetime import datetime
 import flask
 import requests
 
+import groups
 import inventory
 import mail
 import user
@@ -170,11 +171,15 @@ def register_student() -> flask.Response:
     con = sqlite3.connect(DATABASE)
     cur = con.cursor()
 
+    selected_classroom = flask.request.form.get('classroom')
+    if selected_classroom not in groups.get_all():
+        return flask.abort(418)  # I'm a teapot
+
     data = {
         'name': flask.session.get('user').name,
         'email': flask.session.get('user').email,
         'userid': flask.session.get('user').userid,
-        'classroom': flask.request.form.get('classroom'),
+        'classroom': selected_classroom,
         'updated_at': datetime.now().isoformat(),
         'expires_at': next_july().isoformat()
     }

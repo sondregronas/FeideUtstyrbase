@@ -79,6 +79,18 @@ class Item:
         return self.user.get('classroom') or 'Lærer'
 
     @property
+    def classroom(self) -> str:
+        if '(' in self.lender_association:
+            return self.lender_association.split('(')[0].strip()
+        return self.lender_association
+
+    @property
+    def teacher(self) -> str:
+        if '(' in self.lender_association:
+            return self.lender_association.split('(')[1].strip(')')
+        return None
+
+    @property
     def lender(self) -> str:
         return f'{self.lender_name} ({self.lender_association})'
 

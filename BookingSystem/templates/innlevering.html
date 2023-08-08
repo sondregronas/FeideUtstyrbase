@@ -34,7 +34,8 @@
                 {% endif %}
             <td>{{ item.id }}</td>
             <td>{{ item.name }} ({{ item.category }})</td>
-            <td>{{ item.lender }}</td>
+            <td>{{ item.lender_name }} <small> ({{ item.classroom }}{% if item.teacher %},
+                {{ item.teacher }}{% endif %})</small></td>
             <td>{{ item.order_due_date|strftime }}</td>
             </tr>
             {% endfor %}

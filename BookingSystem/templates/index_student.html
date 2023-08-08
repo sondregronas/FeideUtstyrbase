@@ -9,8 +9,9 @@
     </hgroup>
 
     <form action="{{ url_for('api.register_student') }}" method="post">
-        <select name="classroom" id="classroom_select">
-            <option value="" disabled selected>
+        <select name="classroom" id="classroom_select" required
+                data-placeholder="">
+            <option value="" placeholder>
                 {% if session.user.classroom %}
                     Nåværende: {{ session.user.classroom }}
                 {% else %}
@@ -51,6 +52,14 @@
             Du må oppdatere klassen din for å kunne bruke utstyrsrommet i år.
         </div>
     {% endif %}
+
+    <script>
+      $(document).ready(function () {
+        $('form').submit(function () {
+          cueAlert('Registrering fullført', 'Din bruker er blitt opprettet, og du har nå låst opp muligheten for å låne utstyr ut skoleåret.<br><br>Du trenger ikke gjøre mer på denne siden.', 'success');
+        });
+      });
+    </script>
 
 {% endblock %}
 

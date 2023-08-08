@@ -16,7 +16,8 @@
             <option value=""></option>
             {% for user in users %}
                 <option value="{{ user.userid }}"
-                        data-classroom="{% if user.classroom %}{{ user.classroom }}{% else %}Lærer{% endif %}">
+                        data-classroom="
+                                {% if user.classroom %}{{ user.classroom }}{% if user.teacher %} - {{ user.teacher }}{% endif %}{% else %}Lærer{% endif %}">
                     {{ user.name }}
                 </option>
             {% endfor %}

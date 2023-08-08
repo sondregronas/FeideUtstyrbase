@@ -16,7 +16,7 @@ class User:
     name: str
     email: str
     userid: str
-    affiliations: list[str]
+    affiliations: list[str] = list
 
     def update(self) -> None:
         """Update the user's information from login provider. (OAuth)"""
@@ -36,7 +36,7 @@ class User:
     @property
     def classroom(self) -> str:
         """Get the classroom the user is associated with."""
-        return get(self.userid).get('classroom')
+        return get(self.userid).get('classroom', '')
 
     @property
     def active(self) -> bool:
@@ -63,6 +63,15 @@ class KioskUser(User):
         return request.headers.get('Host') == KIOSK_FQDN
 
 
+def separate_classroom_teacher(classroom: str) -> tuple[str, str]:
+    """Separate the classroom and teacher from a string."""
+    if not classroom:
+        return '', ''
+    if '(' in classroom:
+        return classroom.split('(')[0].strip(), classroom.split('(')[1].strip(')')
+    return classroom, ''
+
+
 def get_all_active_users() -> list[dict]:
     """Return a list of all active users in the database."""
     con = sqlite3.connect(DATABASE)
@@ -71,6 +80,8 @@ def get_all_active_users() -> list[dict]:
     columns = [description[0] for description in cur.description]
     data = [{columns[i]: user[i] for i in range(len(columns))} for user in cur.fetchall()]
     con.close()
+    for user in data:
+        user['classroom'], user['teacher'] = separate_classroom_teacher(user['classroom'])
     return data
 
 

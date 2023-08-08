@@ -1,12 +1,11 @@
 import os
 from datetime import datetime
 
-import api
 import flask
 from dateutil import parser
-from flask_session import Session
 from werkzeug.middleware.proxy_fix import ProxyFix
 
+import api
 import audits
 import feide
 import groups
@@ -16,6 +15,7 @@ import routes
 import user
 from __init__ import logger
 from db import init_db
+from flask_session import Session
 
 
 def create_app() -> flask.Flask:
@@ -45,6 +45,10 @@ def create_app() -> flask.Flask:
     def _jinja2_filter_strftime(date, fmt='%d.%m.%Y') -> str:
         return datetime.fromtimestamp(float(date)).strftime(fmt)
 
+    @app.template_filter('split')
+    def _jinja2_filter_split(string, split_char=',') -> list:
+        return string.split(split_char)
+
     @app.context_processor
     def context_processor() -> dict:
         return dict(regex_item=r'^(?:(?![\s])[ÆØÅæøåa-zA-Z0-9_\s\-]*[ÆØÅæøåa-zA-Z0-9_\-]+)$',
@@ -68,6 +72,14 @@ def create_app() -> flask.Flask:
         flask.session.clear()
         logger.warning(f'Unauthorized access: {flask.request.url} from {flask.request.remote_addr}')
         return flask.redirect(flask.url_for('app.login'))
+
+    @app.errorhandler(404)
+    def page_not_found(_) -> str:
+        return flask.render_template('404.html')
+
+    @app.errorhandler(418)
+    def teapot(_) -> flask.Response:
+        return flask.redirect('https://www.youtube.com/watch?v=dQw4w9WgXcQ')
 
     return app
 
