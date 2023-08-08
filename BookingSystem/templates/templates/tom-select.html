@@ -2,6 +2,12 @@
 <link rel="stylesheet" href="/static/css/tom-select.css"/>
 
 <style>
+  @media only screen and (prefers-color-scheme: light) {
+    :root:not([data-theme]), [data-theme=dark] {
+      --form-element-background-color: var(--background-color);
+    }
+  }
+
   .has-items .ts-control {
     border: var(--border-width) solid var(--form-element-valid-border-color);
   }
