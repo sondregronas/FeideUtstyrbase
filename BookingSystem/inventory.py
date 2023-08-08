@@ -88,7 +88,7 @@ class Item:
     def teacher(self) -> str:
         if '(' in self.lender_association:
             return self.lender_association.split('(')[1].strip(')')
-        return None
+        return ''
 
     @property
     def lender(self) -> str:
