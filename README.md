@@ -46,7 +46,6 @@ Python Dependencies are listed in `requirements.txt`
 JS/CSS libraries are used:
 
 - [PicoCSS](https://picocss.com/) (for now)
-- [Chosen](https://harvesthq.github.io/chosen/) (Deprecated, might be removed)
 - [jQuery](https://jquery.com/)
 - [DataTables](https://datatables.net/)
 - [iziToast](https://izitoast.marcelodolza.com/)

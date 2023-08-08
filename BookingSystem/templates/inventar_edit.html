@@ -1,7 +1,7 @@
 {% extends 'layout.html' %}
 
 {% block extra_head %}
-    {% include 'templates/chosen.html' %}
+    {% include 'templates/tom-select.html' %}
 {% endblock %}
 
 {% block content %}
@@ -22,7 +22,7 @@
                value="{{ item.name }}">
 
         <label for="category">Kategori</label>
-        <select name="category" id="category" required>
+        <select name="category" id="category" data-placeholder="Velg kategori" required autocomplete="off">
             <option value=""></option>
             {% for category in categories %}
                 <option value="{{ category }}">{{ category }}
@@ -63,11 +63,7 @@
 
       $(document).ready(function () {
         $('#category').val('{{ item.category }}');
-
-        $('#category').chosen({
-          no_results_text: 'Fant ingen kategorier med det navnet',
-          placeholder_text_single: 'Velg kategori'
-        });
+        new TomSelect('#category', tomDefaults);
 
         $('form').submit(function (event) {
           event.preventDefault();

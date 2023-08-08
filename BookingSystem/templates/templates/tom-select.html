@@ -44,12 +44,33 @@
     font-size: calc(var(--font-size) * 0.75);
   }
 
-  /* Change the height for single select to match others */
-  .ts-wrapper input, .ts-wrapper.single .ts-control {
-    height: calc(1rem * var(--line-height) + var(--form-element-spacing-vertical) * 2 + var(--border-width) * 2) !important;
+  .ts-wrapper input {
+    height: auto;
   }
 
   .ts-dropdown.single {
-    margin-top: .6rem;
+    margin-top: .5rem;
+  }
+
+  .ts-control input {
+    width: auto;
   }
 </style>
+
+<script>
+  let tomDefaults = {
+    create: false,
+    sortField: {
+      field: 'text',
+      direction: 'asc'
+    },
+    searchField: ['text'],
+    hidePlaceholder: true,
+    closeAfterSelect: true,
+    render: {
+      no_results: function (data, escape) {
+        return '<div class="no-results">Fant ingen verdier for <strong>' + escape(data.input) + '</strong></div>';
+      },
+    }
+  }
+</script>

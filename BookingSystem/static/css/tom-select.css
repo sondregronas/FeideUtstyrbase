@@ -316,7 +316,7 @@
   text-indent: 0 !important;
   border: 0 none !important;
   background: none !important;
-  line-height: inherit !important;
+  line-height: var(--line-height) !important;
   -webkit-user-select: auto !important;
   -moz-user-select: auto !important;
   -ms-user-select: auto !important;
@@ -483,12 +483,15 @@
 .ts-dropdown.form-control,
 .ts-dropdown.form-select {
   height: auto;
+  width: calc(100% - 2px);
+  left: 1px;
   padding: 0;
   z-index: 1000;
-  background: var(--dropdown-background-color);
+  background: var(--form-element-background-color);
   color: var(--dropdown-color);
   border: var(--border-width) solid var(--dropdown-border-color);
-  border-radius: var(--border-radius);
+  border-top: 0;
+  border-radius: 0 0 var(--border-radius) var(--border-radius);
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
 }
 
