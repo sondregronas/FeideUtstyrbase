@@ -16,6 +16,7 @@ import mail
 import user
 from __init__ import DATABASE, LABEL_SERVER
 from inventory import Item
+from sanitizer import VALIDATORS, MINMAX, sanitize, handle_api_exception
 from utils import login_required, next_july
 
 api = flask.Blueprint('api', __name__)
@@ -62,46 +63,50 @@ def get_items_by_userid(userid: str) -> flask.Response:
 
 @api.route('/items', methods=['POST'])
 @login_required(admin_only=True)
+@handle_api_exception
 def add_item() -> flask.Response:
     """Add an item to the database."""
-    form = flask.request.form
-    item = {key: form.get(key) for key in form.keys() if key in Item.__annotations__}
+    # START: Validation
+    validation_map = {
+        'id': VALIDATORS.UNIQUE_ID,
+        'name': VALIDATORS.NAME,
+        'category': VALIDATORS.CATEGORY,
+    }
+    item_dict = sanitize(validation_map, flask.request.form)
+    # END: Validation
+
+    item = {key: val for key, val in item_dict.items()}
     item = Item(**item)
-    print_label_count = int(form.get('print_label_count'))
-    print_label_type = form.get('print_label_type')
-    try:
-        inventory.add(item)
-    except ValueError as e:
-        return flask.Response(str(e), status=400)
-    if print_label_count > 0:
-        url = f'{LABEL_SERVER}/print?count={print_label_count}&variant={print_label_type}&id={item.id}&name={item.name}&category={item.category}'
-        print(url)
+    inventory.add(item)
     return flask.Response(f'La til {item.id} i databasen.', status=201)
 
 
 @api.route('/items/<item_id>', methods=['PUT'])
 @login_required(admin_only=True)
+@handle_api_exception
 def edit_item(item_id: str) -> flask.Response:
     """Edit an item in the database."""
-    form = flask.request.form
-    item = {key: form.get(key) for key in form.keys() if key in Item.__annotations__}
-    item = Item(**item)
+    # START: Validation
+    validation_map = {
+        'id': VALIDATORS.UNIQUE_OR_SAME_ID,
+        'name': VALIDATORS.NAME,
+        'category': VALIDATORS.CATEGORY,
+    }
+    item_dict = sanitize(validation_map, flask.request.form, {'id': item_id})
+    # END: Validation
 
-    try:
-        inventory.edit(item_id, item)
-    except ValueError as e:
-        return flask.Response(str(e), status=400)
+    item = {key: val for key, val in item_dict.items()}
+    item = Item(**item)
+    inventory.edit(item_id, item)
     return flask.Response(f'Redigerte {item_id} i databasen.', status=200)
 
 
 @api.route('/items/<item_id>', methods=['DELETE'])
 @login_required(admin_only=True)
+@handle_api_exception
 def delete_item(item_id: str) -> flask.Response:
     """Delete an item from the database."""
-    try:
-        inventory.delete(item_id)
-    except ValueError as e:
-        return flask.Response(str(e), status=400)
+    inventory.delete(item_id)
     return flask.Response(f'Slettet {item_id} fra databasen.', status=200)
 
 
@@ -116,41 +121,56 @@ def get_label_preview(item_id: str, variant: str = 'qr') -> flask.Response:
 
 @api.route('/items/<item_id>/label/print', methods=['POST'])
 @login_required(admin_only=True)
+@handle_api_exception
 def print_label(item_id: str) -> flask.Response:
-    form = flask.request.form
+    # START: Validation
+    validation_map = {
+        'print_label_count': VALIDATORS.INT,
+        'print_label_count_minmax': MINMAX(0, 9),
+        'print_label_type': VALIDATORS.LABEL_TYPE,
+    }
+    form = sanitize(validation_map, flask.request.form)
+    # END: Validation
+
     variant = form.get('print_label_type', 'qr')
     count = int(form.get('print_label_count', '1'))
     item = inventory.get(item_id)
     url = f'{LABEL_SERVER}/print?id={item.id}&name={item.name}&variant={variant}&count={count}'
     try:
         response = requests.post(url)
-    except Exception as e:
+    except requests.exceptions.RequestException as e:
         return flask.Response(str(e), status=500)
     return flask.Response(response.text, status=response.status_code)
 
 
 @api.route('/book/out', methods=['POST'])
 @login_required(admin_only=True)
+@handle_api_exception
 def book_equipment() -> flask.Response:
     """Book out equipment for a user."""
-    form = flask.request.form
+    # START: Validation
+    validation_map = {
+        'user': VALIDATORS.UNIQUE_ID,
+        'days': VALIDATORS.INT,
+        'days_minmax': MINMAX(1, 90),
+        'equipment': VALIDATORS.ITEM_LIST_EXISTS,
+    }
+    form = sanitize(validation_map, flask.request.form)
+    # END: Validation
     userid = form.get('user')
     days = form.get('days')
-    item_ids = form.getlist('equipment')
 
-    for item in item_ids:
+    for item in form.get('equipment'):
         inventory.register_out(item_id=item, userid=userid, days=days)
     return flask.Response(f'Utstyret ble utlevert til {user.get(userid).get("name")}.', status=200)
 
 
 @api.route('/return/<item_id>', methods=['POST'])
 @login_required(admin_only=True)
+@handle_api_exception
 def return_equipment(item_id: str) -> flask.Response:
     """Return equipment from a user."""
-    try:
-        inventory.register_in(item_id=item_id)
-    except ValueError as e:
-        return flask.Response(str(e), status=400)
+    inventory.register_in(item_id=item_id)
     return flask.Response('Utstyr ble innlevert.', status=200)
 
 

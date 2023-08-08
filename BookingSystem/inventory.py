@@ -8,6 +8,7 @@ import audits
 import user
 from __init__ import logger, DATABASE
 from db import read_sql_query
+from sanitizer import APIException
 
 """
 Schema for items and functions to interact with the database.
@@ -110,7 +111,7 @@ def add(item: Item) -> None:
     con = sqlite3.connect(DATABASE)
     if item.exists:
         logger.error(f'{item.id} er allerede i bruk.')
-        raise ValueError(f'{item.id} er allerede i bruk.')
+        raise APIException(f'{item.id} er allerede i bruk.')
     try:
         con.execute(read_sql_query('add_item.sql'), item.__dict__)
         con.commit()
@@ -118,7 +119,7 @@ def add(item: Item) -> None:
         logger.debug(f'La til {item.id} med verdier: {item.__dict__}')
     except sqlite3.IntegrityError:
         logger.error(f'Ukjent feil ved innlegging av {item.id}.')
-        raise ValueError(f'Ukjent feil ved innlegging av {item.id}.')
+        raise APIException(f'Ukjent feil ved innlegging av {item.id}.')
     finally:
         con.close()
     _update_last_seen(item.id)
@@ -131,7 +132,7 @@ def edit(old_item_id: str, new_item: Item) -> None:
     con = sqlite3.connect(DATABASE)
     if old_item_id.lower() != new_item.id.lower() and new_item.exists:
         logger.error(f'{new_item.id} er allerede i bruk.')
-        raise ValueError(f'{new_item.id} er allerede i bruk.')
+        raise APIException(f'{new_item.id} er allerede i bruk.')
     try:
         sql = 'UPDATE inventory SET id=:id, name=:name, category=:category, included_batteries=:included_batteries WHERE id=:old_item_id'
         con.execute(sql, {**new_item.__dict__, 'old_item_id': old_item_id})
@@ -140,7 +141,7 @@ def edit(old_item_id: str, new_item: Item) -> None:
         logger.debug(f'Redigerte utstyr {old_item_id}, differanse: {new_item.__dict__}')
     except sqlite3.IntegrityError:
         logger.error(f'Ukjent feil ved redigering av {old_item_id}.')
-        raise ValueError(f'Ukjent feil ved redigering av {old_item_id}.')
+        raise APIException(f'Ukjent feil ved redigering av {old_item_id}.')
     finally:
         con.close()
     _update_last_seen(new_item.id)
@@ -160,7 +161,7 @@ def delete(item_id: str) -> None:
         logger.info(f'Slettet utstyr {item_id}.')
     except sqlite3.IntegrityError:
         logger.error(f'{item_id} eksisterer ikke.')
-        raise ValueError(f'{item_id} eksisterer ikke.')
+        raise APIException(f'{item_id} eksisterer ikke.')
     finally:
         con.close()
     audits.audit('ITEM_REM', f'{item_id} ble slettet.')
@@ -171,6 +172,9 @@ def get(item_id: str) -> Item:
     con = sqlite3.connect(DATABASE)
     item = Item(*con.execute(read_sql_query('get_item.sql'), {'id': item_id}).fetchone())
     con.close()
+    if not item:
+        logger.error(f'{item_id} eksisterer ikke.')
+        raise APIException(f'{item_id} eksisterer ikke.')
     return item
 
 
@@ -210,7 +214,7 @@ def _update_last_seen(item_id: str) -> None:
         con.execute(sql, {'id': item_id})
         con.commit()
     except sqlite3.IntegrityError:
-        print(f'{item_id} eksisterer ikke.')
+        logger.error(f'{item_id} eksisterer ikke.')
     finally:
         con.close()
 
@@ -231,7 +235,7 @@ def register_out(item_id: str, userid: str, days: str = 1) -> None:
         logger.info(f'{item_id} er ikke lenger tilgjengelig.')
     except sqlite3.IntegrityError:
         logger.error(f'{item_id} eksisterer ikke.')
-        raise ValueError(f'{item_id} eksisterer ikke.')
+        raise APIException(f'{item_id} eksisterer ikke.')
     finally:
         con.close()
     _update_last_seen(item_id)
@@ -245,7 +249,7 @@ def register_in(item_id: str) -> None:
     try:
         get(item_id)
     except TypeError:
-        raise ValueError(f'{item_id} eksisterer ikke i databasen.')
+        raise APIException(f'{item_id} eksisterer ikke.')
 
     con = sqlite3.connect(DATABASE)
     try:
@@ -255,7 +259,7 @@ def register_in(item_id: str) -> None:
         logger.info(f'{item_id} er nå tilgjengelig.')
     except sqlite3.IntegrityError:
         logger.error(f'{item_id} eksisterer ikke.')
-        raise ValueError(f'{item_id} eksisterer ikke.')
+        raise APIException(f'{item_id} eksisterer ikke.')
     finally:
         con.close()
     _update_last_seen(item_id)

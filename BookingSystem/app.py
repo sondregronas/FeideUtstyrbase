@@ -13,7 +13,7 @@ import inventory
 import mail
 import routes
 import user
-from __init__ import logger
+from __init__ import logger, REGEX_ITEM
 from db import init_db
 from flask_session import Session
 
@@ -51,7 +51,7 @@ def create_app() -> flask.Flask:
 
     @app.context_processor
     def context_processor() -> dict:
-        return dict(regex_item=r'^(?:(?![\s])[ÆØÅæøåa-zA-Z0-9_\s\-]*[ÆØÅæøåa-zA-Z0-9_\-]+)$',
+        return dict(regex_item=REGEX_ITEM,
                     groups=groups.get_all(),
                     categories=inventory.all_categories(),
                     emails=mail.get_all_emails(),
