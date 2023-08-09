@@ -1,6 +1,22 @@
-<form action="{{ url_for('api.update_groups') }}" method="post"
-      onclick="cueToast('Suksess!', 'Klasselisten ble oppdatert.', 'success')">
+<form id="update-groups">
     <textarea name="groups" id="groups" cols="30" rows="10"
               placeholder="Eksempel: 1IMA (Ola Nordmann)">{{ '\n'.join(groups) }}</textarea>
     <button type="submit">Oppdater</button>
 </form>
+
+<script>
+  $('#update-groups').submit(function (e) {
+    e.preventDefault();
+    $.ajax({
+      url: '{{ url_for("api.update_groups") }}',
+      type: 'PUT',
+      data: $('#update-groups').serialize(),
+      success: function (response) {
+        customAlert('Suksess!', response, 'success', true);
+      },
+      error: function (response) {
+        customAlert('Feil!', response.responseText, 'error', true);
+      }
+    });
+  });
+</script>

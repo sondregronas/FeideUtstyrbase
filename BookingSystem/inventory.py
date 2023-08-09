@@ -56,6 +56,9 @@ class Item:
             'last_seen': self.last_seen
         }
 
+    def mail_repr(self) -> str:
+        return f'<strong>{self.id}</strong> <small>{self.name} ({self.category})</small>'
+
     def __str__(self) -> str:
         if self.order_due_date:
             return f'{self.lender_name}: {self.id} - {self.name} ({self.category}, {parser.parse(self.order_due_date):%d.%m.%Y})'
@@ -78,6 +81,12 @@ class Item:
         if not self.user.get('name'):
             return 'Sjekk historikk'
         return self.user.get('classroom') or 'Lærer'
+
+    @property
+    def lender_association_mail(self) -> str:
+        if not self.user.get('name'):
+            return 'Slettet bruker [Sjekk historikk]'
+        return self.user.get('classroom') or 'Ansatt'
 
     @property
     def classroom(self) -> str:
@@ -161,7 +170,7 @@ def delete(item_id: str) -> None:
         logger.info(f'Slettet utstyr {item_id}.')
     except sqlite3.IntegrityError:
         logger.error(f'{item_id} eksisterer ikke.')
-        raise APIException(f'{item_id} eksisterer ikke.')
+        raise APIException(f'{item_id} eksisterer ikke.', status_code=404)
     finally:
         con.close()
     audits.audit('ITEM_REM', f'{item_id} ble slettet.')
@@ -170,12 +179,12 @@ def delete(item_id: str) -> None:
 def get(item_id: str) -> Item:
     """Return a JSON object of the item with the given ID."""
     con = sqlite3.connect(DATABASE)
-    item = Item(*con.execute(read_sql_query('get_item.sql'), {'id': item_id}).fetchone())
+    item = con.execute(read_sql_query('get_item.sql'), {'id': item_id}).fetchone()
     con.close()
     if not item:
         logger.error(f'{item_id} eksisterer ikke.')
         raise APIException(f'{item_id} eksisterer ikke.')
-    return item
+    return Item(*item)
 
 
 def get_all() -> list[Item]:

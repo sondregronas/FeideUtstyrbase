@@ -13,7 +13,7 @@ import inventory
 import mail
 import routes
 import user
-from __init__ import logger, REGEX_ITEM
+from __init__ import logger, REGEX_ITEM, MIN_DAYS, MAX_DAYS, MIN_LABELS, MAX_LABELS
 from db import init_db
 from flask_session import Session
 
@@ -60,7 +60,11 @@ def create_app() -> flask.Flask:
                     used_ids=inventory.get_all_ids(),
                     users=user.get_all_active_users(),
                     unavailable_items=inventory.get_all_unavailable(),
-                    overdue_items=inventory.get_all_overdue())
+                    overdue_items=inventory.get_all_overdue(),
+                    MIN_DAYS=MIN_DAYS,
+                    MAX_DAYS=MAX_DAYS,
+                    MIN_LABELS=MIN_LABELS,
+                    MAX_LABELS=MAX_LABELS, )
 
     @app.errorhandler(401)
     def unauthorized(_) -> flask.Response:

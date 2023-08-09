@@ -18,6 +18,11 @@ KIOSK_FQDN = os.getenv('KIOSK_FQDN')
 API_TOKEN = os.getenv('API_TOKEN')
 REGEX_ITEM = r'^(?:(?![\s])[ÆØÅæøåa-zA-Z0-9_\s\-]*[ÆØÅæøåa-zA-Z0-9_\-]+)$'
 
+MIN_DAYS = int(os.getenv('MIN_DAYS', 1))
+MAX_DAYS = int(os.getenv('MAX_DAYS', 14))
+MIN_LABELS = int(os.getenv('MIN_LABELS', 0))
+MAX_LABELS = int(os.getenv('MAX_LABELS', 10))
+
 # Logger setup
 logger = Logger(__name__)
 if os.getenv('DEBUG') == 'True':

@@ -3,8 +3,8 @@ from enum import Enum, auto
 from functools import wraps
 
 import flask
-from werkzeug.datastructures import ImmutableMultiDict
 
+import groups
 import inventory
 from __init__ import REGEX_ITEM, logger
 
@@ -15,9 +15,13 @@ class VALIDATORS(Enum):
     UNIQUE_OR_SAME_ID = auto()
     NAME = auto()
     CATEGORY = auto()
+    CATEGORY_NAME = auto()
     INT = auto()
     LABEL_TYPE = auto()
     ITEM_LIST_EXISTS = auto()
+    EMAIL = auto()
+    GROUP = auto()
+    GROUP_NAME = auto()
 
 
 class APIException(Exception):
@@ -25,6 +29,7 @@ class APIException(Exception):
         super().__init__(message)
         self.message = message
         self.status_code = status_code
+        logger.debug(f'APIException: {message}')
 
 
 class MINMAX:
@@ -52,53 +57,65 @@ def _sanitize_form(sanitization_map: dict[any: VALIDATORS | MINMAX], form, data:
         l_val, l_ids = form.get(fkey).lower(), [i.lower() for i in inventory.get_all_ids()]
         return l_val not in l_ids
 
+    def email(text: str) -> bool:
+        # Check if the email is valid
+        r = re.compile(r"^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,7}$")
+        return bool(r.match(text))
+
+    def categoryname(text: str) -> bool:
+        # Check if the category is valid
+        r = re.compile(r'^[a-zæøåA-ZÆØÅ0-9\- ]+$')
+        return bool(r.match(text))
+
+    def groupname(text: str) -> bool:
+        # Check if the group is valid
+        r = re.compile(r'^([a-zæøåA-ZÆØÅ0-9\- ]+) \(([a-zæøåA-ZÆØÅ0-9\-& ]+)\)$')
+        return bool(r.match(text))
+
     for key, sanitizer in sanitization_map.items():
         match sanitizer:
             case VALIDATORS.ID | VALIDATORS.NAME:
                 # Check if the ID/name is valid
                 if not item_pattern(key):
-                    logger.debug(f'Invalid item pattern for {key} ({form.get(key)})')
                     raise APIException(f'Ugyldig ID ({form.get(key)})')
 
             case VALIDATORS.UNIQUE_ID:
                 # Check if the ID is unique
                 if not unique(key):
-                    logger.debug(f'Invalid unique id for {key} ({form.get(key)})')
                     raise APIException(f'{form.get(key)} er allerede i bruk.')
                 # Check if the ID is valid
                 if not item_pattern(key):
-                    logger.debug(f'Invalid unique id for {key} ({form.get(key)})')
                     raise APIException(f'Ugyldig ID ({form.get(key)})')
 
             case VALIDATORS.UNIQUE_OR_SAME_ID:
                 # Check if the ID is unique or the same as the current ID
                 same_id = form.get(key).lower() == data.get(key).lower()
                 if not unique(key) and not same_id:
-                    logger.debug(f'Invalid unique or same id for {key} ({form.get(key)})')
                     raise APIException(f'{form.get(key)} er allerede i bruk.')
                 # Check if the ID is valid
                 if not item_pattern(key):
-                    logger.debug(f'Invalid unique or same id for {key} ({form.get(key)})')
                     raise APIException(f'Ugyldig ID ({form.get(key)})')
 
             case VALIDATORS.CATEGORY:
                 # Check if the category is valid
                 if form.get(key) not in inventory.all_categories():
-                    logger.debug(f'Invalid category for {key} ({form.get(key)})')
                     raise APIException(f'Ugyldig kategori ({form.get(key)})')
+
+            case VALIDATORS.CATEGORY_NAME:
+                # Check if the category name is valid
+                if not categoryname(form.get(key)):
+                    raise APIException(f'Ugyldig kategorinavn ({form.get(key)})')
 
             case VALIDATORS.INT:
                 # Check if the value is an int
                 try:
                     int(form.get(key))
                 except (ValueError, TypeError):
-                    logger.debug(f'Invalid int for {key} ({form.get(key)})')
                     raise APIException(f'Ugyldig tallverdi ({form.get(key)})')
 
             case VALIDATORS.LABEL_TYPE:
                 # Check if the label type is valid
                 if form.get(key) not in ['barcode', 'qr']:
-                    logger.debug(f'Invalid label type for {key} ({form.get(key)})')
                     raise APIException(f'Ugyldig etikett-type ({form.get(key)})')
 
             case VALIDATORS.ITEM_LIST_EXISTS:
@@ -106,8 +123,22 @@ def _sanitize_form(sanitization_map: dict[any: VALIDATORS | MINMAX], form, data:
                 ids = form.getlist(key)
                 all_ids = [i for i in inventory.get_all_ids()]
                 if not all(i in all_ids for i in ids):
-                    logger.debug(f'Invalid item list for {key} ({form.getlist(key)})')
                     raise APIException(f'En eller flere gjenstander finnes ikke ({form.getlist(key)})')
+
+            case VALIDATORS.EMAIL:
+                # Check if the email is valid
+                if not email(form.get(key)):
+                    raise APIException(f'Ugyldig e-post ({form.get(key)})')
+
+            case VALIDATORS.GROUP:
+                # Check if the group is valid (done by students, send to 418 ;))
+                if form.get(key) not in groups.get_all():
+                    raise APIException(f'Ugyldig gruppe ({form.get(key)}), godt forsøk ;)', 418)
+
+            case VALIDATORS.GROUP_NAME:
+                # Check if the group name is valid
+                if not groupname(form.get(key)):
+                    raise APIException(f'Ugyldig gruppenavn ({form.get(key)}), må være "Klasserom (Lærer)"')
 
         if key.endswith('_minmax'):
             # Check if the value is between the min and max
@@ -122,7 +153,7 @@ def _sanitize_form(sanitization_map: dict[any: VALIDATORS | MINMAX], form, data:
 
 
 def sanitize(validation_map: dict[any: VALIDATORS | MINMAX],
-             form: ImmutableMultiDict,
+             form: dict,
              data: dict = dict) -> dict[str: any]:
     """
     Validate a form based on a validation map,

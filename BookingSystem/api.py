@@ -10,13 +10,12 @@ from datetime import datetime
 import flask
 import requests
 
-import groups
 import inventory
 import mail
 import user
-from __init__ import DATABASE, LABEL_SERVER
+from __init__ import DATABASE, LABEL_SERVER, MIN_DAYS, MAX_DAYS, MIN_LABELS, MAX_LABELS
 from inventory import Item
-from sanitizer import VALIDATORS, MINMAX, sanitize, handle_api_exception
+from sanitizer import VALIDATORS, MINMAX, sanitize, handle_api_exception, APIException
 from utils import login_required, next_july
 
 api = flask.Blueprint('api', __name__)
@@ -112,6 +111,7 @@ def delete_item(item_id: str) -> flask.Response:
 
 @api.route('/items/<item_id>/label/<variant>/preview', methods=['GET'])
 @login_required(admin_only=True)
+@handle_api_exception
 def get_label_preview(item_id: str, variant: str = 'qr') -> flask.Response:
     """Get a label preview for an item."""
     item = inventory.get(item_id)
@@ -126,7 +126,7 @@ def print_label(item_id: str) -> flask.Response:
     # START: Validation
     validation_map = {
         'print_label_count': VALIDATORS.INT,
-        'print_label_count_minmax': MINMAX(0, 9),
+        'print_label_count_minmax': MINMAX(MIN_LABELS, MAX_LABELS),
         'print_label_type': VALIDATORS.LABEL_TYPE,
     }
     form = sanitize(validation_map, flask.request.form)
@@ -152,7 +152,7 @@ def book_equipment() -> flask.Response:
     validation_map = {
         'user': VALIDATORS.UNIQUE_ID,
         'days': VALIDATORS.INT,
-        'days_minmax': MINMAX(1, 90),
+        'days_minmax': MINMAX(MIN_DAYS, MAX_DAYS),
         'equipment': VALIDATORS.ITEM_LIST_EXISTS,
     }
     form = sanitize(validation_map, flask.request.form)
@@ -179,21 +179,19 @@ def return_equipment(item_id: str) -> flask.Response:
 def get_user(userid: str) -> flask.Response:
     """Get user as JSON."""
     u = user.get(userid)
-    if not u:
-        return flask.abort(404)
     return flask.jsonify(u)
 
 
 @api.route('/users', methods=['POST'])
 @login_required()
+@handle_api_exception
 def register_student() -> flask.Response:
     """Add/update a class in the database."""
     con = sqlite3.connect(DATABASE)
     cur = con.cursor()
 
     selected_classroom = flask.request.form.get('classroom')
-    if selected_classroom not in groups.get_all():
-        return flask.abort(418)  # I'm a teapot
+    sanitize({'classroom': VALIDATORS.GROUP}, {'classroom': selected_classroom})
 
     data = {
         'name': flask.session.get('user').name,
@@ -212,68 +210,84 @@ def register_student() -> flask.Response:
     return flask.redirect(flask.request.referrer)
 
 
-@api.route('/groups', methods=['POST'])
+@api.route('/groups', methods=['PUT'])
 @login_required(admin_only=True)
+@handle_api_exception
 def update_groups() -> flask.Response:
     """Update a class in the database."""
+    new_groups = list()
+    for group in flask.request.form.get('groups').split('\n'):
+        if not group.strip():
+            continue
+        sanitize({'group': VALIDATORS.GROUP_NAME}, {'group': group.strip()})
+        new_groups.append(group.strip())
+
     con = sqlite3.connect(DATABASE)
     cur = con.cursor()
     # noinspection SqlWithoutWhere
     cur.execute('DELETE FROM groups')
     con.commit()
-
-    for group in flask.request.form.get('groups').split('\n'):
-        if not group.strip():
-            continue
-        cur.execute('INSERT INTO groups (classroom) VALUES (?)', (group.strip(),))
+    for group in new_groups:
+        cur.execute('INSERT INTO groups (classroom) VALUES (?)', (group,))
 
     con.commit()
     con.close()
-    return flask.redirect(flask.request.referrer)
+    return flask.Response('Gruppene ble oppdatert.', status=200)
 
 
-@api.route('/categories', methods=['POST'])
+@api.route('/categories', methods=['PUT'])
 @login_required(admin_only=True)
+@handle_api_exception
 def update_categories() -> flask.Response:
     """Update every category in the database."""
+    new_categories = list()
+    for category in flask.request.form.get('categories').split('\n'):
+        if not category.strip():
+            continue
+        sanitize({'category': VALIDATORS.CATEGORY_NAME}, {'category': category.strip()})
+        new_categories.append(category.strip())
+
     con = sqlite3.connect(DATABASE)
     cur = con.cursor()
     # noinspection SqlWithoutWhere
     cur.execute('DELETE FROM categories')
     con.commit()
-
-    for category in flask.request.form.get('categories').split('\n'):
-        if not category.strip():
-            continue
-        cur.execute('INSERT INTO categories (name) VALUES (?)', (category.strip(),))
+    for category in new_categories:
+        cur.execute('INSERT INTO categories (name) VALUES (?)', (category,))
 
     con.commit()
     con.close()
-    return flask.redirect(flask.request.referrer)
+    return flask.Response('Kategoriene ble oppdatert.', status=200)
 
 
-@api.route('/emails', methods=['POST'])
+@api.route('/emails', methods=['PUT'])
 @login_required(admin_only=True)
+@handle_api_exception
 def update_emails() -> flask.Response:
     """Update every email in the database."""
+    new_emails = list()
+    for email in flask.request.form.get('emails').split('\n'):
+        if not email.strip():
+            continue
+        sanitize({'email': VALIDATORS.EMAIL}, {'email': email.strip()})
+        new_emails.append(email.strip())
+
     con = sqlite3.connect(DATABASE)
     cur = con.cursor()
     # noinspection SqlWithoutWhere
     cur.execute('DELETE FROM emails')
     con.commit()
-
-    for email in flask.request.form.get('emails').split('\n'):
-        if not email.strip():
-            continue
-        cur.execute('INSERT INTO emails (email) VALUES (?)', (email.strip(),))
+    for email in new_emails:
+        cur.execute('INSERT INTO emails (email) VALUES (?)', (email,))
 
     con.commit()
     con.close()
-    return flask.redirect(flask.request.referrer)
+    return flask.Response('E-postene ble oppdatert.', status=200)
 
 
 @api.route('/email/report', methods=['POST'])
 @login_required(admin_only=True, api=True)
+@handle_api_exception
 def email_report() -> flask.Response:
     """Emails a report to all users in the emails table.
 
@@ -282,13 +296,18 @@ def email_report() -> flask.Response:
 
     If the interval parameter is set, the report will only be sent
     if the last report was sent more than interval days ago.
+
+    You can only send an email once every hour by default. (Handled by mail.py)
     """
     interval = flask.request.args.get('interval')
+
     if interval:
-        last_sent = datetime.fromtimestamp(float(mail.get_last_sent())).date()
+        sanitize({'interval': VALIDATORS.INT}, flask.request.args)
         current_date = datetime.now().date()
+        last_sent = datetime.fromtimestamp(float(mail.get_last_sent())).date()
         if last_sent and (current_date - last_sent).days < int(interval):
-            return flask.Response(f'Ikke sendt - mindre enn {interval} dager siden forrige rapport.', status=200)
+            raise APIException(f'Ikke sendt - mindre enn {interval} dager siden forrige rapport.', 200)
+    
     return mail.send_report()
 
 
@@ -300,6 +319,7 @@ def prune_inactive_users() -> flask.Response:
     Example cronjob:
     0 1 1 7 * curl -X POST "http://localhost:5000/users/prune_inactive?token=<token>"
     """
+    # TODO: run this every day as a background task here instead of an external cronjob?
     user.prune_inactive()
     return flask.Response('Inaktive brukere ble fjernet.', status=200)
 

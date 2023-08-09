@@ -9,7 +9,7 @@
 
     {% if last_sent %}
         <a onclick="sendReport()">
-            <button>Send rapport (Sist sendt {{ last_sent | strfunixtime }})</button>
+            <button id="send-report--btn">Send rapport (Sist sendt {{ last_sent | strfunixtime }})</button>
         </a>
     {% else %}
         <a onclick="sendReport()">
@@ -36,8 +36,9 @@
     {% include 'forms/categories.html' %}
 
     <script>
+      let last_sent = "{{last_sent}}";
+
       function sendReport() {
-        let last_sent = "{{last_sent}}";
         let last_sent_day = new Date(last_sent * 1000).getDate();
         let today = new Date().getDate();
         if (last_sent_day === today) {
@@ -48,14 +49,20 @@
       }
 
       function _send() {
+        last_sent = new Date().getTime() / 1000;
+        $('#send-report--btn').html('Send rapport (Sist sendt ' + new Date().toLocaleDateString('nb-NO', {
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric'
+        }) + ')');
         $.ajax({
           url: "{{url_for('api.email_report')}}",
           type: 'POST',
           success: function (result) {
-            customAlert('Sendt!', 'Rapporten ble sendt ut.', 'success')
+            customAlert('Sendt!', 'Rapporten ble sendt ut.', 'success', true)
           },
           error: function (result) {
-            customAlert('Info', result.responseText, 'info')
+            customAlert('Info', result.responseText, 'info', true)
           }
         });
       }

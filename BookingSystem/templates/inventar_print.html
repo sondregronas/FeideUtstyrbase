@@ -15,7 +15,8 @@
         <table>
             <td>
                 <label for="print_label_count">Antall etiketter</label>
-                <input type="number" name="print_label_count" id="print_label_count" required value="1" min="0" max="9">
+                <input type="number" name="print_label_count" id="print_label_count" required value="1"
+                       min="{{ MIN_LABELS }}" max="{{ MAX_LABELS }}">
             </td>
             <td>
                 <label for="print_label_type">Type</label>

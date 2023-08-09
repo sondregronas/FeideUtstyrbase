@@ -18,6 +18,10 @@ services:
       # Label server FQDN (https://github.com/VaagenIM/EtikettServer)
       - LABEL_SERVER='https://<fqdn-label>'
 
+      # Global settings
+      - MAX_DAYS='14' # Maximum days equipment can be borrowed
+      - MAX_LABELS='10' # Maximum number of labels that can be printed at a time
+
       # SMTP settings for email reports (overdue items)
       - SMTP_SERVER=''
       - SMTP_PORT='587'

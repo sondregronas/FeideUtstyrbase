@@ -1,6 +1,22 @@
-<form action="{{ url_for('api.update_emails') }}" method="post"
-      onclick="cueToast('Suksess!', 'E-postene ble oppdatert.', 'success')">
+<form id="update-emails">
     <textarea name="emails" id="emails" cols="30" rows="10"
               placeholder="Eksempel: olanordmann@skole.rogfk.no">{{ '\n'.join(emails) }}</textarea>
     <button type="submit">Oppdater</button>
 </form>
+
+<script>
+  $('#update-emails').submit(function (e) {
+    e.preventDefault();
+    $.ajax({
+      url: '{{ url_for("api.update_emails") }}',
+      type: 'PUT',
+      data: $('#update-emails').serialize(),
+      success: function (response) {
+        customAlert('Suksess!', response, 'success', true);
+      },
+      error: function (response) {
+        customAlert('Feil!', response.responseText, 'error', true);
+      }
+    });
+  });
+</script>

@@ -38,7 +38,8 @@
             </thead>
             <td>
                 <label for="print_label_count">Antall etiketter</label>
-                <input type="number" name="print_label_count" id="print_label_count" required value="1" min="0" max="9">
+                <input type="number" name="print_label_count" id="print_label_count" required value="1"
+                       min="{{ MIN_LABELS }}" max="{{ MAX_LABELS }}">
             </td>
             <td>
                 <label for="print_label_type">Type</label>
@@ -67,6 +68,7 @@
             url: '{{ url_for("api.add_item") }}',
             data: $('form').serialize(),
             success: function (response) {
+              used_ids.push($('#id').val().toLowerCase());
               iziToast.success({
                 title: 'Suksess!',
                 message: response,
@@ -111,8 +113,9 @@
         });
       }
 
+      let used_ids = [];
       {% if used_ids %}
-        let used_ids = {{ used_ids | tojson | lower }};
+        used_ids = {{ used_ids | tojson | lower }};
         let id = $('#id')
         $(id).change(function () {
           if (used_ids.includes($(id).val().toLowerCase())) {

@@ -7,6 +7,7 @@ import flask
 
 import inventory
 from __init__ import DATABASE, logger
+from sanitizer import APIException
 
 SMTP_SERVER = os.getenv('SMTP_SERVER')
 SMTP_PORT = int(os.getenv('SMTP_PORT')) if os.getenv('SMTP_PORT') else 587
@@ -66,9 +67,9 @@ def formatted_overdue_items() -> str:
     <br><br>
     """
     items = [item for item in inventory.get_all_unavailable() if item.overdue]
-    pairs = {item.lender_association: [item2
-                                       for item2 in items
-                                       if item2.lender_association == item.lender_association]
+    pairs = {item.lender_association_mail: [item2.mail_repr()
+                                            for item2 in items
+                                            if item2.lender_association_mail == item.lender_association_mail]
              for item in items}
     sorted_pairs = {key: pairs[key] for key in sorted(pairs) if pairs[key]}
     w = '<td width="10" style="width: 10px;"></td>'
@@ -84,11 +85,19 @@ def formatted_overdue_items() -> str:
 
 
 def send_report() -> flask.Response:
-    """Send an e-mail to all emails in the database."""
+    """Send an e-mail to all emails in the database.
+
+    Force is for debugging only.
+    """
+    # If the last sent email was sent within the past hour, raise an exception
+    if get_last_sent():
+        if datetime.now().timestamp() - float(get_last_sent()) < 3600:
+            raise APIException('Rapport ble ikke sendt: forrige rapport ble sendt for under en time siden.', 400)
+
     items = [item for item in inventory.get_all_unavailable() if item.overdue]
     if not items:
         update_last_sent()
-        return flask.Response('Ikke sendt (intet å rapportere!)', status=400)
+        raise APIException('Rapport ble ikke sendt: finner ikke overskredet utstyr.', 400)
 
     title = f'[UtstyrServer] Rapport for overskredet utstyr {datetime.now().strftime("%d.%m.%Y")}'
     recipients = get_all_emails()
@@ -120,8 +129,9 @@ table th {{text-align: left; background-color: #333;color: white; height: 30px; 
 <br>{SMTP_FROM}</p>
 """.encode('utf-8')
             server.sendmail(SMTP_USERNAME, recipients, message)
+    # TODO: Handle exceptions properly
     except Exception as e:
         logger.warning(f'Failed to send email: {e}')
-        return flask.Response('Klarte ikke sende rapport, prøv igjen eller kontakt en administrator.', status=500)
+        raise APIException('Klarte ikke sende rapport, prøv igjen eller kontakt en administrator.', 500)
     update_last_sent()
     return flask.Response('Rapport sendt!', status=200)

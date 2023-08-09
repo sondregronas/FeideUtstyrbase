@@ -2,7 +2,13 @@
 
 {% block content %}
     <hgroup>
-        <h2>404 - Page not found</h2>
+        <h2>404 - Fant ikke siden</h2>
         <h3>Siden du prøvde å nå finnes ikke, eller er fjernet.</h3>
     </hgroup>
+
+    {% if error %}
+        <blockquote>
+            <strong>Feilmelding:</strong> {{ error }}
+        </blockquote>
+    {% endif %}
 {% endblock %}

@@ -1,5 +1,21 @@
-<form action="{{ url_for('api.update_categories') }}" method="post"
-      onclick="cueToast('Suksess!', 'Kategoriene ble oppdatert.', 'success')">
+<form id="update-categories">
     <textarea name="categories" id="categories" cols="30" rows="10">{{ '\n'.join(categories) }}</textarea>
-    <button type="submit">Oppdater</button>
+    <button type="submit" onclick="updateCategories()">Oppdater</button>
 </form>
+
+<script>
+  $('#update-categories').submit(function (e) {
+    e.preventDefault();
+    $.ajax({
+      url: '{{ url_for("api.update_categories") }}',
+      type: 'PUT',
+      data: $('#update-categories').serialize(),
+      success: function (response) {
+        customAlert('Suksess!', response, 'success', true);
+      },
+      error: function (response) {
+        customAlert('Feil!', response.responseText, 'error', true);
+      }
+    });
+  });
+</script>

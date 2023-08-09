@@ -4,6 +4,7 @@ import inventory
 import mail
 from __init__ import KIOSK_FQDN, LABEL_SERVER
 from db import add_admin
+from sanitizer import handle_api_exception
 from utils import login_required
 
 app = flask.blueprints.Blueprint('app', __name__)
@@ -72,12 +73,14 @@ def inventar_add() -> str:
 
 @app.route('/inventar/edit/<item_id>')
 @login_required(admin_only=True)
+@handle_api_exception
 def edit_item(item_id: str) -> str:
     return flask.render_template('inventar_edit.html', item=inventory.get(item_id))
 
 
 @app.route('/inventar/print/<item_id>')
 @login_required(admin_only=True)
+@handle_api_exception
 def print_item(item_id: str) -> str:
     return flask.render_template('inventar_print.html', item=inventory.get(item_id))
 
