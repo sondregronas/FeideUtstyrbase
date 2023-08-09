@@ -1,1 +1,30 @@
 <script src="/static/js/jquery-3.7.0.min.js"></script>
+<script>
+  function switchTheme() {
+    let root = document.documentElement;
+    let theme = root.getAttribute('data-theme');
+    if (theme === 'dark') {
+      setTheme('light');
+    } else {
+      setTheme('dark');
+    }
+  }
+
+  function setTheme(theme) {
+    let root = document.documentElement;
+    root.setAttribute('data-theme', theme);
+    if (theme === 'dark') {
+      document.getElementById('theme-switcher').classList.remove('mirrored')
+    } else {
+      document.getElementById('theme-switcher').classList.add('mirrored')
+    }
+    localStorage.setItem('theme', root.getAttribute('data-theme'));
+  }
+
+  function loadTheme() {
+    let theme = localStorage.getItem('theme') || 'dark';
+    setTheme(theme);
+  }
+
+  loadTheme();
+</script>

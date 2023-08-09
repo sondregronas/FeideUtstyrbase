@@ -4,8 +4,8 @@
         - {{ request.path|split('/')|last|title }}
     {% endif %}
 </title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta charset="utf-8">
+
+{% include 'partials/meta.html' %}
 
 {% if session.user and session.user.is_admin %}
     {% include 'partials/css.html' %}

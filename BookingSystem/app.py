@@ -1,5 +1,6 @@
 import os
 from datetime import datetime
+from urllib.parse import urlparse
 
 import flask
 from dateutil import parser
@@ -68,7 +69,8 @@ def create_app() -> flask.Flask:
                     MIN_DAYS=MIN_DAYS,
                     MAX_DAYS=MAX_DAYS,
                     MIN_LABELS=MIN_LABELS,
-                    MAX_LABELS=MAX_LABELS, )
+                    MAX_LABELS=MAX_LABELS,
+                    FQDN=urlparse(flask.request.base_url).hostname, )
 
     @app.errorhandler(401)
     def unauthorized(_) -> flask.Response:
@@ -88,6 +90,11 @@ def create_app() -> flask.Flask:
     @app.errorhandler(418)
     def teapot(_) -> flask.Response:
         return flask.redirect('https://www.youtube.com/watch?v=dQw4w9WgXcQ')
+
+    # robots.txt
+    @app.route('/robots.txt')
+    def robots() -> flask.Response:
+        return flask.send_from_directory(app.static_folder, 'robots.txt')
 
     return app
 

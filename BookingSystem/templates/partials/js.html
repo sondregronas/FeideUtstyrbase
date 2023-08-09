@@ -15,16 +15,16 @@
     $(inputs).on('change', function () {
       updateAriaInvalid(this);
     });
-  });
 
-  function updateAriaInvalid(object) {
-    let taken = $(object).attr('aria-describedby') === 'taken';
-    if ($(object).val() === '') {
-      $(object).removeAttr('aria-invalid');
-    } else if ($(object).is(':invalid') || taken) {
-      $(object).attr('aria-invalid', 'true');
-    } else {
-      $(object).attr('aria-invalid', 'false');
+    function updateAriaInvalid(object) {
+      let taken = $(object).attr('aria-describedby') === 'taken';
+      if ($(object).val() === '') {
+        $(object).removeAttr('aria-invalid');
+      } else if ($(object).is(':invalid') || taken) {
+        $(object).attr('aria-invalid', 'true');
+      } else {
+        $(object).attr('aria-invalid', 'false');
+      }
     }
-  }
+  });
 </script>
