@@ -3,6 +3,7 @@ from datetime import datetime
 
 import flask
 from dateutil import parser
+from flask_minify import Minify
 from werkzeug.middleware.proxy_fix import ProxyFix
 
 import api
@@ -31,6 +32,9 @@ def create_app() -> flask.Flask:
     app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
 
     Session(app)
+
+    # Minify
+    Minify(app=app)
 
     # Register blueprints
     app.register_blueprint(api.api)
