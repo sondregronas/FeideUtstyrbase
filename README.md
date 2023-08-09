@@ -19,6 +19,8 @@ Must be accessed through a reverse proxy, as the server does not support https. 
 
 If you need a kiosk mode, set up a separate reverse proxy with a valid access control (see NgixnProxyManager) and set the `KIOSK_MODE` environment variable to the FQDN of the proxy.
 
+Logo and favicon can be changed by replacing the files in `static/` with your own within the container.
+
 ## API Endpoints:
 Some endpoints can be accessed without login using the specified `?token=<token>` parameter. This isn't strictly necessary, but a few endpoints are useful for cron jobs and such.
 
@@ -39,6 +41,7 @@ Some endpoints can be accessed without login using the specified `?token=<token>
 - [ ] Better README
 - [ ] `booking.html` is a mess.
 - [ ] Code cleanup / refactoring, it's a bit inconsistent right now.
+- [ ] Actual logo and favicon (currently a playstation shopping bag emoji)
 
 ## Dependencies
 Python Dependencies are listed in `requirements.txt`
