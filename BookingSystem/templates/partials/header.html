@@ -2,13 +2,13 @@
     <li><a href="{{ url_for('app.index') }}">Utstyrbase</a></li>
     <ul>
         <li><a href="{{ url_for('app.privacy') }}">Personvern</a></li>
-        <li>
-            {% if session.user %}
+        {% if session.user %}
+            <li>
                 <a href="{{ url_for('app.logout') }}">
                     Logg ut
                 </a>
-            {% endif %}
-        </li>
+            </li>
+        {% endif %}
         <li>
             <a id="theme-switcher" onclick="switchTheme()" data-toggle="tooltip" data-placement="bottom"
                title="Bytt tema">
