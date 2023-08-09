@@ -184,14 +184,16 @@ def get_user(userid: str) -> flask.Response:
 
 @api.route('/users', methods=['POST'])
 @login_required()
-@handle_api_exception
 def register_student() -> flask.Response:
     """Add/update a class in the database."""
     con = sqlite3.connect(DATABASE)
     cur = con.cursor()
 
     selected_classroom = flask.request.form.get('classroom')
-    sanitize({'classroom': VALIDATORS.GROUP}, {'classroom': selected_classroom})
+    try:
+        sanitize({'classroom': VALIDATORS.GROUP}, {'classroom': selected_classroom})
+    except APIException as e:
+        return flask.abort(e.status_code, e.message)
 
     data = {
         'name': flask.session.get('user').name,
@@ -307,7 +309,7 @@ def email_report() -> flask.Response:
         last_sent = datetime.fromtimestamp(float(mail.get_last_sent())).date()
         if last_sent and (current_date - last_sent).days < int(interval):
             raise APIException(f'Ikke sendt - mindre enn {interval} dager siden forrige rapport.', 200)
-    
+
     return mail.send_report()
 
 
