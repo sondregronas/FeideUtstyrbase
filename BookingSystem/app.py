@@ -35,7 +35,7 @@ def create_app() -> flask.Flask:
     Session(app)
 
     # Minify
-    Minify(app=app)
+    Minify(app=app, static=False)
 
     # Register blueprints
     app.register_blueprint(api.api)

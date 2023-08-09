@@ -25,4 +25,8 @@
     let theme = localStorage.getItem('theme') || 'dark';
     setTheme(theme);
   }
+
+  document.addEventListener("DOMContentLoaded", function (event) {
+    loadTheme();
+  });
 </script>
