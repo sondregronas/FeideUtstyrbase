@@ -151,6 +151,7 @@ def test_public_endpoints(client):
         'app.responsibility',
         'feide.login',
         'feide.callback',
+        'robots',
     ]
 
     for endpoint in client.application.view_functions:
@@ -182,6 +183,7 @@ def test_user_endpoints(client):
         'feide.callback',
         'api.register_student',
         'api.delete_me',
+        'robots',
     ]
 
     for endpoint in client.application.view_functions:
