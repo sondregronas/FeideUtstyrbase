@@ -14,9 +14,7 @@
                 <a href="{{ url_for('app.audits') }}">Audits</a>
                 {% if not session.method == 'kiosk' %}
                     <a href="https://github.com/sondregronas/FeideUtstyrbase" target="_blank">Kildekode</a>
-                {% endif %}
-                <a href="{{ url_for('app.privacy') }}">Personvern</a>
-                {% if not session.method == 'kiosk' %}
+                    <a href="{{ url_for('app.privacy') }}">Personvern</a>
                     <a href="{{ url_for('app.logout') }}">Logg ut</a>
                 {% endif %}
             </div>
