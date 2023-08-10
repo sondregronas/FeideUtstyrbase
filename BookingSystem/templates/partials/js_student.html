@@ -13,11 +13,6 @@
   function setTheme(theme) {
     let root = document.documentElement;
     root.setAttribute('data-theme', theme);
-    if (theme === 'dark') {
-      document.getElementById('theme-switcher').classList.remove('mirrored')
-    } else {
-      document.getElementById('theme-switcher').classList.add('mirrored')
-    }
     localStorage.setItem('theme', root.getAttribute('data-theme'));
   }
 
@@ -26,7 +21,5 @@
     setTheme(theme);
   }
 
-  document.addEventListener("DOMContentLoaded", function (event) {
-    loadTheme();
-  });
+  loadTheme();
 </script>
