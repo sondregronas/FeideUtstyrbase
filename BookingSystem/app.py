@@ -15,7 +15,7 @@ import inventory
 import mail
 import routes
 import user
-from __init__ import logger, REGEX_ITEM, MIN_DAYS, MAX_DAYS, MIN_LABELS, MAX_LABELS
+from __init__ import logger, REGEX_ID, REGEX_ITEM, MIN_DAYS, MAX_DAYS, MIN_LABELS, MAX_LABELS
 from db import init_db
 from flask_session import Session
 
@@ -56,7 +56,8 @@ def create_app() -> flask.Flask:
 
     @app.context_processor
     def context_processor() -> dict:
-        return dict(regex_item=REGEX_ITEM,
+        return dict(regex_id=REGEX_ID,
+                    regex_item=REGEX_ITEM,
                     groups=groups.get_all(),
                     categories=inventory.all_categories(),
                     emails=mail.get_all_emails(),

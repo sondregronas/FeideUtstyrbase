@@ -6,7 +6,7 @@ import flask
 
 import groups
 import inventory
-from __init__ import REGEX_ITEM, logger
+from __init__ import REGEX_ITEM, logger, REGEX_ID
 
 
 class VALIDATORS(Enum):
@@ -46,6 +46,10 @@ class MINMAX:
 
 def _sanitize_form(sanitization_map: dict[any: VALIDATORS | MINMAX], form, data: dict = dict) -> bool:
     """Sanitize a form based on a sanitization map."""
+    def id_pattern(fkey: str) -> bool:
+        # Check if the ID/name is valid
+        r = re.compile(REGEX_ID)
+        return bool(r.match(form.get(fkey)))
 
     def item_pattern(fkey: str) -> bool:
         # Check if the ID/name is valid
@@ -74,17 +78,21 @@ def _sanitize_form(sanitization_map: dict[any: VALIDATORS | MINMAX], form, data:
 
     for key, sanitizer in sanitization_map.items():
         match sanitizer:
-            case VALIDATORS.ID | VALIDATORS.NAME:
+            case VALIDATORS.ID:
+                if not id_pattern(key):
+                    raise APIException(f'Ugyldig ID ({form.get(key)})')
+
+            case VALIDATORS.NAME:
                 # Check if the ID/name is valid
                 if not item_pattern(key):
-                    raise APIException(f'Ugyldig ID ({form.get(key)})')
+                    raise APIException(f'Ugyldig Navn ({form.get(key)})')
 
             case VALIDATORS.UNIQUE_ID:
                 # Check if the ID is unique
                 if not unique(key):
                     raise APIException(f'{form.get(key)} er allerede i bruk.')
                 # Check if the ID is valid
-                if not item_pattern(key):
+                if not id_pattern(key):
                     raise APIException(f'Ugyldig ID ({form.get(key)})')
 
             case VALIDATORS.UNIQUE_OR_SAME_ID:
@@ -93,7 +101,7 @@ def _sanitize_form(sanitization_map: dict[any: VALIDATORS | MINMAX], form, data:
                 if not unique(key) and not same_id:
                     raise APIException(f'{form.get(key)} er allerede i bruk.')
                 # Check if the ID is valid
-                if not item_pattern(key):
+                if not id_pattern(key):
                     raise APIException(f'Ugyldig ID ({form.get(key)})')
 
             case VALIDATORS.CATEGORY:
