@@ -57,7 +57,7 @@ class Item:
         }
 
     def mail_repr(self) -> str:
-        return f'<strong>{self.id}</strong> <small>{self.name} ({self.category})</small>'
+        return f'<strong>{self.lender_name}: {self.id}</strong> <small>{self.name} ({self.category})</small>'
 
     def __str__(self) -> str:
         if self.order_due_date:
