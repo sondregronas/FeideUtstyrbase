@@ -104,3 +104,6 @@ def create_app() -> flask.Flask:
 if __name__ == '__main__':
     init_db()
     create_app().run(host='0.0.0.0')
+else:
+    init_db()
+    app = create_app()

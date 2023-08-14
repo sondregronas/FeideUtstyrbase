@@ -7,39 +7,39 @@ services:
       - "5000:5000"
     volumes:
       - ./data:/app/data
-      - #./responsibility.html:/app/templates/user/responsibility.html
+      # - ./responsibility.html:/app/templates/user/responsibility.html
     environment:
       # Feide client settings (Get from https://dashboard.dataporten.no)
       # FEIDE_REDIRECT_URI must be set to <fqdn>/login/feide/callback in dataporten
-      - FEIDE_REDIRECT_URI='https://<fqdn>/login/feide/callback'
-      - FEIDE_CLIENT_ID=''
-      - FEIDE_CLIENT_SECRET=''
+      - FEIDE_REDIRECT_URI=https://<fqdn>/login/feide/callback
+      - FEIDE_CLIENT_ID=
+      - FEIDE_CLIENT_SECRET=
 
       # Label server FQDN (https://github.com/VaagenIM/EtikettServer)
-      - LABEL_SERVER='https://<fqdn-label>'
+      - LABEL_SERVER=https://<fqdn-label>
 
       # Global settings
-      - MAX_DAYS='14' # Maximum days equipment can be borrowed
-      - MAX_LABELS='10' # Maximum number of labels that can be printed at a time
+      - MAX_DAYS=14 # Maximum days equipment can be borrowed
+      - MAX_LABELS=10 # Maximum number of labels that can be printed at a time
 
       # SMTP settings for email reports (overdue items)
-      - SMTP_SERVER=''
-      - SMTP_PORT='587'
-      - SMTP_USERNAME=''
-      - SMTP_PASSWORD=''
-      - SMTP_FROM='UtstyrBase'
+      - SMTP_SERVER=
+      - SMTP_PORT=587
+      - SMTP_USERNAME=
+      - SMTP_PASSWORD=
+      - SMTP_FROM=UtstyrBase
 
       # Reverse proxy for kiosk mode (No login, all visitors are administrators
       # If you don't know what this is, leave it blank
       # Ensure access list only allows your kiosk client, or you will have a bad time
-      - KIOSK_FQDN=''
+      - KIOSK_FQDN=
 
       # Debug only responds to "True", don't use in production
-      - DEBUG='False'
+      - DEBUG=False
 
       # API Token (for API access, see documentation for endpoints, send automatic email reports etc)
-      - API_TOKEN=''
+      - API_TOKEN=
 
       # Set timezone to your local timezone
-      - TZ='Europe/Oslo'
+      - TZ=Europe/Oslo
     restart: unless-stopped
