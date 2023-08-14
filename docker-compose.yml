@@ -36,6 +36,7 @@ services:
 
       # Debug only responds to "True", don't use in production
       - DEBUG=False
+      - WEB_CONCURRENCY=4  # Number of workers for gunicorn (default 1)
 
       # API Token (for API access, see documentation for endpoints, send automatic email reports etc)
       - API_TOKEN=
