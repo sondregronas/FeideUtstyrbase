@@ -93,6 +93,10 @@ def create_app() -> flask.Flask:
     def teapot(_) -> flask.Response:
         return flask.redirect('https://www.youtube.com/watch?v=dQw4w9WgXcQ')
 
+    @app.errorhandler(500)
+    def internal_server_error(_) -> str:
+        return flask.render_template('500.html')
+
     # robots.txt
     @app.route('/robots.txt')
     def robots() -> flask.Response:

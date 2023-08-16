@@ -1,116 +1,97 @@
+"""
+This module handles the Feide login and the Feide API.
+
+Everything is done via Authlib, which is a library that handles OAuth2 and OpenID Connect.
+
+utils.py calls the `refresh_user` function on every request, which updates the session with the latest user data.
+Should the data be invalid the session will clear and the user gets redirected to the login page. (401)
+"""
+
 import os
+from functools import wraps
 
 import flask
 import requests
+from authlib.integrations.base_client.errors import AuthlibBaseError
+from authlib.integrations.flask_client import OAuth
 
 from __init__ import logger
 
-"""
-Upon successful authentication, the user's data is saved in the session.
-
-session['method'] = 'feide'
-session['feide_token'] = '123456-abcdef'
-
-Inside utils.py, the function refresh_user() is called to update the session with the latest user data,
-this gets updated every time a page that requires authentication is loaded (depending on the method);
-
-Example:
-session['user'] = {
-    'name': 'John Doe',
-    'email': 'johndoe@example.com',
-    'userid': '123456',
-    'affiliation': ['employee', 'admin']
-}
-"""
-
-# page to redirect to after successful authentication
-POST_AUTH_PAGE = 'app.register'  # (flask.url_for)
-
-"""
-Routes / blueprint for FEIDE login.
-"""
-
-FEIDE_CLIENT_ID = os.getenv('FEIDE_CLIENT_ID')
-FEIDE_CLIENT_SECRET = os.getenv('FEIDE_CLIENT_SECRET')
-FEIDE_REDIRECT_URI = os.getenv('FEIDE_REDIRECT_URI')
-
 feide = flask.Blueprint('feide', __name__)
 
+oauth = OAuth(flask.current_app)
+oauth.register(
+    name='feide',
+    client_id=os.getenv('FEIDE_CLIENT_ID'),
+    client_secret=os.getenv('FEIDE_CLIENT_SECRET'),
+    access_token_url='https://auth.dataporten.no/oauth/token',
+    access_token_params=None,
+    authorize_url='https://auth.dataporten.no/oauth/authorization',
+    authorize_params=None,
+    api_base_url='https://auth.dataporten.no/',
+    client_kwargs={'scope': 'groups-org userinfo-name email'},
+)
 
-@feide.route('/login/feide', methods=['GET'])
+
+def handle_auth_exception(f) -> callable:
+    """Handle exceptions that may occur during the authorization process."""
+
+    @wraps(f)
+    def wrapper(*args, **kwargs) -> callable:
+        try:
+            return f(*args, **kwargs)
+        except(KeyError, AttributeError):
+            logger.warning(f'Unauthorized access: {flask.request.url} from {flask.request.remote_addr}')
+            flask.session.clear()
+            flask.abort(401)
+        except AuthlibBaseError:
+            logger.error(f'Authlib error: {flask.request.url} from {flask.request.remote_addr}')
+            flask.session.clear()
+            flask.abort(500)
+        except(requests.exceptions.ConnectionError, requests.exceptions.HTTPError):
+            logger.error(f'Connection error: {flask.request.url} from {flask.request.remote_addr}')
+            flask.abort(500)
+
+    return wrapper
+
+
+@feide.route('/login/feide')
 def login() -> flask.Response:
-    """Redirect to FEIDE's endpoint for login."""
-    return flask.redirect(
-        f'https://auth.dataporten.no/oauth/authorization?response_type=code&client_id={FEIDE_CLIENT_ID}&redirect_uri={FEIDE_REDIRECT_URI}')
+    """Redirect the user to the Feide login page."""
+    feide_oauth = oauth.create_client('feide')
+    redirect_uri = os.getenv('FEIDE_REDIRECT_URI')
+    return feide_oauth.authorize_redirect(redirect_uri)
 
 
-@feide.route('/login/feide/callback', methods=['GET'])
+@feide.route('/login/feide/callback')
+@handle_auth_exception
 def callback() -> flask.Response:
-    """Callback from FEIDE, save method & token in the session then redirect to register page. (Regardless of whether the user is already registered or not.)"""
-    code = flask.request.args.get('code')
-    if not code:
-        logger.error('No code in callback!')
-        flask.abort(401)
+    """Authorize the user and redirect them to the index page."""
+    feide_oauth = oauth.create_client('feide')
+    token = feide_oauth.authorize_access_token()
+    if not token:
+        raise KeyError
+    flask.session['feide_token'] = token
     flask.session['method'] = 'feide'
-    flask.session['feide_token'] = _get_feide_token(code)
-    return flask.redirect(flask.url_for(POST_AUTH_PAGE))
+    feide_oauth.get('https://groups-api.dataporten.no/groups/me/groups').json()
+    return flask.redirect(flask.url_for('app.register'))
 
 
-"""
-Functions for FEIDE login.
-
-get_feide_data() - returns a dict with the user's data from FEIDE, 
-                   and is the only function that should be called fromoutside this file.
-"""
-
-
+@handle_auth_exception
 def get_feide_data() -> dict:
-    """Get relevant user info from FEIDE."""
-    data = _get_feide_userinfo()
-    data['affiliations'] = _get_feide_affiliations()
-    return data
+    """
+    Return a dict with the user's name, email, userid and affiliations.
 
-
-def _get_feide_token(code: str) -> str:
-    """Get a token from FEIDE."""
-    url = 'https://auth.dataporten.no/oauth/token'
-    headers = {'Content-Type': 'application/x-www-form-urlencoded'}
-    data = {
-        'grant_type': 'authorization_code',
-        'redirect_uri': FEIDE_REDIRECT_URI,
-        'code': code,
-        'client_id': FEIDE_CLIENT_ID,
-        'client_secret': FEIDE_CLIENT_SECRET
-    }
-    response = requests.post(url, headers=headers, data=data)
-    if response.status_code != 200:
-        logger.error(f'Error getting FEIDE token: {response.status_code} {response.text}')
-        flask.abort(401)
-    return response.json().get('access_token')
-
-
-def _query(url: str) -> dict:
-    """Query a URL, return the response as JSON."""
-    headers = {'Authorization': f'Bearer {flask.session.get("feide_token")}'}
-    response = requests.get(url, headers=headers)
-    if response.status_code != 200:
-        logger.error(f'Error querying FEIDE: {response.status_code} {response.text}')
-        flask.abort(401)
-    return response.json()
-
-
-def _get_feide_affiliations() -> list[str]:
-    """Get affiliation from FEIDE."""
-    url = 'https://groups-api.dataporten.no/groups/me/groups'
-    return _query(url)[0]['membership']['affiliation']
-
-
-def _get_feide_userinfo() -> dict:
-    """Get user info from FEIDE."""
-    url = 'https://auth.dataporten.no/userinfo'
-    data = _query(url).get('user')
+    Used by @login_required to get the user's data (or kick them out if they're not a valid user).
+    (See utils.py for more info on @login_required.)
+    """
+    feide_oauth = oauth.create_client('feide')
+    feide_oauth.token = flask.session.get('feide_token')
+    userinfo = feide_oauth.get('userinfo').json()
+    groups = feide_oauth.get('https://groups-api.dataporten.no/groups/me/groups').json()
     return {
-        'name': data.get('name'),
-        'email': data.get('email'),
-        'userid': data.get('userid')
+        'name': userinfo['user']['name'],
+        'email': userinfo['user']['email'],
+        'userid': userinfo['user']['userid'],
+        'affiliations': groups[0]['membership']['affiliation']
     }
