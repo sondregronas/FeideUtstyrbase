@@ -36,6 +36,7 @@ ENV API_TOKEN=''
 # Debug mode
 ENV DEBUG='False'
 
+RUN pip install -U pip
 RUN pip install setuptools wheel
 
 WORKDIR /app
