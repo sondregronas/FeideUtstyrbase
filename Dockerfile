@@ -36,7 +36,7 @@ ENV API_TOKEN=''
 # Debug mode
 ENV DEBUG='False'
 
-RUN pip install setuptools wheels
+RUN pip install setuptools wheel
 
 WORKDIR /app
 COPY requirements.txt requirements.txt
