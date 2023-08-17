@@ -34,7 +34,6 @@ def callback() -> flask.Response:
         raise KeyError
     flask.session['feide_token'] = token
     flask.session['method'] = 'feide'
-    feide_oauth.get('https://groups-api.dataporten.no/groups/me/groups').json()
     return flask.redirect(flask.url_for('app.register'))
 
 
