@@ -8,8 +8,10 @@ import sqlite3
 from datetime import datetime
 
 import flask
+import markupsafe
 import requests
 
+import audits
 import inventory
 import mail
 import user
@@ -285,6 +287,23 @@ def update_emails() -> flask.Response:
     con.commit()
     con.close()
     return flask.Response('E-postene ble oppdatert.', status=200)
+
+
+@api.route('/registrer_avvik', methods=['POST'])
+@login_required(admin_only=True)
+@handle_api_exception
+def registrer_avvik() -> flask.Response:
+    """Log a defect."""
+    item_id = flask.request.form.get('id') or ''
+    log_text = flask.request.form.get('text') or ''
+
+    if item_id:
+        txt = f'Avvik - {item_id}: {log_text}'
+    else:
+        txt = f'Avvik - {log_text}'
+
+    audits.audit('AVVIK', markupsafe.escape(txt))
+    return flask.Response(f'Avvik registrert: {txt}', status=200)
 
 
 @api.route('/email/report', methods=['POST'])

@@ -2,6 +2,7 @@ import sqlite3
 from datetime import datetime
 
 from dateutil import parser
+from markupsafe import Markup
 
 from __init__ import DATABASE
 
@@ -36,5 +37,5 @@ def get_all() -> list[dict]:
     return [{
         'timestamp': parser.parse(row[1]).strftime('%d.%m.%Y %H:%M:%S'),
         'event': row[2],
-        'message': row[3]
+        'message': Markup(row[3]).unescape()
     } for row in rows]

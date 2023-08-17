@@ -4,14 +4,6 @@ FROM python:3.10
 ARG DEBIAN_FRONTEND=noninteractive
 ENV TZ='Europe/Oslo'
 RUN apt-get update && apt-get install -y tzdata
-
-
-# Install dependencies for cryptography (ARM only)
-RUN if [ "$(uname -m)" = "armv7l" ]; then \
-    apt-get install -y build-essential libssl-dev libffi-dev python3-dev cargo \
-    && pip install cryptography; \
-    fi
-
 RUN rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # Global settings

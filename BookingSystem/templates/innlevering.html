@@ -5,8 +5,6 @@
 {% endblock %}
 
 {% block content %}
-
-
     <hgroup>
         <h2>Aktive ordre</h2>
         <h3>Sjekk at alt er med - bruk søkefeltet under til å dobbeltsjekke alle aktive ordre!</h3>
@@ -15,6 +13,12 @@
     <br>
 
     {% include 'forms/return.html' %}
+
+    <center>
+        <a href="{{ url_for('app.registrer_avvik') }}">Avvik? Klikk her!</a>
+    </center>
+
+    <br><br>
 
     {% if unavailable_items %}
         <table id="active">
@@ -71,5 +75,4 @@
         });
       });
     </script>
-
 {% endblock %}

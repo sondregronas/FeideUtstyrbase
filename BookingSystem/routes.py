@@ -97,6 +97,12 @@ def innlevering() -> str:
     return flask.render_template('innlevering.html')
 
 
+@app.route('/registrer_avvik')
+@login_required(admin_only=True)
+def registrer_avvik() -> str:
+    return flask.render_template('registrer_avvik.html')
+
+
 @app.route('/etikettserver')
 @login_required(admin_only=True)
 def labelserver() -> str:

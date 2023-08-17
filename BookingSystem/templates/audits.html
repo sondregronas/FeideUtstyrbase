@@ -10,6 +10,57 @@
         <h3>Her kan du søke i loggen etter forlatt utstyr, hva skjedde med det?</h3>
     </hgroup>
 
+    <nav>
+        <ul></ul>
+        <ul>
+            <li>
+                <a href="?search=ITEM_NEW">
+                    <button>
+                        Nytt utstyr
+                    </button>
+                </a>
+            </li>
+            <li>
+                <a href="?search=ITEM_EDIT">
+                    <button>
+                        Redigert
+                    </button>
+                </a>
+            </li>
+            <li>
+                <a href="?search=AVVIK">
+                    <button>
+                        Avvik
+                    </button>
+                </a>
+            </li>
+            <li>
+                <a href="?search=REG_OUT">
+                    <button>
+                        Utlånt
+                    </button>
+                </a>
+            </li>
+            <li>
+                <a href="?search=REG_IN">
+                    <button>
+                        Innlevert
+                    </button>
+                </a>
+            </li>
+            <li>
+                <a href="?search=REG_">
+                    <button>
+                        Hendelser
+                    </button>
+                </a>
+            </li>
+        </ul>
+        <ul></ul>
+    </nav>
+
+    <br>
+
     <table>
         <thead>
         <tr>
@@ -30,33 +81,31 @@
     </table>
 
     <script>
-      $(document).ready(function () {
-        let lang = {
-          "lengthMenu": "Vis _MENU_ rader per side",
-          "zeroRecords": "Ingen treff",
-          "info": "Viser side _PAGE_ av _PAGES_",
-          "infoEmpty": "Ingen rader tilgjengelig",
-          "infoFiltered": "(filtrert fra _MAX_ rader totalt)",
-          "search": "Søk:",
-          "paginate": {
-            "first": "Første",
-            "last": "Siste",
-            "next": "Neste",
-            "previous": "Forrige"
-          }
-        };
-        $('table').DataTable({
-          "order": [[0, "desc"]],
-          "pageLength": 25,
-          "lengthMenu": [[25, 50, -1], [25, 50, "Alle"]],
-          "language": lang
-        });
-
-        {% if search %}
-          $('input[type=search]').val('{{ search }}');
-          $('input[type=search]').trigger('keyup');
-        {% endif  %}
+      let lang = {
+        "lengthMenu": "Vis _MENU_ rader per side",
+        "zeroRecords": "Ingen treff",
+        "info": "Viser side _PAGE_ av _PAGES_",
+        "infoEmpty": "Ingen rader tilgjengelig",
+        "infoFiltered": "(filtrert fra _MAX_ rader totalt)",
+        "search": "Søk:",
+        "paginate": {
+          "first": "Første",
+          "last": "Siste",
+          "next": "Neste",
+          "previous": "Forrige"
+        }
+      };
+      $('table').DataTable({
+        "order": [[0, "desc"]],
+        "pageLength": 25,
+        "lengthMenu": [[25, 50, -1], [25, 50, "Alle"]],
+        "language": lang
       });
+
+      {% if search %}
+        $('input[type=search]').val('{{ search }}');
+        $('input[type=search]').trigger('keyup');
+      {% endif  %}
     </script>
 
 {% endblock %}

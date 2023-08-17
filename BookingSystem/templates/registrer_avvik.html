@@ -1,0 +1,48 @@
+{% extends 'layout.html' %}
+
+{% block extra_head %}
+    {% include 'templates/tom-select.html' %}
+{% endblock %}
+
+{% block content %}
+    <hgroup>
+        <h2>Registrer avvik</h2>
+        <h3>Alle avvik skal loggføres, både små og store.</h3>
+    </hgroup>
+
+    <form>
+        <label for="id">Løpenummer (Valgfritt)</label>
+        <input type="text" name="id" id="id" placeholder="Løpenummer (Valgfritt)"
+               pattern="{{ regex_id }}">
+
+        <label for="text">Beskrivelse</label>
+        <textarea name="text" id="text"
+                  placeholder="Obs. Unngå personopplysninger, med mindre det er sentralt for avviket"
+                  required></textarea>
+
+        <button type="submit">Lagre</button>
+    </form>
+
+    <script>
+      $(document).ready(function () {
+        $('form').submit(function (event) {
+          event.preventDefault();
+          $.ajax({
+            type: 'POST',
+            url: '{{ url_for("api.registrer_avvik") }}',
+            data: $('form').serialize(),
+            success: function (response) {
+              cueAlert('Sukksess!', response, 'success');
+              window.location.href = '{{ url_for("app.innlevering") }}';
+            },
+            error: function (response) {
+              iziToast.error({
+                title: 'Feil!',
+                message: response.responseText,
+              });
+            }
+          });
+        });
+      });
+    </script>
+{% endblock %}
