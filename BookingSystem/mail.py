@@ -4,7 +4,10 @@ import sqlite3
 from datetime import datetime
 
 import flask
+import markupsafe
+from dateutil.parser import parser
 
+import audits
 import inventory
 from __init__ import DATABASE, logger
 from sanitizer import APIException
@@ -50,7 +53,24 @@ def update_last_sent() -> None:
     con.close()
 
 
-def formatted_overdue_items() -> str:
+def formatted_new_deviations(deviations: list) -> str:
+    """Return a table of new deviations, format:
+    Table header: Nye avvik
+    Table rows: <tr><td><b>• "Avvik"</b></td></tr>
+    Paragraph: Avvik må følges opp av ansvarlig(e) for utstyret, sørg for at avvikene blir dokumentert i Teams kanalen.
+    """
+    if not deviations:
+        return ''
+    w = '<td width="10" style="width: 10px;"></td>'
+    wh = '<th width="10" style="width: 10px; line-height: 1px;"></th>'
+    h = '<tr><td height="10" style="height: 10px; line-height: 1px;"></td></tr>'
+    return f'<h2>Nye avvik (f.o.m. forrige rapport)</h2>' \
+           f'<table><tr>{wh}<th>Avvik</th>{wh}</tr>{h}\n' + \
+           '\n'.join([f'<tr>{w}<td><b>• {markupsafe.escape(deviation)}</b></td>{w}</tr>' for deviation in deviations]) + \
+           f'{h}</table>\n<p><i><b>OBS:</b> Større avvik må oppfølges, eller noteres i utstyrskanalen i Teams manuelt.</i></p>'
+
+
+def formatted_overdue_items(items: list) -> str:
     """
     Returns a string formatted like this from all overdue items:
     <table class="association">
@@ -66,7 +86,6 @@ def formatted_overdue_items() -> str:
     </table>
     <br><br>
     """
-    items = [item for item in inventory.get_all_unavailable() if item.overdue]
     pairs = {item.lender_association_mail: [item2.mail_repr()
                                             for item2 in items
                                             if item2.lender_association_mail == item.lender_association_mail]
@@ -75,13 +94,15 @@ def formatted_overdue_items() -> str:
     w = '<td width="10" style="width: 10px;"></td>'
     wh = '<th width="10" style="width: 10px; line-height: 1px;"></th>'
     h = '<tr><td height="10" style="height: 10px; line-height: 1px;"></td></tr>'
-    strings = [f'<table class="association"><tr>{wh}<th><b>{key or "Ansatt"}</b></th>{wh}</tr>{h}\n' +
+    strings = [f'<table><tr>{wh}<th><b>{key or "Ansatt"}</b></th>{wh}</tr>{h}\n' +
                '\n'.join([f'<tr>{w}<td>{item}</td>{w}</tr>'
                           for item in sorted_pairs[key]]) +
-               f'{h}</table><br><br>'
+               f'{h}</table><br>'
                for key in sorted_pairs.keys()]
 
-    return '\n'.join(strings)
+    return '<h2>Overskredet utstyr</h2>' + \
+           '\n'.join(strings) + \
+           '\n<i>Dersom du kjenner igjen utlåneren, vennligst få dem til å levere utstyret tilbake ASAP.</i><br>'
 
 
 def send_report() -> flask.Response:
@@ -90,16 +111,20 @@ def send_report() -> flask.Response:
     Force is for debugging only.
     """
     # If the last sent email was sent within the past hour, raise an exception
-    if get_last_sent():
-        if datetime.now().timestamp() - float(get_last_sent()) < 3600:
+    last_sent = get_last_sent()
+    if last_sent:
+        if datetime.now().timestamp() - float(last_sent) < 3600:
             raise APIException('Rapport ble ikke sendt: forrige rapport ble sendt for under en time siden.', 400)
 
     items = [item for item in inventory.get_all_unavailable() if item.overdue]
-    if not items:
+    new_deviations = [audit['message'] for audit in audits.get_all()
+                      if parser().parse(audit['timestamp']) > datetime.fromtimestamp(float(last_sent))
+                      and audit['event'] == 'AVVIK']
+    if not items and not new_deviations:
         update_last_sent()
         raise APIException('Rapport ble ikke sendt: finner ikke overskredet utstyr.', 400)
 
-    title = f'[UtstyrServer] Rapport for overskredet utstyr {datetime.now().strftime("%d.%m.%Y")}'
+    title = f'[Utstyrbase {datetime.now().strftime("%d.%m.%Y")}] Utstyrsrapport'
     recipients = get_all_emails()
 
     try:
@@ -115,18 +140,12 @@ Content-Type: text/html; charset=utf-8
 table {{width: 80%;border-collapse: collapse;border: 1px solid #ddd;}}
 table th {{text-align: left; background-color: #333;color: white; height: 30px; vertical-align: middle;}}
 </style>
-
-<h1>Rapport for utlånt utstyr</h1>
-<p>Hei!
-<br>Her er en rapport for utlånt utstyr som er på overtid:</p>
+{formatted_overdue_items(items)}
 <br>
-
-{formatted_overdue_items()}
-
-<p>Dersom du kjenner igjen utlåneren, vennligst få dem til å levere utstyret tilbake ASAP.</p>
-
-<p>Med vennlig hilsen,
-<br>{SMTP_FROM}</p>
+{formatted_new_deviations(new_deviations)}
+<br>
+Med vennlig hilsen,
+<br><b>{SMTP_FROM}</b> <i>(Vennligst ikke svar på denne e-posten)</i>
 """.encode('utf-8')
             server.sendmail(SMTP_USERNAME, recipients, message)
     # TODO: Handle exceptions properly

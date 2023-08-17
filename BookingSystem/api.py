@@ -298,9 +298,9 @@ def registrer_avvik() -> flask.Response:
     log_text = flask.request.form.get('text') or ''
 
     if item_id:
-        txt = f'Avvik - {item_id}: {log_text}'
+        txt = f'Avvik på utstyr {item_id}: {log_text}'
     else:
-        txt = f'Avvik - {log_text}'
+        txt = f'Generelt avvik: {log_text}'
 
     audits.audit('AVVIK', markupsafe.escape(txt))
     return flask.Response(f'Avvik registrert: {txt}', status=200)
