@@ -13,11 +13,13 @@
     <form>
         <label for="id">Løpenummer (Valgfritt)</label>
         <input type="text" name="id" id="id" placeholder="Løpenummer (Valgfritt)"
-               pattern="{{ regex_id }}">
+               pattern="{{ regex_id }}"
+               autocomplete="off">
 
         <label for="text">Beskrivelse</label>
         <textarea name="text" id="text"
                   placeholder="Obs. Unngå personopplysninger, med mindre det er sentralt for avviket"
+                  autocomplete="off"
                   required></textarea>
 
         <button type="submit">Lagre</button>

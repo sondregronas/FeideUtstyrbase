@@ -14,12 +14,14 @@
         <label for="id">Løpenummer</label>
         <input type="text" name="id" id="id" required placeholder="Eksempel: A6500-01"
                pattern="{{ regex_id }}"
-               value="{{ item.id }}">
+               value="{{ item.id }}"
+               autocomplete="off">
 
         <label for="name">Navn</label>
         <input type="text" name="name" id="name" required placeholder="Eksempel: Sony A6500"
                pattern="{{ regex_item }}"
-               value="{{ item.name }}">
+               value="{{ item.name }}"
+               autocomplete="off">
 
         <label for="category">Kategori</label>
         <select name="category" id="category" data-placeholder="Velg kategori" required autocomplete="off">
