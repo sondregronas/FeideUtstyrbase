@@ -3,7 +3,7 @@ FROM python:3.10
 # Setup Timezone
 ARG DEBIAN_FRONTEND=noninteractive
 ENV TZ='Europe/Oslo'
-RUN apt-get update && apt-get install -y tzdata
+RUN apt-get update && apt-get install -y tzdata build-essential libssl-dev libffi-dev python3-dev cargo
 RUN rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # Global settings
