@@ -76,13 +76,15 @@ def create_app() -> flask.Flask:
     @app.errorhandler(401)
     def unauthorized(_) -> flask.Response:
         flask.session.clear()
-        logger.warning(f'Unauthorized access: {flask.request.url} from {flask.request.remote_addr}')
+        if flask.request.url != flask.url_for('app.index', _external=True):
+            logger.warning(f'Unauthorized access: {flask.request.url} from {flask.request.remote_addr}')
         return flask.redirect(flask.url_for('app.login'))
 
     @app.errorhandler(403)
     def unauthorized(_) -> flask.Response:
         flask.session.clear()
-        logger.warning(f'Unauthorized access: {flask.request.url} from {flask.request.remote_addr}')
+        if flask.request.url != flask.url_for('app.index', _external=True):
+            logger.warning(f'Unauthorized access: {flask.request.url} from {flask.request.remote_addr}')
         return flask.redirect(flask.url_for('app.login'))
 
     @app.errorhandler(404)

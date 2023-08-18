@@ -157,7 +157,8 @@ def edit(old_item_id: str, new_item: Item) -> None:
     diff = ', '.join([f'{key}: {old.__dict__[key]}->{new_item.__dict__[key]}' for key in old.__dict__
                       if old.__dict__[key] != new_item.__dict__[key]
                       and new_item.__dict__[key] is not None])
-    audits.audit('ITEM_EDIT', f'{old_item_id} ble redigert ({diff}).')
+    if diff:
+        audits.audit('ITEM_EDIT', f'{old_item_id} ble redigert ({diff}).')
 
 
 def delete(item_id: str) -> None:
