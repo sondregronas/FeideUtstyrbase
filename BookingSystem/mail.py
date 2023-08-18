@@ -86,6 +86,8 @@ def formatted_overdue_items(items: list) -> str:
     </table>
     <br><br>
     """
+    if not items:
+        return ''
     pairs = {item.lender_association_mail: [item2.mail_repr()
                                             for item2 in items
                                             if item2.lender_association_mail == item.lender_association_mail]
