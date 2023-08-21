@@ -33,15 +33,10 @@ ENV KIOSK_FQDN=''
 # API token
 ENV API_TOKEN=''
 
-# Debug mode
+# Misc
 ENV DEBUG='False'
-
-# Auto update
 ENV AUTO_UPDATE='True'
-
-# Workers (2x CPU cores + 1 recommended)
 ENV WEB_CONCURRENCY='1'
-
 
 RUN pip install -U pip && pip install setuptools wheel
 
@@ -49,7 +44,6 @@ RUN git clone https://github.com/sondregronas/FeideUtstyrbase &&  \
     pip install -r /FeideUtstyrbase/requirements.txt &&  \
     mkdir /app &&  \
     cp -r /FeideUtstyrbase/BookingSystem/* /app
-
 
 RUN echo  \
     "cd /FeideUtstyrbase && \
