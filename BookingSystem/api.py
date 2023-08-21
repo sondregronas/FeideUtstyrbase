@@ -303,7 +303,7 @@ def registrer_avvik() -> flask.Response:
         txt = f'Generelt avvik: {log_text}'
 
     audits.audit('AVVIK', markupsafe.escape(txt))
-    return flask.Response(f'Avvik registrert: {txt}', status=200)
+    return flask.Response(f'Avvik registrert: {markupsafe.escape(txt)}', status=200)
 
 
 @api.route('/email/report', methods=['POST'])

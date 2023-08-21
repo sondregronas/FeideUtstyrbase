@@ -34,7 +34,7 @@
             url: '{{ url_for("api.registrer_avvik") }}',
             data: $('form').serialize(),
             success: function (response) {
-              cueAlert('Sukksess!', response, 'success');
+              cueAlert('Suksess!', response, 'success');
               window.location.href = '{{ url_for("app.innlevering") }}';
             },
             error: function (response) {
