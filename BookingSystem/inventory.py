@@ -108,7 +108,7 @@ class Item:
     def overdue(self) -> bool:
         if self.order_due_date is None:
             return False
-        return parser.parse(self.order_due_date) < datetime.now()
+        return parser.parse(self.order_due_date) < datetime.now() - timedelta(days=1)
 
     @property
     def exists(self) -> bool:
