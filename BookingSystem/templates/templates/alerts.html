@@ -60,17 +60,14 @@
   });
 
   function customAlert(header, msg, type, fullscreen = false) {
-    let icon;
-    let color;
+    const typeMapping = {
+      success: {icon: 'fa fa-check-circle', color: 'green'},
+      warning: {icon: 'fa fa-exclamation-circle', color: 'orange'},
+      error: {icon: 'fa fa-times-circle', color: 'red'},
+      default: {icon: 'fa fa-info-circle', color: 'blue'}
+    }
+    let {icon, color} = typeMapping[type] || typeMapping.default;
     if (fullscreen) {
-      const typeMapping = {
-        success: {icon: 'fa fa-check-circle', type: 'green',},
-        warning: {icon: 'fa fa-exclamation-circle', type: 'orange',},
-        error: {icon: 'fa fa-times-circle', type: 'red',},
-        default: {icon: 'fa fa-info-circle', type: 'blue',}
-      }
-      icon = typeMapping[type].icon || typeMapping.default.icon;
-      color = typeMapping[type].type || typeMapping.default.type;
       $.alert({
         title: header,
         content: msg,
