@@ -19,7 +19,7 @@ Must be accessed through a reverse proxy, as the server does not support https. 
 
 If you need a kiosk mode, set up a separate reverse proxy with a valid access control (see NgixnProxyManager) and set the `KIOSK_MODE` environment variable to the FQDN of the proxy.
 
-Logo and favicon can be changed by replacing the files in `static/` with your own within the container.
+Logo and favicon can be changed by replacing the files in `/overrides/static/` with your own within the container, requiring the mapping of the `/overrides` directory. You can also change any of the files inside `BookingSystem` by putting them in `/overrides` should you need to.
 
 ## API Endpoints:
 Some endpoints can be accessed without login using the specified `?token=<token>` parameter. This isn't strictly necessary, but a few endpoints are useful for cron jobs and such.

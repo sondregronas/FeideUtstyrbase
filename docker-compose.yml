@@ -8,6 +8,9 @@ services:
     volumes:
       - ./data:/app/data
       # - ./responsibility.html:/app/templates/user/responsibility.html
+      # - ./overrides:/overrides  # Optional, such as custom templates or static files
+      #                             (i.e.) ./logo.png:/overrides/static/logo.png
+      #                             or passing an entire directory, follows the same structure as the app directory
     environment:
       # Feide client settings (Get from https://dashboard.dataporten.no)
       # FEIDE_REDIRECT_URI must be set to <fqdn>/login/feide/callback in dataporten

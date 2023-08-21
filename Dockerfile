@@ -59,6 +59,9 @@ RUN echo  \
     else \
       echo \"Auto update disabled (AUTO_UPDATE not True)\"; \
     fi && \
+    if [ -d \"/overrides\" ]; then \
+      cp -r /overrides/* /app; \
+    fi && \
     gunicorn -b 0.0.0.0:5000 app:app" > /usr/local/bin/entrypoint.sh
 
 EXPOSE 5000
