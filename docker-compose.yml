@@ -32,11 +32,12 @@ services:
       # Reverse proxy for kiosk mode (No login, all visitors are administrators
       # If you don't know what this is, leave it blank
       # Ensure access list only allows your kiosk client, or you will have a bad time
-      - KIOSK_FQDN=
+      - KIOSK_FQDN=localhost:5000
 
-      # Debug only responds to "True", don't use in production
-      - DEBUG=False
+      # Misc
+      - DEBUG=False        # Don't use debug mode in production
       - WEB_CONCURRENCY=4  # Number of workers for gunicorn (default 1)
+      - AUTO_UPDATE=True   # Automatically update app on startup (default True) (only responds to "True")
 
       # API Token (for API access, see documentation for endpoints, send automatic email reports etc)
       - API_TOKEN=

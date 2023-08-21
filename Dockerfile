@@ -3,7 +3,7 @@ FROM python:3.10
 # Setup Timezone
 ARG DEBIAN_FRONTEND=noninteractive
 ENV TZ='Europe/Oslo'
-RUN apt-get update && apt-get install -y tzdata
+RUN apt-get update && apt-get install -y tzdata git
 RUN rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # Global settings
@@ -36,14 +36,38 @@ ENV API_TOKEN=''
 # Debug mode
 ENV DEBUG='False'
 
-RUN pip install -U pip
-RUN pip install setuptools wheel
+# Auto update
+ENV AUTO_UPDATE='True'
 
-WORKDIR /app
-COPY requirements.txt requirements.txt
-RUN pip install -r requirements.txt
-COPY BookingSystem .
+# Workers (2x CPU cores + 1 recommended)
+ENV WEB_CONCURRENCY='1'
 
-VOLUME /app/data
+
+RUN pip install -U pip && pip install setuptools wheel
+
+RUN git clone https://github.com/sondregronas/FeideUtstyrbase &&  \
+    pip install -r /FeideUtstyrbase/requirements.txt &&  \
+    mkdir /app &&  \
+    cp -r /FeideUtstyrbase/BookingSystem/* /app
+
+
+RUN echo  \
+    "cd /FeideUtstyrbase && \
+    git pull && \
+    pip install -r requirements.txt && \
+    cp -r /FeideUtstyrbase/BookingSystem/* /app" > /usr/local/bin/auto-update.sh
+
+# Entrypoint (Update or run)
+RUN echo  \
+    "if [ \"\$AUTO_UPDATE\" = \"True\" ]; then \
+      echo \"Auto update enabled\" && \
+      sh /usr/local/bin/auto-update.sh; \
+    else \
+      echo \"Auto update disabled (AUTO_UPDATE not True)\"; \
+    fi && \
+    gunicorn -b 0.0.0.0:5000 app:app" > /usr/local/bin/entrypoint.sh
+
 EXPOSE 5000
-CMD ["gunicorn", "-b", "0.0.0.0:5000", "app:app"]
+WORKDIR /app
+VOLUME /app/data
+CMD ["sh", "/usr/local/bin/entrypoint.sh"]
