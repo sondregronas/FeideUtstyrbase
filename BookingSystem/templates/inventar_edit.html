@@ -74,7 +74,7 @@
             url: '{{ url_for("api.edit_item", item_id=item.id) }}',
             data: $('form').serialize(),
             success: function (response) {
-              cueToast('Sukksess!', `${$('#id').val()} ble oppdatert.`, 'success');
+              cueToast('Suksess!', `${$('#id').val()} ble oppdatert.`, 'success');
               window.location.href = '{{ url_for("app.inventar") }}';
             },
             error: function (response) {
