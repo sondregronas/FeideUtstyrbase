@@ -57,7 +57,7 @@ RUN echo  \
     pip install -r requirements.txt && \
     cp -r /FeideUtstyrbase/BookingSystem/* /app" > /usr/local/bin/auto-update.sh
 
-# Entrypoint (Update or run)
+# Entrypoint (Update / run)
 RUN echo  \
     "if [ \"\$AUTO_UPDATE\" = \"True\" ]; then \
       echo \"Auto update enabled\" && \
