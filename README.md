@@ -9,7 +9,7 @@ For Vågen VGS, might be possible to use for other schools with some modificatio
 ## Setup
 Proper README coming soon.
 
-- Register app at Dataporten
+- Register app at Dataporten (must be approved by a Feide Administrator)
 - Set callback url to `https://<your-domain>/login/feide/callback`
 - Setup https://github.com/VaagenIM/EtikettServer (Currently not optional)
 - Only supports SMTP for now.
