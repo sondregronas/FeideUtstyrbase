@@ -4,6 +4,8 @@ Routes to interact with the database. (API endpoints.)
 This should be called from the frontend to get data from the database.
 Filtering and sorting should be done on the frontend, not the backend.
 """
+import os
+import shutil
 import sqlite3
 from datetime import datetime
 
@@ -353,3 +355,22 @@ def delete_me() -> flask.Response:
     user.delete(u.userid)
     flask.session.clear()
     return flask.Response(f'Bruker {u.name} ble slettet.', status=200)
+
+
+@api.route('/backup/<filename>', methods=['POST'])
+@login_required(admin_only=True, api=True)
+@handle_api_exception
+def backup(filename: str) -> flask.Response:
+    """Backup the database with the given filename to the data/backups folder.
+
+    Recommended to use a cronjob to run this every week, e.g.:
+    0 1 * * 1 curl -X POST "http://localhost:5000/backup/backup-$(date +\%Y-w\%V).sqlite?token=<token>"
+    """
+    if not filename.endswith('.sqlite'):
+        raise APIException('Ugyldig filnavn (Må avsluttes med .sqlite).', 400)
+
+    if not os.path.exists('data/backups'):
+        os.mkdir('data/backups')
+
+    shutil.copyfile(DATABASE, f'data/backups/{filename}')
+    return flask.Response(f'Databasen ble sikkerhetskopiert til {filename}.', status=200)

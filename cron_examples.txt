@@ -4,3 +4,6 @@
 
 # Prune inactive users on the first of July
 0 1 1 7 * curl -X POST "<fqdn>/users/prune_inactive?token=<token>"
+
+# Backup db weekly
+0 1 * * 1 curl -X POST "<fqdn>/backup/backup-$(date +\%Y-w\%V).sqlite?token=<token>"
