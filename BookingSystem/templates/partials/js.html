@@ -26,5 +26,16 @@
         $(object).attr('aria-invalid', 'false');
       }
     }
+
+    // Every 10 minutes of inactivity, redirect to index
+    let timeout = setTimeout(function () {
+      window.location.href = "{{ url_for('app.index') }}";
+    }, 10 * 60 * 1000);
+    $(document).on('click keypress', function () {
+      clearTimeout(timeout);
+      timeout = setTimeout(function () {
+        window.location.href = "{{ url_for('app.index') }}";
+      }, 10 * 60 * 1000);
+    });
   });
 </script>
