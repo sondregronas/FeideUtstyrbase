@@ -34,6 +34,12 @@
         <h3>En kategori per linje</h3>
     </hgroup>
     {% include 'forms/categories.html' %}
+    
+    <hgroup>
+        <h2>Bulletin</h2>
+        <h3>En beskjed på toppen av siden. La feltene stå tomme for å fjerne bulletin</h3>
+    </hgroup>
+    {% include 'forms/bulletin.html' %}
 
     <script>
       let last_sent = "{{last_sent}}";

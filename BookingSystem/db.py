@@ -21,3 +21,26 @@ def init_db() -> None:
     con = sqlite3.connect(DATABASE)
     con.executescript(read_sql_query("tables.sql"))
     con.close()
+
+
+class Settings:
+    @staticmethod
+    def get(key: str) -> str:
+        """Get a setting by key."""
+        con = sqlite3.connect(DATABASE)
+        value = con.execute('SELECT value FROM settings WHERE name = ?', (key,)).fetchone()
+        con.close()
+
+        if not value:
+            return ''
+
+        return value[0]
+
+    @staticmethod
+    def set(key: str, value: str) -> None:
+        """Set a setting by key."""
+        con = sqlite3.connect(DATABASE)
+        cur = con.cursor()
+        cur.execute('REPLACE INTO settings (name, value) VALUES (?, ?)', (key, value))
+        con.commit()
+        con.close()

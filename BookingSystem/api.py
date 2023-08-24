@@ -17,6 +17,7 @@ import audits
 import inventory
 import mail
 import user
+from db import Settings
 from __init__ import DATABASE, LABEL_SERVER, MIN_DAYS, MAX_DAYS, MIN_LABELS, MAX_LABELS
 from inventory import Item
 from sanitizer import VALIDATORS, MINMAX, sanitize, handle_api_exception, APIException
@@ -374,3 +375,16 @@ def backup(filename: str) -> flask.Response:
 
     shutil.copyfile(DATABASE, f'data/backups/{filename}')
     return flask.Response(f'Databasen ble sikkerhetskopiert til {filename}.', status=200)
+
+
+@api.route('/bulletin', methods=['PUT'])
+@login_required(admin_only=True)
+@handle_api_exception
+def update_bulletin() -> flask.Response:
+    """Update the bulletin."""
+    bulletin_title = flask.request.form.get('bulletin_title') or ''
+    bulletin = flask.request.form.get('bulletin') or ''
+
+    Settings.set('bulletin_title', markupsafe.escape(bulletin_title))
+    Settings.set('bulletin', markupsafe.escape(bulletin))
+    return flask.Response('Bulletin ble oppdatert.', status=200)

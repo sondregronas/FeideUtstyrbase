@@ -7,6 +7,15 @@
     {% block extra_head %}{% endblock %}
 </head>
 <body>
+
+{% if bulletin and session.user and session.user.is_admin %}
+    <div id="bulletin-section">
+        <hgroup id="bulletin-contents">
+            <h3>{{ bulletin_title }}</h3>
+            <h4>{{ bulletin }}</h4></hgroup>
+    </div>
+{% endif %}
+
 <header>
     {% block header %}
         {% if session.user and session.user.is_admin %}

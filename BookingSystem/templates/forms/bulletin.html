@@ -1,0 +1,26 @@
+<form id="update-bulletin">
+    <label for="bulletin_title">Tittel</label>
+    <input name="bulletin_title" id="bulletin_title" placeholder="Tittel" value="{{ bulletin_title }}" maxlength="50"
+           autocomplete="off">
+    <label for="bulletin">Tekst</label>
+    <input name="bulletin" id="bulletin" placeholder="Tekst" value="{{ bulletin }}"
+           maxlength="350" autocomplete="off">
+    <button type="submit">Oppdater</button>
+</form>
+
+<script>
+  $('#update-bulletin').submit(function (e) {
+    e.preventDefault();
+    $.ajax({
+      url: '{{ url_for("api.update_bulletin") }}',
+      type: 'PUT',
+      data: $('#update-bulletin').serialize(),
+      success: function (response) {
+        customAlert('Suksess!', response, 'success', true);
+      },
+      error: function (response) {
+        customAlert('Feil!', response.responseText, 'error', true);
+      }
+    });
+  });
+</script>
