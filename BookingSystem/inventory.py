@@ -57,12 +57,18 @@ class Item:
         }
 
     def mail_repr(self) -> str:
-        return f'<strong>{self.lender_name}: {self.id}</strong> <small>{self.name} ({self.category})</small>'
+        return f'<strong>{self.lender_name}: {self.id}</strong> <small>{self.name} ({self.category}, Frist: {self.order_due_date_fmt})</small>'
 
     def __str__(self) -> str:
         if self.order_due_date:
-            return f'{self.lender_name}: {self.id} - {self.name} ({self.category}, {parser.parse(self.order_due_date):%d.%m.%Y})'
+            return f'{self.lender_name}: {self.id} - {self.name} ({self.category}, {self.order_due_date_fmt})'
         return f'{self.id} - {self.name} - {self.category}'
+
+    @property
+    def order_due_date_fmt(self) -> str:
+        if not self.order_due_date:
+            return ''
+        return parser.parse(self.order_due_date).strftime('%d.%m.%Y')
 
     @property
     def user(self) -> dict:
