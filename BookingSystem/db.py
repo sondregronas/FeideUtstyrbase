@@ -1,6 +1,8 @@
 import sqlite3
 from pathlib import Path
 
+import markupsafe
+
 from __init__ import DATABASE, logger
 
 
@@ -31,10 +33,7 @@ class Settings:
         value = con.execute('SELECT value FROM settings WHERE name = ?', (key,)).fetchone()
         con.close()
 
-        if not value:
-            return ''
-
-        return value[0]
+        return markupsafe.Markup(value[0]) if value else ''
 
     @staticmethod
     def set(key: str, value: str) -> None:
