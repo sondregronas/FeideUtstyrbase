@@ -16,6 +16,7 @@ DATABASE = Path('data') / 'db.sqlite'
 LABEL_SERVER = os.getenv('LABEL_SERVER')
 KIOSK_FQDN = os.getenv('KIOSK_FQDN')
 API_TOKEN = os.getenv('API_TOKEN')
+TEAMS_WEBHOOKS = os.getenv('TEAMS_WEBHOOKS', '').split(',')
 REGEX_ID = r'^(?:(?![\s])[a-zA-Z0-9_\s\-]*[a-zA-Z0-9_\-]+)$'
 REGEX_ITEM = r'^(?:(?![\s])[ÆØÅæøåa-zA-Z0-9_\s\-]*[ÆØÅæøåa-zA-Z0-9_\-]+)$'
 

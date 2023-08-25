@@ -32,13 +32,6 @@ CREATE TABLE IF NOT EXISTS `groups`
     UNIQUE (`classroom`)
 );
 
-CREATE TABLE IF NOT EXISTS `emails`
-(
-    `id`    INTEGER PRIMARY KEY AUTOINCREMENT,
-    `email` TEXT NOT NULL,
-    UNIQUE (`email`)
-);
-
 CREATE TABLE IF NOT EXISTS `categories`
 (
     `id`   INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -82,16 +75,10 @@ CREATE TABLE IF NOT EXISTS `audits`
     `message`   TEXT NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS `email_report_info`
-(
-    `id`        INTEGER PRIMARY KEY AUTOINCREMENT,
-    `timestamp` TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
-);
-
 CREATE TABLE IF NOT EXISTS `settings`
 (
-    `id`        INTEGER PRIMARY KEY AUTOINCREMENT,
-    `name`      TEXT NOT NULL,
-    `value`     TEXT NOT NULL,
+    `id`    INTEGER PRIMARY KEY AUTOINCREMENT,
+    `name`  TEXT NOT NULL,
+    `value` TEXT NOT NULL,
     UNIQUE (`name`)
 );

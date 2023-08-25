@@ -20,12 +20,8 @@ ENV FEIDE_CLIENT_SECRET=''
 # Label server (https://github.com/VaagenIM/EtikettServer)
 ENV LABEL_SERVER='https://<fqdn-label>'
 
-# SMTP
-ENV SMTP_SERVER=''
-ENV SMTP_PORT='587'
-ENV SMTP_USERNAME=''
-ENV SMTP_PASSWORD=''
-ENV SMTP_FROM='UtstyrBase'
+# Teams webhooks (comma separated)
+ENV TEAMS_WEBHOOKS=''
 
 # Kiosk (Admin access without login) (FQDN)
 ENV KIOSK_FQDN=''

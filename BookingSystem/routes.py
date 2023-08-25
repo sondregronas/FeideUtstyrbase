@@ -1,9 +1,8 @@
 import flask
 
 import inventory
-import mail
 from __init__ import KIOSK_FQDN, LABEL_SERVER
-from db import add_admin
+from db import add_admin, Settings
 from sanitizer import handle_api_exception
 from utils import login_required
 
@@ -50,7 +49,7 @@ def logout() -> flask.Response:
 @app.route('/admin')
 @login_required(admin_only=True)
 def admin_settings() -> str:
-    return flask.render_template('admin_settings.html', last_sent=mail.get_last_sent())
+    return flask.render_template('admin_settings.html', last_sent=Settings.get('report_last_sent') or 0)
 
 
 @app.route('/audits')

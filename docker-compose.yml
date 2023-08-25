@@ -25,12 +25,8 @@ services:
       - MAX_DAYS=14 # Maximum days equipment can be borrowed
       - MAX_LABELS=10 # Maximum number of labels that can be printed at a time
 
-      # SMTP settings for email reports (overdue items)
-      - SMTP_SERVER=
-      - SMTP_PORT=587
-      - SMTP_USERNAME=
-      - SMTP_PASSWORD=
-      - SMTP_FROM=UtstyrBase
+      # Teams Webhooks (for sending notifications to teams channel) - comma separated
+      - TEAMS_WEBHOOKS=
 
       # Reverse proxy for kiosk mode (No login, all visitors are administrators
       # If you don't know what this is, leave it blank
@@ -42,7 +38,7 @@ services:
       - WEB_CONCURRENCY=4  # Number of workers for gunicorn (default 1)
       - AUTO_UPDATE=True   # Automatically update app on startup (default True) (only responds to "True")
 
-      # API Token (for API access, see documentation for endpoints, send automatic email reports etc)
+      # API Token (for API access, see documentation for endpoints, send automatic reports etc)
       - API_TOKEN=
 
       # Set timezone to your local timezone

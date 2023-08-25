@@ -15,10 +15,10 @@ import requests
 
 import audits
 import inventory
-import mail
+import teams
 import user
-from db import Settings
 from __init__ import DATABASE, LABEL_SERVER, MIN_DAYS, MAX_DAYS, MIN_LABELS, MAX_LABELS
+from db import Settings
 from inventory import Item
 from sanitizer import VALIDATORS, MINMAX, sanitize, handle_api_exception, APIException
 from utils import login_required, next_july
@@ -267,31 +267,6 @@ def update_categories() -> flask.Response:
     return flask.Response('Kategoriene ble oppdatert.', status=200)
 
 
-@api.route('/emails', methods=['PUT'])
-@login_required(admin_only=True)
-@handle_api_exception
-def update_emails() -> flask.Response:
-    """Update every email in the database."""
-    new_emails = list()
-    for email in flask.request.form.get('emails').split('\n'):
-        if not email.strip():
-            continue
-        sanitize({'email': VALIDATORS.EMAIL}, {'email': email.strip()})
-        new_emails.append(email.strip())
-
-    con = sqlite3.connect(DATABASE)
-    cur = con.cursor()
-    # noinspection SqlWithoutWhere
-    cur.execute('DELETE FROM emails')
-    con.commit()
-    for email in new_emails:
-        cur.execute('INSERT INTO emails (email) VALUES (?)', (email,))
-
-    con.commit()
-    con.close()
-    return flask.Response('E-postene ble oppdatert.', status=200)
-
-
 @api.route('/registrer_avvik', methods=['POST'])
 @login_required(admin_only=True)
 @handle_api_exception
@@ -309,30 +284,28 @@ def registrer_avvik() -> flask.Response:
     return flask.Response(f'Avvik registrert: {markupsafe.escape(txt)}', status=200)
 
 
-@api.route('/email/report', methods=['POST'])
+@api.route('/send_report', methods=['POST'])
 @login_required(admin_only=True, api=True)
 @handle_api_exception
-def email_report() -> flask.Response:
-    """Emails a report to all users in the emails table.
+def send_report() -> flask.Response:
+    """Send a report to the specified teams webhooks.
 
     Can be used with a cron job to send reports automatically, e.g.:
-    15 8 * 1-6,8-12 MON curl -X POST "http://localhost:5000/email/report?interval=7&token=<token>"
+    15 8 * 1-6,8-12 MON curl -X POST "http://localhost:5000/send_report?interval=7&token=<token>"
 
     If the interval parameter is set, the report will only be sent
     if the last report was sent more than interval days ago.
-
-    You can only send an email once every hour by default. (Handled by mail.py)
     """
     interval = flask.request.args.get('interval')
 
     if interval:
         sanitize({'interval': VALIDATORS.INT}, flask.request.args)
         current_date = datetime.now().date()
-        last_sent = datetime.fromtimestamp(float(mail.get_last_sent())).date()
+        last_sent = datetime.fromtimestamp(float(Settings.get('report_last_sent') or 0)).date()
         if last_sent and (current_date - last_sent).days < int(interval):
             raise APIException(f'Ikke sendt - mindre enn {interval} dager siden forrige rapport.', 200)
 
-    return mail.send_report()
+    return teams.send_report()
 
 
 @api.route('/users/prune_inactive', methods=['POST'], endpoint='prune_inactive_users')

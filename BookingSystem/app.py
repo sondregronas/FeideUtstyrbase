@@ -12,7 +12,6 @@ import audits
 import feide
 import groups
 import inventory
-import mail
 import routes
 import user
 from __init__ import logger, REGEX_ID, REGEX_ITEM, MIN_DAYS, MAX_DAYS, MIN_LABELS, MAX_LABELS
@@ -62,7 +61,6 @@ def create_app() -> flask.Flask:
                     bulletin_title=Settings.get('bulletin_title'),
                     bulletin=Settings.get('bulletin'),
                     categories=inventory.all_categories(),
-                    emails=mail.get_all_emails(),
                     audits=audits.get_all(),
                     items=inventory.get_all(),
                     used_ids=inventory.get_all_ids(),

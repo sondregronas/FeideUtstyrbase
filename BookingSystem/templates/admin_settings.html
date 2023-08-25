@@ -24,17 +24,11 @@
     {% include 'forms/groups.html' %}
 
     <hgroup>
-        <h2>E-poster</h2>
-        <h3>Hvem skal motta e-post? En addresse per linje</h3>
-    </hgroup>
-    {% include 'forms/emails.html' %}
-
-    <hgroup>
         <h2>Kategorier</h2>
         <h3>En kategori per linje</h3>
     </hgroup>
     {% include 'forms/categories.html' %}
-    
+
     <hgroup>
         <h2>Bulletin</h2>
         <h3>En beskjed på toppen av siden. La feltene stå tomme for å fjerne bulletin</h3>
@@ -62,7 +56,7 @@
           year: 'numeric'
         }) + ')');
         $.ajax({
-          url: "{{url_for('api.email_report')}}",
+          url: "{{url_for('api.send_report')}}",
           type: 'POST',
           success: function (result) {
             customAlert('Sendt!', 'Rapporten ble sendt ut.', 'success', true)
