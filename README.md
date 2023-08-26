@@ -4,20 +4,20 @@
 [![codecov](https://codecov.io/gh/sondregronas/FeideUtstyrbase/branch/main/graph/badge.svg?token=JNLY5WWC3X)](https://codecov.io/gh/sondregronas/FeideUtstyrbase)
 [![License](https://img.shields.io/github/license/sondregronas/FeideUtstyrbase)](https://github.com/sondregronas/FeideUtstyrbase/blob/main/LICENSE)
 
-For Vågen VGS, might be possible to use for other schools with some modifications - for now this fits our needs, but will most likely not fit yours. (Work in progress, this is NOT plug and play)
+For Vågen VGS, might be possible to use for other schools with some modifications. (Work in progress, this is NOT plug and play)
 
 ## Setup
 Proper README coming soon.
 
 - Register app at Dataporten (must be approved by a Feide Administrator)
 - Set callback url to `https://<your-domain>/login/feide/callback`
-- Setup https://github.com/VaagenIM/EtikettServer (Currently not optional)
-- Only supports SMTP for now.
+- Setup https://github.com/VaagenIM/EtikettServer (currently not optional)
+- Add as many Teams webhooks as you want, they need to be comma separated in the `TEAMS_WEBHOOKS` environment variable. (using cron to send out reports - will be built in sooner or later, see `cron_examples.txt` for an example use case)
 - Run the `docker-compose.yml` file after setting up the environment variables.
 
-Must be accessed through a reverse proxy, as the server does not support https. Use something like NginxProxyManager. Port `5000` is exposed.
+Must be accessed through a reverse proxy, such as [NginxProxyManager](https://nginxproxymanager.com/).
 
-If you need a kiosk mode, set up a separate reverse proxy with a valid access control (see NgixnProxyManager) and set the `KIOSK_MODE` environment variable to the FQDN of the proxy.
+If you need a kiosk, set up a separate reverse proxy with proper access controls (limit to specified IP) and set `KIOSK_FQDN` to the FQDN of the kiosk proxy.
 
 Logo and favicon can be changed by replacing the files in `/overrides/static/` with your own within the container, requiring the mapping of the `/overrides` directory. You can also change any of the files inside `BookingSystem` by putting them in `/overrides` should you need to.
 

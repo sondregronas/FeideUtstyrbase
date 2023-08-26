@@ -39,3 +39,10 @@ def get_all() -> list[dict]:
         'event': row[2],
         'message': Markup(row[3]).unescape()
     } for row in rows]
+
+
+def get_new_deviations(since: float | int | str) -> list:
+    """Return a list of new deviations."""
+    return [a['message'] for a in get_all()
+            if parser.parse(a['timestamp']) > datetime.fromtimestamp(float(since))
+            and a['event'] == 'AVVIK']

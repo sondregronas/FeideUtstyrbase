@@ -3,7 +3,6 @@ from datetime import datetime
 import flask
 import markupsafe
 import pymsteams
-from dateutil.parser import parser
 
 import audits
 import inventory
@@ -12,28 +11,31 @@ from db import Settings
 from sanitizer import APIException
 
 
-def update_last_sent() -> None:
-    """Write the current date to 'data/last_sent.txt'."""
-    Settings.set('report_last_sent', str(datetime.now().timestamp()))
+def get_overdue_items_pairs(items: list) -> dict:
+    """Return a dictionary of overdue items grouped by lender association (in html representation)."""
+    pairs = {item.lender_association_html: [item2.html_repr()
+                                            for item2 in items
+                                            if item2.lender_association_html == item.lender_association_html]
+             for item in items}
+    return {key: pairs[key] for key in sorted(pairs) if pairs[key]}
 
 
 def formatted_overdue_items(items: list) -> str:
     """Return formatted HTML string of overdue items."""
     if not items:
         return ''
-    pairs = {item.lender_association_mail: [item2.mail_repr()
-                                            for item2 in items
-                                            if item2.lender_association_mail == item.lender_association_mail]
-             for item in items}
-    sorted_pairs = {key: pairs[key] for key in sorted(pairs) if pairs[key]}
+    pairs = get_overdue_items_pairs(items)
 
     strings = [
-        f'<table bordercolor="black" border="1"><tr style="background-color: teal; color: white;"><th><b>&nbsp;Tilhørighet: {key or "Ansatt"}</b></th></tr>\n' +
-        '\n'.join([f'<tr><td>&nbsp;{item}</td></tr>' for item in sorted_pairs[key]]) +
+        '<table bordercolor="black" border="1">' +
+        '<tr style="background-color: teal; color: white;">' +
+        f'<th><b>&nbsp;Tilhørighet: {association or "Ansatt"}</b></th>' +
+        f'</tr>\n' +
+        '\n'.join([f'<tr><td>&nbsp;{item}</td></tr>' for item in pairs[association]]) +
         f'</table><br>'
-        for key in sorted_pairs.keys()]
+        for association in pairs.keys()]
     return '\n'.join(strings) + \
-           '\n<i>Dersom du kjenner igjen utlåneren, vennligst få dem til å levere utstyret tilbake ASAP.</i>'
+           '\n<small><i>Dersom du kjenner igjen utlåneren, vennligst få dem til å levere utstyret tilbake ASAP.</i></small>'
 
 
 def formatted_new_deviations(deviations: list) -> str:
@@ -43,28 +45,30 @@ def formatted_new_deviations(deviations: list) -> str:
     return '\n'.join([f'<li><b>{markupsafe.escape(deviation)}</b></li>' for deviation in deviations])
 
 
-def generate_card(title, text, color) -> pymsteams.connectorcard:
-    """Generate a card."""
-    card = pymsteams.connectorcard(None)
+def generate_card(title, text, color, webhook=None) -> pymsteams.connectorcard:
+    """Generate a teams card."""
+    card = pymsteams.connectorcard(webhook)
     card.title(title)
     card.color(color)
     card.text(text)
     return card
 
 
-def generate_cards(webhook: str = None):
-    """Send a report to a webhook."""
+def last_sent_within_hour_treshold(debug=False) -> float | int | str:
+    """Return True if the last report was sent less than an hour ago."""
     last_sent = Settings.get('report_last_sent') or 0
-    if last_sent:
-        if datetime.now().timestamp() - float(last_sent) < 3600:
-            raise APIException('Rapport ble ikke sendt: forrige rapport ble sendt for under en time siden.', 400)
+    if last_sent and datetime.now().timestamp() - float(last_sent) < 3600:
+        raise APIException('Rapport ble ikke sendt: forrige rapport ble sendt for under en time siden.', 400)
+    Settings.set('report_last_sent', str(datetime.now().timestamp()))
+    return last_sent
 
-    update_last_sent()
 
-    overdue_items = [item for item in inventory.get_all_unavailable() if item.overdue]
-    new_deviations = [audit['message'] for audit in audits.get_all()
-                      if parser().parse(audit['timestamp']) > datetime.fromtimestamp(float(last_sent))
-                      and audit['event'] == 'AVVIK']
+def generate_cards() -> list[pymsteams.connectorcard]:
+    """Send a report to a webhook."""
+    last_sent = last_sent_within_hour_treshold()
+
+    overdue_items = inventory.get_all_overdue()
+    new_deviations = audits.get_new_deviations(since=last_sent)
 
     cards = list()
     if overdue_items:
@@ -92,7 +96,6 @@ def send_report() -> flask.Response:
         [send_card_to_hook(card, webhook)
          for webhook in TEAMS_WEBHOOKS
          for card in generate_cards()]
+        return flask.Response('Rapport ble sendt til alle konfigurerte teamskanaler!', 200)
     except pymsteams.TeamsWebhookException:
         raise APIException('Rapport ble ikke sendt: ugyldig webhook.', 400)
-    finally:
-        return flask.Response('Rapport sendt.', status=200)

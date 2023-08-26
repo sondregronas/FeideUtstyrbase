@@ -59,7 +59,7 @@
           url: "{{url_for('api.send_report')}}",
           type: 'POST',
           success: function (result) {
-            customAlert('Sendt!', 'Rapporten ble sendt ut.', 'success', true)
+            customAlert('Sendt!', result, 'success', true)
           },
           error: function (result) {
             customAlert('Info', result.responseText, 'info', true)

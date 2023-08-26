@@ -56,7 +56,7 @@ class Item:
             'last_seen': self.last_seen
         }
 
-    def mail_repr(self) -> str:
+    def html_repr(self) -> str:
         return f'<strong>{self.lender_name}: {self.id}</strong> <small>{self.name} ({self.category}, Frist: {self.order_due_date_fmt})</small>'
 
     def __str__(self) -> str:
@@ -89,10 +89,12 @@ class Item:
         return self.user.get('classroom') or 'Lærer'
 
     @property
-    def lender_association_mail(self) -> str:
+    def lender_association_html(self) -> str:
         if not self.user.get('name'):
             return 'Slettet bruker [Sjekk historikk]'
-        return self.user.get('classroom') or 'Ansatt'
+        if not self.user.get('classroom'):
+            return 'Ansatt'
+        return f'{self.classroom} (<at>{self.teacher}</at>)'
 
     @property
     def classroom(self) -> str:
