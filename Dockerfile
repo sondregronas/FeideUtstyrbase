@@ -47,18 +47,7 @@ RUN echo  \
     pip install -r requirements.txt && \
     cp -r /FeideUtstyrbase/BookingSystem/* /app" > /usr/local/bin/auto-update.sh
 
-# Entrypoint (Update / run)
-RUN echo  \
-    "if [ \"\$AUTO_UPDATE\" = \"True\" ]; then \
-      echo \"Auto update enabled\" && \
-      sh /usr/local/bin/auto-update.sh; \
-    else \
-      echo \"Auto update disabled (AUTO_UPDATE not True)\"; \
-    fi && \
-    if [ -d \"/overrides\" ]; then \
-      cp -r /overrides/* /app; \
-    fi && \
-    gunicorn -b 0.0.0.0:5000 app:app" > /usr/local/bin/entrypoint.sh
+COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 
 EXPOSE 5000
 WORKDIR /app
