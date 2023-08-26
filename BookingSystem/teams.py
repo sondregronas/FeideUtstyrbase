@@ -28,7 +28,7 @@ def formatted_overdue_items(items: list) -> str:
     sorted_pairs = {key: pairs[key] for key in sorted(pairs) if pairs[key]}
 
     strings = [
-        f'<table bordercolor="black" border="1"><tr style="background-color: teal; color: white;"><th><b>&nbsp;{key or "Ansatt"}</b></th></tr>\n' +
+        f'<table bordercolor="black" border="1"><tr style="background-color: teal; color: white;"><th><b>&nbsp;Tilhørighet: {key or "Ansatt"}</b></th></tr>\n' +
         '\n'.join([f'<tr><td>&nbsp;{item}</td></tr>' for item in sorted_pairs[key]]) +
         f'</table><br>'
         for key in sorted_pairs.keys()]
@@ -43,39 +43,56 @@ def formatted_new_deviations(deviations: list) -> str:
     return '\n'.join([f'<li><b>{markupsafe.escape(deviation)}</b></li>' for deviation in deviations])
 
 
-def send_report_to_hook(webhook: str = None):
+def generate_card(title, text, color) -> pymsteams.connectorcard:
+    """Generate a card."""
+    card = pymsteams.connectorcard(None)
+    card.title(title)
+    card.color(color)
+    card.text(text)
+    return card
+
+
+def generate_cards(webhook: str = None):
     """Send a report to a webhook."""
     last_sent = Settings.get('report_last_sent') or 0
     if last_sent:
         if datetime.now().timestamp() - float(last_sent) < 3600:
             raise APIException('Rapport ble ikke sendt: forrige rapport ble sendt for under en time siden.', 400)
 
+    update_last_sent()
+
     overdue_items = [item for item in inventory.get_all_unavailable() if item.overdue]
     new_deviations = [audit['message'] for audit in audits.get_all()
                       if parser().parse(audit['timestamp']) > datetime.fromtimestamp(float(last_sent))
                       and audit['event'] == 'AVVIK']
 
+    cards = list()
     if overdue_items:
-        report = pymsteams.connectorcard(webhook)
-        report.title('Overskredet lån')
-        report.text(formatted_overdue_items(overdue_items))
-        report.send()
+        cards.append(generate_card(title='Overskredet lån',
+                                   text=formatted_overdue_items(overdue_items),
+                                   color='FFA500'))
     if new_deviations:
-        report = pymsteams.connectorcard(webhook)
-        report.title('Nye avvik')
-        report.text(formatted_new_deviations(new_deviations))
-        report.send()
+        cards.append(generate_card(title='Nye avvik',
+                                   text=formatted_new_deviations(new_deviations),
+                                   color='FF0000'))
+    return cards
 
-    update_last_sent()
+
+def send_card_to_hook(card: pymsteams.connectorcard, webhook: str) -> None:
+    """Send a card to a webhook."""
+    card.newhookurl(webhook)
+    card.send()
 
 
 def send_report() -> flask.Response:
     """Send a report card to all webhooks in TEAMS_WEBHOOKS."""
     if TEAMS_WEBHOOKS == ['']:
         raise APIException('Rapport ble ikke sendt: webhooks er ikke konfigurert', 400)
-    for webhook in TEAMS_WEBHOOKS:
-        try:
-            send_report_to_hook(webhook)
-            return flask.Response('Rapport sendt!', status=200)
-        except pymsteams.TeamsWebhookException:
-            raise APIException('Rapport ble ikke sendt: ugyldig webhook.', 400)
+    try:
+        [send_card_to_hook(card, webhook)
+         for webhook in TEAMS_WEBHOOKS
+         for card in generate_cards()]
+    except pymsteams.TeamsWebhookException:
+        raise APIException('Rapport ble ikke sendt: ugyldig webhook.', 400)
+    finally:
+        return flask.Response('Rapport sendt.', status=200)
