@@ -54,7 +54,7 @@ def generate_card(title, text, color, webhook=None) -> pymsteams.connectorcard:
     return card
 
 
-def last_sent_within_hour_treshold(debug=False) -> float | int | str:
+def last_sent_within_hour_treshold() -> float | int | str:
     """Return True if the last report was sent less than an hour ago."""
     last_sent = Settings.get('report_last_sent') or 0
     if last_sent and datetime.now().timestamp() - float(last_sent) < 3600:
