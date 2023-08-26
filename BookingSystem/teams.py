@@ -27,14 +27,16 @@ def formatted_overdue_items(items: list) -> str:
     pairs = get_overdue_items_pairs(items)
 
     strings = [
-        '<table bordercolor="black" border="1">' +
+        '<table bordercolor="black" border="1" style="width: 100%;">' +
         '<tr style="background-color: teal; color: white;">' +
-        f'<th><b>&nbsp;Tilhørighet: {association or "Ansatt"}</b></th>' +
+        f'<th>&nbsp;Tilhørighet: {association or "Ansatt"}</th>' +
         f'</tr>\n' +
         '\n'.join([f'<tr><td>&nbsp;{item}</td></tr>' for item in pairs[association]]) +
-        f'</table><br>'
+        f'</table>'
         for association in pairs.keys()]
-    return '\n'.join(strings) + \
+    return '<blockquote style="border-color: #FF0000;">' + \
+           '<br>'.join(strings) + \
+           '</blockquote>' + \
            '\n<small><i>Dersom du kjenner igjen utlåneren, vennligst få dem til å levere utstyret tilbake ASAP.</i></small>'
 
 
@@ -42,7 +44,10 @@ def formatted_new_deviations(deviations: list) -> str:
     """Return formatted HTML string of new deviations."""
     if not deviations:
         return ''
-    return '\n'.join([f'<li><b>{markupsafe.escape(deviation)}</b></li>' for deviation in deviations])
+    return '<blockquote style="border-color: #FF0000;">' + \
+           '<br>'.join([f'{markupsafe.escape(deviation)}' for deviation in deviations]) + \
+           '</blockquote>' + \
+           '<small><i><b>NB:</b> Avvik må registreres manuelt i notatblokken (inntil videre), jeg kan kun varsle om nye avvik.</i></small>'
 
 
 def generate_card(title, text, color, webhook=None) -> pymsteams.connectorcard:
@@ -72,13 +77,13 @@ def generate_cards() -> list[pymsteams.connectorcard]:
 
     cards = list()
     if overdue_items:
-        cards.append(generate_card(title='Overskredet lån',
+        cards.append(generate_card(title='Utlån på overtid',
                                    text=formatted_overdue_items(overdue_items),
                                    color='FFA500'))
     if new_deviations:
-        cards.append(generate_card(title='Nye avvik',
+        cards.append(generate_card(title='Nye avvik som krever oppfølging',
                                    text=formatted_new_deviations(new_deviations),
-                                   color='FF0000'))
+                                   color='FFA500'))
     return cards
 
 

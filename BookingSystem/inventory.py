@@ -57,7 +57,8 @@ class Item:
         }
 
     def html_repr(self) -> str:
-        return f'<strong>{self.lender_name}: {self.id}</strong> <small>{self.name} ({self.category}, Frist: {self.order_due_date_fmt})</small>'
+        return f'<strong>{self.lender_name}: </strong> {self.id}' \
+               f'<br><small>({self.name}, {self.category}, Frist: {self.order_due_date_fmt})</small>'
 
     def __str__(self) -> str:
         if self.order_due_date:
