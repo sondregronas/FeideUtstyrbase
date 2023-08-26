@@ -9,11 +9,7 @@ if [ -d "/overrides" ]; then
   cp -r /overrides/* /app;
 fi
 
-shutdown() {
-  kill -TERM $PID && wait $PID
-}
-
-trap "shutdown" TERM
+trap 'kill -TERM $PID && wait $PID && echo "SIGTERM received, exiting." && exit 0' TERM INT
 
 gunicorn --bind 0.0.0.0:5000 app:app &
 PID=$!
