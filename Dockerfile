@@ -44,7 +44,7 @@ RUN git clone https://github.com/sondregronas/FeideUtstyrbase &&  \
 RUN echo  \
     "cd /FeideUtstyrbase && \
     git pull && \
-    pip install -r requirements.txt && \
+    pip install -q -r requirements.txt && \
     cp -r /FeideUtstyrbase/BookingSystem/* /app" > /usr/local/bin/auto-update.sh
 
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
