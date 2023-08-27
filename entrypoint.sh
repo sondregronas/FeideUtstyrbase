@@ -15,5 +15,5 @@ run_app() {
   wait $PID
 }
 
-trap 'kill -TERM $PID && wait $PID && echo "SIGTERM received, exiting." && run_app' TERM
+trap 'kill -TERM $PID && wait $PID && echo "SIGTERM received, exiting." && run_app' TERM HUP INT
 run_app
