@@ -10,7 +10,7 @@ run_app() {
     cp -r /overrides/* /app;
   fi
 
-  gunicorn --bind 0.0.0.0:5000 app:app &
+  gunicorn --bind 0.0.0.0:5000 -t 60 app:app &
   PID=$!
   wait $PID
 }
