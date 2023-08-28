@@ -27,6 +27,7 @@ services:
 
       # Teams Webhooks (for sending notifications to teams channel) - comma separated
       - TEAMS_WEBHOOKS=
+      - TEAMS_WEBHOOKS_DEVIATIONS=
 
       # Reverse proxy for kiosk mode (No login, all visitors are administrators
       # If you don't know what this is, leave it blank

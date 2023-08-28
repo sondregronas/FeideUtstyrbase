@@ -6,7 +6,7 @@ import pymsteams
 
 import audits
 import inventory
-from __init__ import TEAMS_WEBHOOKS
+from __init__ import TEAMS_WEBHOOKS, TEAMS_WEBHOOKS_DEVIATIONS
 from db import Settings
 from sanitizer import APIException
 
@@ -68,19 +68,18 @@ def last_sent_within_hour_treshold() -> float | int | str:
     return last_sent
 
 
-def generate_cards() -> list[pymsteams.connectorcard]:
+def generate_cards(last_sent: float | int | str, overdue: bool = True, deviations: bool = True) -> list[
+    pymsteams.connectorcard]:
     """Send a report to a webhook."""
-    last_sent = last_sent_within_hour_treshold()
-
     overdue_items = inventory.get_all_overdue()
     new_deviations = audits.get_new_deviations(since=last_sent)
 
     cards = list()
-    if overdue_items:
+    if overdue_items and overdue:
         cards.append(generate_card(title='Utlån på overtid',
                                    text=formatted_overdue_items(overdue_items),
                                    color='FFA500'))
-    if new_deviations:
+    if new_deviations and deviations:
         cards.append(generate_card(title='Nye avvik som krever oppfølging',
                                    text=formatted_new_deviations(new_deviations),
                                    color='FFA500'))
@@ -95,12 +94,23 @@ def send_card_to_hook(card: pymsteams.connectorcard, webhook: str) -> None:
 
 def send_report() -> flask.Response:
     """Send a report card to all webhooks in TEAMS_WEBHOOKS."""
+    last_sent = last_sent_within_hour_treshold()
+    o_hooks = TEAMS_WEBHOOKS
+    d_hooks = TEAMS_WEBHOOKS_DEVIATIONS
+    if d_hooks == ['']:
+        d_hooks = o_hooks
     if TEAMS_WEBHOOKS == ['']:
         raise APIException('Rapport ble ikke sendt: webhooks er ikke konfigurert', 400)
     try:
+        # Overdue cards are sent to TEAMS_WEBHOOKS
         [send_card_to_hook(card, webhook)
-         for webhook in TEAMS_WEBHOOKS
-         for card in generate_cards()]
+         for webhook in o_hooks
+         for card in generate_cards(last_sent, overdue=True, deviations=False)]
+        # Deviation cards are sent to a separate webhook (if configured)
+        [send_card_to_hook(card, webhook)
+         for webhook in d_hooks
+         for card in generate_cards(last_sent, overdue=False, deviations=True)]
+        # Return 200 OK
         return flask.Response('Rapport ble sendt til alle konfigurerte teamskanaler!', 200)
     except pymsteams.TeamsWebhookException:
         raise APIException('Rapport ble ikke sendt: ugyldig webhook.', 400)

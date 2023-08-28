@@ -22,6 +22,7 @@ ENV LABEL_SERVER='https://<fqdn-label>'
 
 # Teams webhooks (comma separated)
 ENV TEAMS_WEBHOOKS=''
+ENV TEAMS_WEBHOOKS_DEVIATIONS=''
 
 # Kiosk (Admin access without login) (FQDN)
 ENV KIOSK_FQDN=''
