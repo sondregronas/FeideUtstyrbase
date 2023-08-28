@@ -1,4 +1,5 @@
 from datetime import datetime
+from multiprocessing import Process
 
 import flask
 import markupsafe
@@ -89,28 +90,28 @@ def generate_cards(last_sent: float | int | str, overdue: bool = True, deviation
 def send_card_to_hook(card: pymsteams.connectorcard, webhook: str) -> None:
     """Send a card to a webhook."""
     card.newhookurl(webhook)
-    card.send()
+    p = Process(target=card.send)
+    p.start()
 
 
 def send_report() -> flask.Response:
     """Send a report card to all webhooks in TEAMS_WEBHOOKS."""
     last_sent = last_sent_within_hour_treshold()
-    o_hooks = TEAMS_WEBHOOKS
-    d_hooks = TEAMS_WEBHOOKS_DEVIATIONS
-    if d_hooks == ['']:
-        d_hooks = o_hooks
+
     if TEAMS_WEBHOOKS == ['']:
         raise APIException('Rapport ble ikke sendt: webhooks er ikke konfigurert', 400)
-    try:
-        # Overdue cards are sent to TEAMS_WEBHOOKS
-        [send_card_to_hook(card, webhook)
-         for webhook in o_hooks
-         for card in generate_cards(last_sent, overdue=True, deviations=False)]
-        # Deviation cards are sent to a separate webhook (if configured)
-        [send_card_to_hook(card, webhook)
-         for webhook in d_hooks
-         for card in generate_cards(last_sent, overdue=False, deviations=True)]
-        # Return 200 OK
-        return flask.Response('Rapport ble sendt til alle konfigurerte teamskanaler!', 200)
-    except pymsteams.TeamsWebhookException:
-        raise APIException('Rapport ble ikke sendt: ugyldig webhook.', 400)
+    deviation_webhooks = TEAMS_WEBHOOKS_DEVIATIONS if TEAMS_WEBHOOKS_DEVIATIONS != [''] else TEAMS_WEBHOOKS
+
+    # Overdue cards are sent to TEAMS_WEBHOOKS
+    [send_card_to_hook(card, webhook)
+     for webhook in TEAMS_WEBHOOKS
+     for card in generate_cards(last_sent, overdue=True, deviations=False)]
+
+    # Deviation cards are sent to a separate webhook (if configured)
+    [send_card_to_hook(card, webhook)
+     for webhook in deviation_webhooks
+     for card in generate_cards(last_sent, overdue=False, deviations=True)]
+
+    # Return 200 OK (even if no cards exceptions are raised and no cards were sent,
+    #                since this is strictly speaking not an error as far as the API is concerned)
+    return flask.Response('Rapport ble sendt til alle konfigurerte teamskanaler!', 200)
