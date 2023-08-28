@@ -84,7 +84,7 @@ def get_deviation_card(new_deviations: list) -> pymsteams.connectorcard:
 
 
 def send_card_to_hooks(card: pymsteams.connectorcard, webhooks: list[str]) -> None:
-    """Send a card to a webhook."""
+    """Send a card to all webhooks."""
     for webhook in webhooks:
         card.newhookurl(webhook)
         Process(target=card.send).start()
