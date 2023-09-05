@@ -5,6 +5,7 @@ from urllib.parse import urlparse
 import flask
 from dateutil import parser
 from flask_minify import Minify
+from flask_session import Session
 from werkzeug.middleware.proxy_fix import ProxyFix
 
 import api
@@ -16,7 +17,6 @@ import routes
 import user
 from __init__ import logger, REGEX_ID, REGEX_ITEM, MIN_DAYS, MAX_DAYS, MIN_LABELS, MAX_LABELS
 from db import init_db, Settings
-from flask_session import Session
 
 
 def create_app() -> flask.Flask:
@@ -48,6 +48,10 @@ def create_app() -> flask.Flask:
     @app.template_filter('strfunixtime')
     def _jinja2_filter_strftime(date, fmt='%d.%m.%Y') -> str:
         return datetime.fromtimestamp(float(date)).strftime(fmt)
+
+    @app.template_filter('unixtime')
+    def _jinja2_filter_unixtime(date) -> int:
+        return int(parser.parse(date, dayfirst=True).timestamp())
 
     @app.template_filter('split')
     def _jinja2_filter_split(string, split_char=',') -> list:

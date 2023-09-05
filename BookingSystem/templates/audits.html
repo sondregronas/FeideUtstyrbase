@@ -72,7 +72,7 @@
         <tbody>
         {% for audit in audits %}
             <tr>
-                <td>{{ audit.timestamp }}</td>
+                <td data-sort="{{ audit.timestamp | unixtime }}">{{ audit.timestamp }}</td>
                 <td>{{ audit.event }}</td>
                 <td>{{ audit.message }}</td>
             </tr>
