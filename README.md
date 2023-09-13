@@ -56,3 +56,4 @@ JS/CSS libraries are used:
 - [jquery-confirm](https://craftpip.github.io/jquery-confirm/)
 - [Font Awesome](https://fontawesome.com/)
 - [Tom Select](https://tom-select.js.org/)
+- [html5-qrcode](https://github.com/mebjas/html5-qrcode)
