@@ -96,6 +96,12 @@ def innlevering() -> str:
     return flask.render_template('innlevering.html')
 
 
+@app.route('/varetelling')
+@login_required(admin_only=True)
+def varetelling() -> str:
+    return flask.render_template('varetelling.html')
+
+
 @app.route('/registrer_avvik')
 @login_required(admin_only=True)
 def registrer_avvik() -> str:

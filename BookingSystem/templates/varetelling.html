@@ -1,0 +1,88 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+    <div id="qr-reader" style="width:100%; overflow:hidden;"></div>
+    <hgroup>
+        <h2>Varetelling på mobil</h2>
+        <h3>Pek mobilen på utstyrets QR kode for å automatisk skanne inn utstyr som er på lager</h3>
+    </hgroup>
+
+    <button onclick="start()" id="start-qr-btn">Start kamera</button>
+
+    <article>
+        <h2>Hvordan vet man hva som mangler?</h2>
+        På inventar siden kan man sortere etter 'Sist sett' i revers og få opp det som ikke er blitt skannet.
+        Dette vil være en god indikasjon på hvilket utstyr som mangler, som bør sjekkes etter en varetelling.
+        <br>
+        <br>
+        Oppdater man avvik er det være lurt <a href="{{ url_for('app.registrer_avvik') }}">å registrere dette</a>,
+        og eventuelt slette utstyret fra databasen om det ikke lenger er i bruk (rediger -> slett).
+    </article>
+
+    <script src="/static/js/html5-qrcode.min.js"></script>
+    <script>
+      let lastResult = 0;
+
+      const startBtn = $('#start-qr-btn');
+      const reader = $('#qr-reader');
+      const html5QrCode = new Html5Qrcode("qr-reader");
+
+      const onScanSuccess = (decodedText, _) => {
+        if (decodedText !== lastResult) {
+          lastResult = decodedText;
+          url = "{{ url_for('api.return_equipment', item_id='REPLACE_ME') }}";
+          url = url.replace('REPLACE_ME', decodedText);
+          $.ajax({
+            url: url,
+            type: 'POST',
+            success: function (result) {
+              iziToast.success({
+                title: 'Suksess!',
+                message: `<i>${decodedText}</i> ble registrert`,
+              })
+            },
+            error: function (result) {
+              iziToast.error({
+                title: 'Feil!',
+                message: result.responseText,
+              })
+            }
+          });
+        }
+      }
+
+      function start() {
+        html5QrCode.start(
+          {facingMode: {exact: "environment"}}, {fps: 10, qrbox: 250}, onScanSuccess
+        ).then(_ => {
+          startBtn.text('Stopp kamera');
+          startBtn.attr('onclick', 'stop()');
+          reader.css('margin-bottom', '1rem');
+        }).catch(_ => {
+          $.confirm({
+            title: "Klarte ikke starte kamera",
+            content: "Har du gitt tilgang? (Denne siden er kun for mobil)",
+            type: 'orange',
+            icon: 'fa fa-camera',
+            buttons: {
+              confirm: {
+                text: 'Gå til manuell registrering',
+                btnClass: 'btn-blue',
+                action: function () {
+                  window.location.href = "{{ url_for('app.innlevering') }}";
+                }
+              }
+            }
+          });
+        });
+      }
+
+      function stop() {
+        html5QrCode.stop().then(ignore => {
+          startBtn.text('Start kamera');
+          startBtn.attr('onclick', 'start()');
+          reader.css('margin-bottom', '0rem');
+        });
+      }
+    </script>
+{% endblock %}
