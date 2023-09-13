@@ -7,10 +7,6 @@
         <h3>Dersom du er forvirret av denne siden, så kan du trygt forlate den :)</h3>
     </hgroup>
 
-    <a href="{{ url_for('app.varetelling') }}">
-        <button>Varetelling</button>
-    </a>
-
     {% if last_sent %}
         <a onclick="sendReport()">
             <button id="send-report--btn">Send rapport (Sist sendt {{ last_sent | strfunixtime }})</button>
