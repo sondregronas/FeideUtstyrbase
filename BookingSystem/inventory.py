@@ -72,6 +72,19 @@ class Item:
         return parser.parse(self.order_due_date).strftime('%d.%m.%Y')
 
     @property
+    def last_seen_td_html(self) -> str:
+        if not self.last_seen:
+            return ''
+        parsed = parser.parse(self.last_seen)
+        # Show last seen within 3hrs as new (color in table)
+        within_3hrs = 'class="last-seen-new"' if parsed > datetime.now() - timedelta(hours=3) else ''
+        # 1yr = 1 school year (300 days) (color in table)
+        over_1yr = 'class="last-seen-old"' if parsed < datetime.now() - timedelta(days=300) else ''
+        inject_class = f'{within_3hrs}{over_1yr}'
+        # Construct HTML
+        return f"<td data-sort=\"{self.last_seen}\"{inject_class}>{parsed.strftime('%d.%m.%Y')}</td>"
+
+    @property
     def user(self) -> dict:
         if self.borrowed_to is None:
             return {}

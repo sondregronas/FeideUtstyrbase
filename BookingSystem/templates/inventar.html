@@ -37,7 +37,7 @@
                 <td>{{ item.id }}</td>
                 <td>{{ item.name }}</td>
                 <td>{{ item.category }}</td>
-                <td>{{ item.last_seen }}</td>
+                {{ item.last_seen_td_html | safe }}
                 <td>
                     {% if item.available %}
                         <a href="{{ url_for('app.edit_item', item_id=item.id) }}">Rediger</a>
