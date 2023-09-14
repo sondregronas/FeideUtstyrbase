@@ -8,6 +8,24 @@
 
 <script>
   $(document).ready(function () {
+    $.confirm({
+      title: 'Gå gjennom utstyret før innlevering!',
+      content: '<li>Se gjennom vesker/etui - bekreft at alt er på plass<br>' +
+        '<li>Sjekk minnekort og annet medfølgende tilbehør<br>' +
+        '<li>Sett eventuelle batterier til lading<br>' +
+        '<br>' +
+        '<b>Eventuelle avvik skal registreres.</b>',
+      type: 'orange',
+      icon: 'fa fa-exclamation-triangle',
+      buttons: {
+        ok: {
+          text: 'Den er grei!',
+          btnClass: 'btn-blue',
+          action: function () {
+          }
+        }
+      }
+    })
     $('#id').focus();
     $('form').submit(function (event) {
       event.preventDefault();
