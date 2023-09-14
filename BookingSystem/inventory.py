@@ -76,13 +76,20 @@ class Item:
         if not self.last_seen:
             return ''
         parsed = parser.parse(self.last_seen)
-        # Show last seen within 3hrs as new (color in table)
-        within_3hrs = 'class="last-seen-new"' if parsed > datetime.now() - timedelta(hours=3) else ''
-        # 1yr = 1 school year (300 days) (color in table)
-        over_1yr = 'class="last-seen-old"' if parsed < datetime.now() - timedelta(days=300) else ''
-        inject_class = f'{within_3hrs}{over_1yr}'
+        now = datetime.now()
+        innertext = parsed.strftime('%d.%m.%Y')
+
+        # Modify text and class if necessary (recently seen, stale)
+        inject_class = ''
+        if parsed > now - timedelta(hours=3):
+            innertext = 'Nå nettopp'
+            inject_class = ' class="last-seen-recent"'
+        elif parsed < now - timedelta(days=300):  # School year is ~300 days (10 months)
+            innertext += ' <i class="fa fa-warning"></i>'
+            inject_class = ' class="last-seen-stale"'
+
         # Construct HTML
-        return f"<td data-sort=\"{self.last_seen}\"{inject_class}>{parsed.strftime('%d.%m.%Y')}</td>"
+        return f'<td data-sort="{self.last_seen}"{inject_class}>{innertext}</td>'
 
     @property
     def user(self) -> dict:
