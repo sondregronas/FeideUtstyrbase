@@ -305,3 +305,24 @@ def register_in(item_id: str) -> None:
         con.close()
     _update_last_seen(item_id)
     audits.audit('REG_IN', f'{item_id} er nå tilgjengelig.')
+
+
+def postpone_due_date(item_id: str, days: int) -> None:
+    """Postpone the due date of the item with the given ID by the given number of days."""
+    item = get(item_id)
+    if item.available:
+        raise APIException(f'{item_id} er ikke utlånt.')
+    due_date = datetime.now() + timedelta(days=days)
+
+    con = sqlite3.connect(DATABASE)
+    try:
+        sql = 'UPDATE inventory SET order_due_date=:order_due_date WHERE id=:id'
+        con.execute(sql, {'id': item_id, 'order_due_date': due_date})
+        con.commit()
+        logger.info(f'{item_id} har fått utsatt frist til {due_date}.')
+    except sqlite3.IntegrityError:
+        logger.error(f'{item_id} eksisterer ikke. (postpone)')
+        raise APIException(f'{item_id} eksisterer ikke.')
+    finally:
+        con.close()
+    audits.audit('POSTPONE', f'{item_id} har fått utsatt frist til {due_date:%d.%m.%Y} ({item.lender}).')

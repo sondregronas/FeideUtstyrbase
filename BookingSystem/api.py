@@ -170,6 +170,25 @@ def book_equipment() -> flask.Response:
     return flask.Response(f'Utstyret ble utlevert til {user.get(userid).get("name")}.', status=200)
 
 
+@api.route('/book/postpone', methods=['POST'])
+@login_required(admin_only=True)
+@handle_api_exception
+def postpone_due_date() -> flask.Response:
+    """Postpone the due date for an item."""
+    # START: Validation
+    validation_map = {
+        'item_id': VALIDATORS.ID,
+        'days': VALIDATORS.INT,
+        'days_minmax': MINMAX(MIN_DAYS, MAX_DAYS),
+    }
+    form = sanitize(validation_map, flask.request.form)
+    # END: Validation
+    item_id = form.get('item_id')
+    days = int(form.get('days'))
+    inventory.postpone_due_date(item_id=item_id, days=days)
+    return flask.Response(f'Fristen for {item_id} ble utsatt med {days} {"dager" if days > 1 else "dag"}.', status=200)
+
+
 @api.route('/return/<item_id>', methods=['POST'])
 @login_required(admin_only=True)
 @handle_api_exception

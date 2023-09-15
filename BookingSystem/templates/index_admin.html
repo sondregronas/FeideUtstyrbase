@@ -27,31 +27,38 @@
     </a>
 
     {% if overdue_items %}
-        <br><br>
-        <center>
-            <h4>
-                Overskredet utstyr:
-            </h4>
-        </center>
-        <table id="active">
-            <thead>
-            <tr>
-                <th>Løpenummer</th>
-                <th>Utstyr</th>
-                <th>Utlånt til</th>
-                <th>Frist for levering</th>
-            </thead>
-            <tbody>
-            {% for item in overdue_items %}
-                <tr class="item-row item-row--overdue">
-                    <td>{{ item.id }}</td>
-                    <td>{{ item.name }} ({{ item.category }})</td>
-                    <td>{{ item.lender_name }} <small> ({{ item.classroom }}{% if item.teacher %},
-                        {{ item.teacher }}{% endif %})</small></td>
-                    <td>{{ item.order_due_date|strftime }}</td>
-                </tr>
-            {% endfor %}
-        </table>
+        <div id="overdue_items">
+            <br><br>
+            <center>
+                <h4>
+                    Overskredet utstyr:
+                </h4>
+            </center>
+            <table id="active">
+                <thead>
+                <tr>
+                    <th>Løpenummer</th>
+                    <th>Utstyr</th>
+                    <th>Utlånt til</th>
+                    <th>Frist for levering</th>
+                    <th>Alternativer</th>
+                </thead>
+                <tbody>
+                {% for item in overdue_items %}
+                    <tr class="item-row item-row--overdue">
+                        <td>{{ item.id }}</td>
+                        <td>{{ item.name }} ({{ item.category }})</td>
+                        <td>{{ item.lender_name }} <small> ({{ item.classroom }}{% if item.teacher %},
+                            {{ item.teacher }}{% endif %})</small></td>
+                        <td>{{ item.order_due_date|strftime }}</td>
+                        <td>
+                            <a onclick="postpone('{{ item.id }}', '{{ item.lender }}', this.parentNode.parentNode)">Utsett
+                                frist</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
     {% endif %}
 
     <script>
@@ -77,6 +84,66 @@
           "lengthMenu": [[25, 50, -1], [25, 50, "Alle"]],
         });
       });
+
+      function postpone(id, lender, node) {
+        $.confirm({
+          title: `Utsett levering av '${id}'`,
+          type: 'blue',
+          icon: 'fa fa-calendar-plus-o',
+          content: `<i>Lånt til ${lender}</i>` +
+            '<br><br>Utlånsfristen kan utsettes opp til 7 dager, kontaktlærer bør varsles om utsettelsen før den gjennomføres.',
+          buttons: {
+            oneDay: {
+              text: '1 dag',
+              btnClass: 'btn-blue',
+              action: function () {
+                submitPostpone(id, lender, node, 1)
+              }
+            },
+            threeDays: {
+              text: '3 dager',
+              btnClass: 'btn-blue',
+              action: function () {
+                submitPostpone(id, lender, node, 3)
+              }
+            },
+            sevenDays: {
+              text: '1 uke',
+              btnClass: 'btn-blue',
+              action: function () {
+                submitPostpone(id, lender, node, 7)
+              }
+            },
+          },
+        })
+      }
+
+      function submitPostpone(id, lender, tr, days) {
+        $.ajax({
+          url: "{{ url_for('api.postpone_due_date') }}",
+          data: {
+            item_id: id,
+            days: days
+          },
+          type: 'POST',
+          success: function (response, status) {
+            iziToast.success({
+              title: 'Utsetter levering',
+              message: response
+            });
+            tr.remove();
+            if ($('.item-row').length === 0) {
+              $('#overdue_items').remove();
+            }
+          },
+          error: function (response, status) {
+            iziToast.error({
+              title: 'Feil',
+              message: response.responseText,
+            });
+          }
+        })
+      }
     </script>
 
 {% endblock %}

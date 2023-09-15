@@ -46,6 +46,7 @@ class MINMAX:
 
 def _sanitize_form(sanitization_map: dict[any: VALIDATORS | MINMAX], form, data: dict = dict) -> bool:
     """Sanitize a form based on a sanitization map."""
+
     def id_pattern(fkey: str) -> bool:
         # Check if the ID/name is valid
         r = re.compile(REGEX_ID)
@@ -152,8 +153,8 @@ def _sanitize_form(sanitization_map: dict[any: VALIDATORS | MINMAX], form, data:
             # Check if the value is between the min and max
             mn, mx = sanitizer
             if not mn <= int(form.get(key[:-7])) <= mx:
-                logger.debug(f'Invalid minmax for {key} ({form.get(key)})')
-                raise APIException(f'Tallverdien er ikke mellom {mn} og {mx} ({form.get(key)})')
+                logger.debug(f'Invalid minmax for {key} ({form.get(key[:-7])})')
+                raise APIException(f'Tallverdien er ikke mellom {mn} og {mx} ({form.get(key[:-7])})')
 
         # Passed all checks!
         logger.debug(f'Validated {key} ({sanitizer}, {form.get(key)})')
