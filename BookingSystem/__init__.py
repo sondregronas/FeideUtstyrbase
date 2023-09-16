@@ -30,7 +30,7 @@ MAX_LABELS = int(os.getenv('MAX_LABELS', 10))
 DEBUG = os.getenv('DEBUG', '').lower() == 'true'
 MOCK_DATA = os.getenv('MOCK_DATA', '').lower() == 'true'
 if MOCK_DATA:
-    DATABASE = Path('data') / 'db_mock.sqlite'
+    DATABASE = 'file:memdb1?mode=memory&cache=shared'
 
 # Logger setup
 logger = Logger(__name__)
