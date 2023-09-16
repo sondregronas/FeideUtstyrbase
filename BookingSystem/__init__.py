@@ -30,7 +30,12 @@ MAX_LABELS = int(os.getenv('MAX_LABELS', 10))
 DEBUG = os.getenv('DEBUG', '').lower() == 'true'
 MOCK_DATA = os.getenv('MOCK_DATA', '').lower() == 'true'
 if MOCK_DATA:
-    DATABASE = 'file:memdb1?mode=memory&cache=shared'
+    import platform
+
+    if platform.system() == 'Windows':
+        DATABASE = 'file:memory?mode=memory&cache=shared'
+    else:
+        DATABASE = 'file::memory:?cache=shared'
 
 # Logger setup
 logger = Logger(__name__)
