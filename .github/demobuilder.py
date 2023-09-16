@@ -86,12 +86,12 @@ def generate_demo():
                 if link == '/':
                     path = 'index.html'
                 else:
-                    path = link[1:].replace('/', '\\')
+                    path = link[1:]
                     if '.' not in path:
-                        path += '\\index.html'
+                        path += '/index.html'
 
                 os.makedirs(os.path.dirname(f'demo/{path}'), exist_ok=True)
-                with open(f'demo\\{path}', 'w+', encoding='utf-8') as f:
+                with open(f'demo/{path}', 'w+', encoding='utf-8') as f:
                     f.write(html)
                     abspath = os.path.abspath(f.name)
                     print(f'Wrote {abspath}')
