@@ -47,6 +47,10 @@ def get_html(url):
     for s in skipped:
         html = html.replace(s, '#')
 
+    # Prepend every relative link for GitHub Pages
+    html = html.replace('href="/', 'href="/FeideUtstyrbase/')
+    html = html.replace('src="/', 'src="/FeideUtstyrbase/')
+
     return html
 
 
@@ -89,6 +93,8 @@ def generate_demo():
                 os.makedirs(os.path.dirname(f'demo/{path}'), exist_ok=True)
                 with open(f'demo\\{path}', 'w+', encoding='utf-8') as f:
                     f.write(html)
+                    abspath = os.path.abspath(f.name)
+                    print(f'Wrote {abspath}')
 
 
 def set_demo_bulletin():
@@ -107,7 +113,7 @@ if __name__ == '__main__':
     p = Process(target=launch_app)
     p.start()
     # Wait for the app to start
-    time.sleep(10)
+    time.sleep(5)
     set_demo_bulletin()
     generate_demo()
     p.terminate()
