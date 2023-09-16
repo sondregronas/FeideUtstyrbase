@@ -6,7 +6,6 @@ Filtering and sorting should be done on the frontend, not the backend.
 """
 import os
 import shutil
-import sqlite3
 from datetime import datetime
 
 import flask
@@ -14,6 +13,7 @@ import markupsafe
 import requests
 
 import audits
+import db
 import inventory
 import teams
 import user
@@ -210,9 +210,6 @@ def get_user(userid: str) -> flask.Response:
 @login_required()
 def register_student() -> flask.Response:
     """Add/update a class in the database."""
-    con = sqlite3.connect(DATABASE)
-    cur = con.cursor()
-
     selected_classroom = flask.request.form.get('classroom')
     try:
         sanitize({'classroom': VALIDATORS.GROUP}, {'classroom': selected_classroom})
@@ -227,12 +224,13 @@ def register_student() -> flask.Response:
         'updated_at': datetime.now().isoformat(),
         'expires_at': next_july().isoformat()
     }
-    cur.execute(
-        'REPLACE INTO users (name, email, userid, classroom, updated_at, expires_at) '
-        'VALUES (:name, :email, :userid, :classroom, :updated_at, :expires_at)',
-        data)
-    con.commit()
-    con.close()
+
+    with db.connect() as (con, cur):
+        cur.execute(
+            'REPLACE INTO users (name, email, userid, classroom, updated_at, expires_at) '
+            'VALUES (:name, :email, :userid, :classroom, :updated_at, :expires_at)',
+            data)
+
     return flask.redirect(flask.request.referrer)
 
 
@@ -248,16 +246,13 @@ def update_groups() -> flask.Response:
         sanitize({'group': VALIDATORS.GROUP_NAME}, {'group': group.strip()})
         new_groups.append(group.strip())
 
-    con = sqlite3.connect(DATABASE)
-    cur = con.cursor()
-    # noinspection SqlWithoutWhere
-    cur.execute('DELETE FROM groups')
-    con.commit()
-    for group in new_groups:
-        cur.execute('INSERT INTO groups (classroom) VALUES (?)', (group,))
+    with db.connect() as (con, cur):
+        # noinspection SqlWithoutWhere
+        cur.execute('DELETE FROM groups')
+        con.commit()
+        for group in new_groups:
+            cur.execute('INSERT INTO groups (classroom) VALUES (?)', (group,))
 
-    con.commit()
-    con.close()
     return flask.Response('Gruppene ble oppdatert.', status=200)
 
 
@@ -273,16 +268,13 @@ def update_categories() -> flask.Response:
         sanitize({'category': VALIDATORS.CATEGORY_NAME}, {'category': category.strip()})
         new_categories.append(category.strip())
 
-    con = sqlite3.connect(DATABASE)
-    cur = con.cursor()
-    # noinspection SqlWithoutWhere
-    cur.execute('DELETE FROM categories')
-    con.commit()
-    for category in new_categories:
-        cur.execute('INSERT INTO categories (name) VALUES (?)', (category,))
+    with db.connect() as (con, cur):
+        # noinspection SqlWithoutWhere
+        cur.execute('DELETE FROM categories')
+        con.commit()
+        for category in new_categories:
+            cur.execute('INSERT INTO categories (name) VALUES (?)', (category,))
 
-    con.commit()
-    con.close()
     return flask.Response('Kategoriene ble oppdatert.', status=200)
 
 
