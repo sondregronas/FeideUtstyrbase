@@ -85,7 +85,7 @@
         });
       });
 
-      function postpone(id, lender, node) {
+      function postpone(id, lender, tr) {
         $.confirm({
           title: `Utsett levering av '${id}'`,
           type: 'blue',
@@ -97,28 +97,28 @@
               text: '1 dag',
               btnClass: 'btn-blue',
               action: function () {
-                submitPostpone(id, lender, node, 1)
+                submitPostpone(id, tr, 1)
               }
             },
             threeDays: {
               text: '3 dager',
               btnClass: 'btn-blue',
               action: function () {
-                submitPostpone(id, lender, node, 3)
+                submitPostpone(id, tr, 3)
               }
             },
             sevenDays: {
               text: '1 uke',
               btnClass: 'btn-blue',
               action: function () {
-                submitPostpone(id, lender, node, 7)
+                submitPostpone(id, tr, 7)
               }
             },
           },
         })
       }
 
-      function submitPostpone(id, lender, tr, days) {
+      function submitPostpone(id, tr, days) {
         $.ajax({
           url: "{{ url_for('api.postpone_due_date') }}",
           data: {
