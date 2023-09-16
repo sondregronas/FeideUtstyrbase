@@ -92,16 +92,16 @@ def create_app() -> flask.Flask:
         return flask.redirect(flask.url_for('app.login'))
 
     @app.errorhandler(404)
-    def page_not_found(_) -> str:
-        return flask.render_template('404.html')
+    def page_not_found(_) -> tuple[str, int]:
+        return flask.render_template('404.html'), 404
 
     @app.errorhandler(418)
     def teapot(_) -> flask.Response:
         return flask.redirect('https://www.youtube.com/watch?v=dQw4w9WgXcQ')
 
     @app.errorhandler(500)
-    def internal_server_error(_) -> str:
-        return flask.render_template('500.html')
+    def internal_server_error(_) -> tuple[str, int]:
+        return flask.render_template('500.html'), 500
 
     # robots.txt
     @app.route('/robots.txt')

@@ -148,7 +148,6 @@
         url = url.replace('REPLACEME', user.val());
         $.ajax({
           url: url,
-          data: {user: user.val()},
           type: 'GET',
           success: function (response, status) {
             // Spawn table, send info toast if user has items, send warning toast if user has overdue items
@@ -187,6 +186,12 @@
               }
             }
           },
+          error: function (error) {
+            iziToast.error({
+              title: 'Feil!',
+              message: 'Noe gikk galt ved innhenting av aktive lån',
+            });
+          }
         });
       });
     </script>
