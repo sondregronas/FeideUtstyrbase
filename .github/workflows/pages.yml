@@ -49,7 +49,7 @@ jobs:
 
       - name: Copy Static Files
         run: |
-          cp -r BookingSystem/static/* demobuilder/demo
+          cp -r BookingSystem/static/* demo
 
       - name: Upload Pages Artifact
         uses: actions/upload-pages-artifact@v1
