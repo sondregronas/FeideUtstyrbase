@@ -102,8 +102,8 @@ def set_demo_bulletin():
     global cookies
 
     data = {
-        'bulletin_title': 'Demo',
-        'bulletin': 'This is just a static demo of the booking systems frontend. Nothing is functional, no data is stored. You cannot actually do anything here :)'
+        'bulletin_title': 'Static Preview',
+        'bulletin': 'This is just a static preview of the booking systems frontend. Nothing is functional, no data is stored.'
     }
     cookies = requests.get('http://localhost:5000/', allow_redirects=True).cookies
     requests.put('http://localhost:5000/bulletin', data=data, cookies=cookies)

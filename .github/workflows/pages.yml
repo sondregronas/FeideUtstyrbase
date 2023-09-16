@@ -49,10 +49,11 @@ jobs:
 
       - name: Copy Static Files
         run: |
-          ls -lsa ./demo
-          ls -l
           cp -r BookingSystem/static ./demo
-          ls -lsa ./demo
+
+      - name: Update relative URL FontAwesome
+        run: |
+          sed -i 's/\/static/\/FeideUtstyrbase\/static/g' demo/static/css/font-awesome.min.css
 
       - name: Upload Pages Artifact
         uses: actions/upload-pages-artifact@v1
