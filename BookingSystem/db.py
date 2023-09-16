@@ -33,6 +33,7 @@ def create_mock_data() -> None:
     con = sqlite3.connect(DATABASE)
     con.execute('DELETE FROM users')
     con.execute('DELETE FROM inventory')
+    con.execute('DELETE FROM audits')
     con.executescript(read_sql_query("mock_data.sql"))
     con.close()
 
