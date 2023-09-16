@@ -4,6 +4,7 @@ A bit of a hacky way to generate a demo of the booking system frontend.
 
 import os
 import re
+import time
 from multiprocessing import Process
 
 import requests
@@ -105,6 +106,8 @@ def set_demo_bulletin():
 if __name__ == '__main__':
     p = Process(target=launch_app)
     p.start()
+    # Wait for the app to start
+    time.sleep(10)
     set_demo_bulletin()
     generate_demo()
     p.terminate()
