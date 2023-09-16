@@ -5,7 +5,6 @@ from urllib.parse import urlparse
 import flask
 from dateutil import parser
 from flask_minify import Minify
-from flask_session import Session
 from werkzeug.middleware.proxy_fix import ProxyFix
 
 import api
@@ -15,8 +14,9 @@ import groups
 import inventory
 import routes
 import user
-from __init__ import logger, REGEX_ID, REGEX_ITEM, MIN_DAYS, MAX_DAYS, MIN_LABELS, MAX_LABELS
+from __init__ import logger, REGEX_ID, REGEX_ITEM, MIN_DAYS, MAX_DAYS, MIN_LABELS, MAX_LABELS, DEBUG, MOCK_DATA
 from db import init_db, Settings
+from flask_session import Session
 
 
 def create_app() -> flask.Flask:
@@ -107,6 +107,13 @@ def create_app() -> flask.Flask:
     @app.route('/robots.txt')
     def robots() -> flask.Response:
         return flask.send_from_directory(app.static_folder, 'robots.txt')
+
+    # If we're in debug & mock-data mode, we can use /demo-login to skip logging in
+    if DEBUG and MOCK_DATA:
+        @app.route('/demo-login')
+        def debug_login() -> flask.Response:
+            flask.session['user'] = user.User('demo', 'Demo User', '', ['admin'])
+            return flask.redirect(flask.url_for('app.index'))
 
     return app
 

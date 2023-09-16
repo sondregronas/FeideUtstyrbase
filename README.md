@@ -12,8 +12,10 @@ Recommended `.env` file for development:
 ```
 DEBUG=True  
 MOCK_DATA=True             # Uses mock data instead of real data
-KIOSK_FQDN=127.0.0.1:5000  # Skips login
+KIOSK_FQDN=127.0.0.1:5000  # Automatically logs in as Kiosk user when visiting this domain
 ```
+
+If both `DEBUG` and `MOCK_DATA` are set to true you can also log in as an admin by visiting `/demo-login`, which is slightly different from logging in as kiosk.
 
 ## Setup
 Proper README coming soon.

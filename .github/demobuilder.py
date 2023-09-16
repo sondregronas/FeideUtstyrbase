@@ -12,7 +12,7 @@ import requests
 # Global variables to keep track of things
 links = ['/']
 visited = []
-skip = ['/etikettserver', '/inventar/print/*']
+skip = ['/etikettserver', '/inventar/print/*', '/logout']
 skipped = []
 cookies = {}
 
@@ -23,8 +23,8 @@ def launch_app():
 
     This needs to be called in a separate process, as it blocks the main thread.
     """
+    os.environ['DEBUG'] = 'true'
     os.environ['MOCK_DATA'] = 'true'
-    os.environ['KIOSK_FQDN'] = 'localhost:5000'
     root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     app_path = os.path.join(root, 'BookingSystem', 'app.py')
     os.system(f'python {app_path}')
@@ -33,10 +33,7 @@ def launch_app():
 def get_html(url):
     """Get the html from the given url, and append the new links to the links list."""
     r = requests.get(f'http://localhost:5000{url}', allow_redirects=True, cookies=cookies)
-
-    cookies.update(r.cookies)
     html = r.text
-
     new_links = get_links(html)
 
     for l in new_links:
@@ -63,7 +60,7 @@ def get_links(html):
     """
     global skipped
 
-    links = re.compile(r'href="([^"]*)"').findall(html)
+    links = re.compile(r'href="(\/[^"]*)"').findall(html)
     for s in skip:
         old = links.copy()
         links = [x for x in links if not re.match(s.replace('*', '.*'), x)]
@@ -102,10 +99,10 @@ def set_demo_bulletin():
     global cookies
 
     data = {
-        'bulletin_title': 'Static Preview',
-        'bulletin': 'This is just a static preview of the booking systems frontend. Nothing is functional, no data is stored.'
+        'bulletin_title': 'Static Admin Preview',
+        'bulletin': f'This is a static preview of the booking systems admin-frontend. Nothing is functional, no data is stored. (Automatically generated {time.strftime("%d.%m.%Y")})'
     }
-    cookies = requests.get('http://localhost:5000/', allow_redirects=True).cookies
+    cookies = requests.get('http://localhost:5000/demo-login', allow_redirects=True).cookies
     requests.put('http://localhost:5000/bulletin', data=data, cookies=cookies)
 
 
