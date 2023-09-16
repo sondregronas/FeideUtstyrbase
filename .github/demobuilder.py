@@ -47,6 +47,7 @@ def get_html(url):
     # Prepend every relative link for GitHub Pages
     html = html.replace('href="/', 'href="/FeideUtstyrbase/')
     html = html.replace('src="/', 'src="/FeideUtstyrbase/')
+    html = html.replace('https://localhost/', 'https://sondregronas.github.io/FeideUtstyrbase/')
 
     return html
 
@@ -100,7 +101,7 @@ def set_demo_bulletin():
 
     data = {
         'bulletin_title': 'Static Admin Preview',
-        'bulletin': f'This is a static preview of the booking systems admin-frontend. Nothing is functional, no data is stored. (Automatically generated {time.strftime("%d.%m.%Y")})'
+        'bulletin': f'Nothing is functional, no data is stored. (Automatically generated {time.strftime("%d.%m.%Y")})'
     }
     cookies = requests.get('http://localhost:5000/demo-login', allow_redirects=True).cookies
     requests.put('http://localhost:5000/bulletin', data=data, cookies=cookies)
