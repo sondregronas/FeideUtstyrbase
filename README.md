@@ -6,6 +6,14 @@
 
 For Vågen VGS, might be possible to use for other schools with some modifications. (Work in progress, this is NOT plug and play)
 
+## Dev setup
+Recommended `.env` file for development:
+```
+DEBUG=True  
+MOCK_DATA=True             # Uses mock data instead of real data
+KIOSK_FQDN=127.0.0.1:5000  # Skips login
+```
+
 ## Setup
 Proper README coming soon.
 

@@ -26,11 +26,14 @@ MAX_DAYS = int(os.getenv('MAX_DAYS', 14))
 MIN_LABELS = int(os.getenv('MIN_LABELS', 0))
 MAX_LABELS = int(os.getenv('MAX_LABELS', 10))
 
+# Debugging / development / testing
+DEBUG = os.getenv('DEBUG', '').lower() == 'true'
+MOCK_DATA = os.getenv('MOCK_DATA', '').lower() == 'true'
+if MOCK_DATA:
+    DATABASE = Path('data') / 'db_mock.sqlite'
+
 # Logger setup
 logger = Logger(__name__)
-if os.getenv('DEBUG') == 'True':
-    logger.setLevel('DEBUG')
-else:
-    logger.setLevel('INFO')
+logger.setLevel('DEBUG' if DEBUG else 'INFO')
 logger.addHandler(StreamHandler())
 logger.handlers[0].setFormatter(Formatter('[%(levelname)s | %(asctime)s]: %(message)s', '%Y-%m-%d %H:%M:%S'))

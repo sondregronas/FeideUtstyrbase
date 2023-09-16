@@ -3,7 +3,7 @@ from pathlib import Path
 
 import markupsafe
 
-from __init__ import DATABASE, logger
+from __init__ import DATABASE, logger, MOCK_DATA
 
 
 def read_sql_query(sql_name) -> str:
@@ -22,6 +22,18 @@ def add_admin(data_dict: dict) -> None:
 def init_db() -> None:
     con = sqlite3.connect(DATABASE)
     con.executescript(read_sql_query("tables.sql"))
+    con.close()
+    if MOCK_DATA:
+        logger.info('MOCK_DATA is enabled. Recreating mock data.')
+        create_mock_data()
+
+
+def create_mock_data() -> None:
+    """Clear the relevant databases and add fresh mock data"""
+    con = sqlite3.connect(DATABASE)
+    con.execute('DELETE FROM users')
+    con.execute('DELETE FROM inventory')
+    con.executescript(read_sql_query("mock_data.sql"))
     con.close()
 
 
