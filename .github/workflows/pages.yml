@@ -49,13 +49,13 @@ jobs:
 
       - name: Copy Static Files
         run: |
-          cp -r BookingSystem/static/* demo
+          cp -r BookingSystem/static/* ./demo
 
       - name: Upload Pages Artifact
         uses: actions/upload-pages-artifact@v1
         with:
-          artifact-name: pages
-          path: demo
+          artifact-name: github-pages
+          path: ./demo
 
       - name: Deploy to GitHub Pages
         id: deployment
