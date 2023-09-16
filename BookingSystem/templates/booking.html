@@ -54,13 +54,13 @@
           searchField: ['text', 'classroom'],
           render: {
             option: function (data, escape) {
-              let icon = data.classroom === 'Lærer' ? 'fa-user-circle' : 'fa-user-circle-o';
+              let icon = data.classroom.trim() === 'Lærer' ? 'fa-user-circle' : 'fa-user-circle-o';
               return `<div><i class="fa ${icon}"></i> \
 <div class="option-text">${data.text}</div>\
 <div class="option-details">${data.classroom}</div></div>`
             },
             item: function (data, escape) {
-              let icon = data.classroom === 'Lærer' ? 'fa-user-circle' : 'fa-user-circle-o';
+              let icon = data.classroom.trim() === 'Lærer' ? 'fa-user-circle' : 'fa-user-circle-o';
               return `<div class="booking-option">\<div class="option-inline-text">${data.text}</div>\
 <div class="option-inline-details">${data.classroom}</div></div>`
             },
@@ -157,8 +157,8 @@
               table.append('<tr><th><b>Løpenummer</b></th><th><b>Utstyr</b></th><th><b>Kategori</b></th><th><b>Frist for levering</b></th></tr>');
               for (let i = 0; i < response.length; i++) {
                 let item = response[i];
-                let due_date = new Date(item.order_due_date)
-                let overdue = due_date < new Date();
+                let due_date = new Date(item.order_due_date);
+                let overdue = due_date < new Date().setHours(0, 0, 0, 0);
                 let row = $('<tr></tr>');
                 if (overdue) {
                   any_overdue = true;
