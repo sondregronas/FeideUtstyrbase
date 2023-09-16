@@ -3,3 +3,4 @@ flask_session/
 .idea/
 __pycache__/
 data/
+demo/
