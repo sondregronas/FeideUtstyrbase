@@ -110,7 +110,7 @@ def registrer_avvik() -> str:
 
 @app.route('/etikettserver')
 @login_required(admin_only=True)
-def labelserver() -> str:
+def labelserver() -> str:  # pragma: no cover
     return flask.render_template('labelserver.html', labelserver_url=LABEL_SERVER)
 
 

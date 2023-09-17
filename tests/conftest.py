@@ -1,6 +1,7 @@
 import sys
 from pathlib import Path
 
+import flask
 import pytest
 
 sys.path.append(str(Path(__file__).parent.parent) + '\\BookingSystem')
@@ -39,3 +40,33 @@ def client():
     flask_app.config['TESTING'] = True
     init_db()
     yield flask_app.test_client()
+
+
+@pytest.fixture
+def admin_client(client):
+    with client.session_transaction() as session:
+        session['user'] = AdminUser()
+    yield client
+
+
+@pytest.fixture
+def student_client(client):
+    with client.session_transaction() as session:
+        session['user'] = StudentUser()
+    yield client
+
+
+def url_for(client, endpoint: str, **kwargs) -> str:
+    """
+    Helper function to get url for endpoint.
+    """
+    fns = client.application.view_functions
+
+    for fn in fns:
+        if fn != endpoint:
+            continue
+        context = client.application.test_request_context()
+        context.push()
+        url = flask.url_for(fn, **kwargs)
+        context.pop()
+        return url

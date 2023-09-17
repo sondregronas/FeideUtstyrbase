@@ -1,10 +1,10 @@
-import sqlite3
 from dataclasses import dataclass
 from datetime import datetime
 
 from flask import request
 
-from __init__ import DATABASE, KIOSK_FQDN, logger
+import db
+from __init__ import KIOSK_FQDN, logger
 from db import read_sql_query
 from feide import get_feide_data
 
@@ -47,7 +47,7 @@ class User:
         return date_from_string > datetime.now()
 
 
-class FeideUser(User):
+class FeideUser(User):  # pragma: no cover
     def update(self) -> None:
         """Get the latest information from Feide, ensuring it is up-to-date and is a valid user."""
         data = get_feide_data()
@@ -74,12 +74,11 @@ def separate_classroom_teacher(classroom: str) -> tuple[str, str]:
 
 def get_all_active_users() -> list[dict]:
     """Return a list of all active users in the database."""
-    con = sqlite3.connect(DATABASE)
-    cur = con.cursor()
-    cur.execute(read_sql_query('get_all_active_users.sql'))
-    columns = [description[0] for description in cur.description]
-    data = [{columns[i]: user[i] for i in range(len(columns))} for user in cur.fetchall()]
-    con.close()
+    with db.connect() as (con, cur):
+        cur.execute(read_sql_query('get_all_active_users.sql'))
+        columns = [description[0] for description in cur.description]
+        data = [{columns[i]: user[i] for i in range(len(columns))} for user in cur.fetchall()]
+
     for user in data:
         user['classroom'], user['teacher'] = separate_classroom_teacher(user['classroom'])
     return data
@@ -87,21 +86,17 @@ def get_all_active_users() -> list[dict]:
 
 def prune_inactive() -> None:
     """Remove all inactive users from the database."""
-    con = sqlite3.connect(DATABASE)
-    cur = con.cursor()
-    cur.execute(read_sql_query('prune_old_users.sql'))
-    con.commit()
-    con.close()
+    with db.connect() as (con, cur):
+        cur.execute(read_sql_query('prune_inactive_users.sql'))
 
 
 def get(userid: str) -> dict:
     """Load the user's information from the database."""
-    con = sqlite3.connect(DATABASE)
-    cur = con.cursor()
-    cur.execute(read_sql_query("get_user_by_id.sql"), (userid,))
-    user = cur.fetchone()
-    columns = [description[0] for description in cur.description]
-    con.close()
+    with db.connect() as (con, cur):
+        cur.execute(read_sql_query("get_user_by_id.sql"), (userid,))
+        user = cur.fetchone()
+        columns = [description[0] for description in cur.description]
+
     if not user:
         return {}
     return {columns[i]: user[i] for i in range(len(columns)) if not columns[i] == 'id'}
@@ -109,9 +104,6 @@ def get(userid: str) -> dict:
 
 def delete(userid: str) -> None:
     """Delete the user from the database."""
-    con = sqlite3.connect(DATABASE)
-    cur = con.cursor()
-    cur.execute('DELETE FROM users WHERE userid = ?', (userid,))
+    with db.connect() as (con, cur):
+        cur.execute('DELETE FROM users WHERE userid = ?', (userid,))
     logger.debug(f'Deleted user {userid}')
-    con.commit()
-    con.close()

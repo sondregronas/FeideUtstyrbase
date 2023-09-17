@@ -1,4 +1,3 @@
-import flask
 import pytest  # noqa: F401
 
 from conftest import *
@@ -12,7 +11,7 @@ def test_index(client):
     """
     # Not logged in
     response = client.get('/')
-    assert response.status_code == 302
+    assert response.status_code == 302  # Redirect
     assert '/login' == response.headers['Location']
 
     # Logged in as admin
@@ -60,7 +59,7 @@ def test_admin_page(client):
     """
     # Not logged in
     response = client.get('/admin')
-    assert response.status_code == 302
+    assert response.status_code == 302  # Redirect
     assert '/login' == response.headers['Location']
 
     # Logged in as admin
@@ -74,10 +73,9 @@ def test_admin_page(client):
         session['user'] = StudentUser()
     response = client.get('/admin')
     # Should clear session cookie if not admin
-    # (could return a 403 instead, but this is simpler)
     with client.session_transaction() as session:
         assert 'user' not in session
-    assert response.status_code == 302
+    assert response.status_code == 302  # Redirect
     assert '/login' == response.headers['Location']
 
 
