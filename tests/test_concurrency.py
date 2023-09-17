@@ -1,6 +1,7 @@
 import time
 import uuid
 from multiprocessing import Process
+from pathlib import Path
 
 import docker
 import pytest
@@ -29,8 +30,15 @@ class Container:
 
     @staticmethod
     def start_docker_container(port: int, options: dict):
+        # Build the docker image
+        dockerfile_path = str(Path(__file__).parent.parent)
+        docker_client.images.build(path=dockerfile_path,
+                                   tag='test_feideutstyrbase',
+                                   rm=True)
+
+        # Run the docker image
         docker_client.containers.run(
-            "ghcr.io/sondregronas/feideutstyrbase:latest",
+            "test_feideutstyrbase",
             name='test_feideutstyrbase',
             detach=True,
             environment=options,
