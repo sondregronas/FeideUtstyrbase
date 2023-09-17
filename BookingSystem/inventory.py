@@ -1,12 +1,12 @@
-import sqlite3
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 
 from dateutil import parser
 
 import audits
+import db
 import user
-from __init__ import logger, DATABASE
+from __init__ import logger
 from db import read_sql_query
 from sanitizer import APIException
 
@@ -17,16 +17,12 @@ Schema for items and functions to interact with the database.
 
 def all_categories() -> list[str]:
     """Get all categories."""
-    con = sqlite3.connect(DATABASE)
-    cur = con.cursor()
-    sql = 'SELECT * FROM categories'
-    cur.execute(sql)
-    categories = [row[1] for row in cur.fetchall()]
-    con.close()
+    with db.connect() as (con, cur):
+        sql = 'SELECT * FROM categories'
+        cur.execute(sql)
+        categories = [row[1] for row in cur.fetchall()]
+
     return categories
-
-
-# TODO: Use a context manager to open and close the database connection, instead of opening and closing it for every function
 
 
 @dataclass
@@ -148,20 +144,19 @@ class Item:
 
 def add(item: Item) -> None:
     """Add the given item to the database."""
-    con = sqlite3.connect(DATABASE)
     if item.exists:
         logger.error(f'{item.id} er allerede i bruk.')
         raise APIException(f'{item.id} er allerede i bruk.')
-    try:
-        con.execute(read_sql_query('add_item.sql'), item.__dict__)
-        con.commit()
-        logger.info(f'La til {item.id}.')
-        logger.debug(f'La til {item.id} med verdier: {item.__dict__}')
-    except sqlite3.IntegrityError:
-        logger.error(f'Ukjent feil ved innlegging av {item.id}.')
-        raise APIException(f'Ukjent feil ved innlegging av {item.id}.')
-    finally:
-        con.close()
+
+    with db.connect() as (con, cur):
+        try:
+            cur.execute(read_sql_query('add_item.sql'), item.__dict__)
+            logger.info(f'La til {item.id}.')
+            logger.debug(f'La til {item.id} med verdier: {item.__dict__}')
+        except db.IntegrityError:
+            logger.error(f'Ukjent feil ved innlegging av {item.id}.')
+            raise APIException(f'Ukjent feil ved innlegging av {item.id}.')
+
     _update_last_seen(item.id)
     audits.audit('ITEM_NEW', f'{item.id} ble lagt til. ({item})')
 
@@ -169,21 +164,20 @@ def add(item: Item) -> None:
 def edit(old_item_id: str, new_item: Item) -> None:
     """Edit the item with the given ID in the database."""
     old = get(old_item_id)
-    con = sqlite3.connect(DATABASE)
     if old_item_id.lower() != new_item.id.lower() and new_item.exists:
         logger.error(f'{new_item.id} er allerede i bruk.')
         raise APIException(f'{new_item.id} er allerede i bruk.')
-    try:
-        sql = 'UPDATE inventory SET id=:id, name=:name, category=:category, included_batteries=:included_batteries WHERE id=:old_item_id'
-        con.execute(sql, {**new_item.__dict__, 'old_item_id': old_item_id})
-        con.commit()
-        logger.info(f'Redigerte utstyr {old_item_id}.')
-        logger.debug(f'Redigerte utstyr {old_item_id}, differanse: {new_item.__dict__}')
-    except sqlite3.IntegrityError:
-        logger.error(f'Ukjent feil ved redigering av {old_item_id}.')
-        raise APIException(f'Ukjent feil ved redigering av {old_item_id}.')
-    finally:
-        con.close()
+
+    with db.connect() as (con, cur):
+        try:
+            sql = 'UPDATE inventory SET id=:id, name=:name, category=:category, included_batteries=:included_batteries WHERE id=:old_item_id'
+            cur.execute(sql, {**new_item.__dict__, 'old_item_id': old_item_id})
+            logger.info(f'Redigerte utstyr {old_item_id}.')
+            logger.debug(f'Redigerte utstyr {old_item_id}, differanse: {new_item.__dict__}')
+        except db.IntegrityError:
+            logger.error(f'Ukjent feil ved redigering av {old_item_id}.')
+            raise APIException(f'Ukjent feil ved redigering av {old_item_id}.')
+
     _update_last_seen(new_item.id)
     diff = ', '.join([f'{key}: {old.__dict__[key]}->{new_item.__dict__[key]}' for key in old.__dict__
                       if old.__dict__[key] != new_item.__dict__[key]
@@ -194,25 +188,23 @@ def edit(old_item_id: str, new_item: Item) -> None:
 
 def delete(item_id: str) -> None:
     """Delete the item with the given ID from the database."""
-    con = sqlite3.connect(DATABASE)
-    try:
-        sql = 'DELETE FROM inventory WHERE id=:id'
-        con.execute(sql, {'id': item_id})
-        con.commit()
-        logger.info(f'Slettet utstyr {item_id}.')
-    except sqlite3.IntegrityError:
-        logger.error(f'{item_id} eksisterer ikke.')
-        raise APIException(f'{item_id} eksisterer ikke.', status_code=404)
-    finally:
-        con.close()
+    with db.connect() as (con, cur):
+        try:
+            sql = 'DELETE FROM inventory WHERE id=:id'
+            cur.execute(sql, {'id': item_id})
+            logger.info(f'Slettet utstyr {item_id}.')
+        except db.IntegrityError:
+            logger.error(f'{item_id} eksisterer ikke.')
+            raise APIException(f'{item_id} eksisterer ikke.', status_code=404)
+
     audits.audit('ITEM_REM', f'{item_id} ble slettet.')
 
 
 def get(item_id: str) -> Item:
     """Return a JSON object of the item with the given ID."""
-    con = sqlite3.connect(DATABASE)
-    item = con.execute(read_sql_query('get_item.sql'), {'id': item_id}).fetchone()
-    con.close()
+    with db.connect() as (con, cur):
+        item = cur.execute(read_sql_query('get_item.sql'), {'id': item_id}).fetchone()
+
     if not item:
         logger.error(f'{item_id} eksisterer ikke.')
         raise APIException(f'{item_id} eksisterer ikke.')
@@ -221,9 +213,10 @@ def get(item_id: str) -> Item:
 
 def get_all() -> list[Item]:
     """Return a JSON list of all items in the database."""
-    con = sqlite3.connect(DATABASE)
-    items = [Item(*row) for row in con.execute(read_sql_query('get_all_items.sql'))]
-    con.close()
+    with db.connect() as (con, cur):
+        cur.execute(read_sql_query('get_all_items.sql'))
+        items = [Item(*row) for row in cur.fetchall()]
+
     return items
 
 
@@ -249,15 +242,12 @@ def get_all_ids() -> list[str]:
 
 def _update_last_seen(item_id: str) -> None:
     """Update the last_seen column of the item with the given ID."""
-    con = sqlite3.connect(DATABASE)
-    try:
-        sql = "UPDATE inventory SET last_seen=DATETIME('now','localtime') WHERE id=:id"
-        con.execute(sql, {'id': item_id})
-        con.commit()
-    except sqlite3.IntegrityError:
-        logger.error(f'{item_id} eksisterer ikke.')
-    finally:
-        con.close()
+    with db.connect() as (con, cur):
+        try:
+            sql = "UPDATE inventory SET last_seen=DATETIME('now','localtime') WHERE id=:id"
+            cur.execute(sql, {'id': item_id})
+        except db.IntegrityError:
+            logger.error(f'{item_id} eksisterer ikke.')
 
 
 def register_out(item_id: str, userid: str, days: str = 1) -> None:
@@ -268,17 +258,15 @@ def register_out(item_id: str, userid: str, days: str = 1) -> None:
     if item.available == 0:
         register_in(item_id)
 
-    con = sqlite3.connect(DATABASE)
-    try:
-        sql = 'UPDATE inventory SET available=0, borrowed_to=:borrowed_to, order_due_date=:order_due_date WHERE id=:id'
-        con.execute(sql, {'id': item_id, 'borrowed_to': userid, 'order_due_date': due_date})
-        con.commit()
-        logger.info(f'{item_id} er ikke lenger tilgjengelig.')
-    except sqlite3.IntegrityError:
-        logger.error(f'{item_id} eksisterer ikke.')
-        raise APIException(f'{item_id} eksisterer ikke.')
-    finally:
-        con.close()
+    with db.connect() as (con, cur):
+        try:
+            sql = 'UPDATE inventory SET available=0, borrowed_to=:borrowed_to, order_due_date=:order_due_date WHERE id=:id'
+            cur.execute(sql, {'id': item_id, 'borrowed_to': userid, 'order_due_date': due_date})
+            logger.info(f'{item_id} er ikke lenger tilgjengelig.')
+        except db.IntegrityError:
+            logger.error(f'{item_id} eksisterer ikke.')
+            raise APIException(f'{item_id} eksisterer ikke.')
+
     _update_last_seen(item_id)
     u = user.get(userid)
     audits.audit('REG_OUT',
@@ -292,17 +280,15 @@ def register_in(item_id: str) -> None:
     except TypeError:
         raise APIException(f'{item_id} eksisterer ikke.')
 
-    con = sqlite3.connect(DATABASE)
-    try:
-        sql = 'UPDATE inventory SET available=1, borrowed_to=NULL, order_due_date=NULL WHERE id=:id'
-        con.execute(sql, {'id': item_id})
-        con.commit()
-        logger.info(f'{item_id} er nå tilgjengelig.')
-    except sqlite3.IntegrityError:
-        logger.error(f'{item_id} eksisterer ikke.')
-        raise APIException(f'{item_id} eksisterer ikke.')
-    finally:
-        con.close()
+    with db.connect() as (con, cur):
+        try:
+            sql = 'UPDATE inventory SET available=1, borrowed_to=NULL, order_due_date=NULL WHERE id=:id'
+            cur.execute(sql, {'id': item_id})
+            logger.info(f'{item_id} er nå tilgjengelig.')
+        except db.IntegrityError:
+            logger.error(f'{item_id} eksisterer ikke.')
+            raise APIException(f'{item_id} eksisterer ikke.')
+
     _update_last_seen(item_id)
     audits.audit('REG_IN', f'{item_id} er nå tilgjengelig.')
 
@@ -314,15 +300,13 @@ def postpone_due_date(item_id: str, days: int) -> None:
         raise APIException(f'{item_id} er ikke utlånt.')
     due_date = datetime.now() + timedelta(days=days)
 
-    con = sqlite3.connect(DATABASE)
-    try:
-        sql = 'UPDATE inventory SET order_due_date=:order_due_date WHERE id=:id'
-        con.execute(sql, {'id': item_id, 'order_due_date': due_date})
-        con.commit()
-        logger.info(f'{item_id} har fått utsatt frist til {due_date}.')
-    except sqlite3.IntegrityError:
-        logger.error(f'{item_id} eksisterer ikke. (postpone)')
-        raise APIException(f'{item_id} eksisterer ikke.')
-    finally:
-        con.close()
+    with db.connect() as (con, cur):
+        try:
+            sql = 'UPDATE inventory SET order_due_date=:order_due_date WHERE id=:id'
+            cur.execute(sql, {'id': item_id, 'order_due_date': due_date})
+            logger.info(f'{item_id} har fått utsatt frist til {due_date}.')
+        except db.IntegrityError:
+            logger.error(f'{item_id} eksisterer ikke. (postpone)')
+            raise APIException(f'{item_id} eksisterer ikke.')
+
     audits.audit('POSTPONE', f'{item_id} har fått utsatt frist til {due_date:%d.%m.%Y} ({item.lender}).')
