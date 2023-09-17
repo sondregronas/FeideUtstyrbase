@@ -2,6 +2,26 @@
 
 {% block extra_head %}
     {% include 'templates/tom-select.html' %}
+
+    <style>
+      #days-container {
+        position: relative;
+      }
+
+      #days::-webkit-outer-spin-button,
+      #days::-webkit-inner-spin-button {
+        display: none;
+      }
+
+      #days-text {
+        position: absolute;
+        right: 0;
+        top: calc(var(--spacing));
+        color: var(--muted-color);
+        font-size: calc(var(--font-size) * 0.75);
+        padding-right: calc(var(--spacing) + 1.5rem);
+      }
+    </style>
 {% endblock %}
 
 {% block content %}
@@ -25,7 +45,10 @@
         </select>
 
         <label for="days">Hvor lenge (antall dager, maks 14)</label>
-        <input type="number" name="days" id="days" min="{{ MIN_DAYS }}" max="{{ MAX_DAYS }}" value="1" required>
+        <div id="days-container">
+            <input type="number" name="days" id="days" min="{{ MIN_DAYS }}" max="{{ MAX_DAYS }}" required>
+            <div id="days-text"></div>
+        </div>
 
         <label for="equipment">Liste over utstyr</label>
         <select name="equipment" id="equipment" multiple data-placeholder="Marker dette feltet før du bruker skanneren!"
@@ -48,6 +71,7 @@
     <script>
       let userSelect
       $(document).ready(function () {
+        // Enable user select with TomSelect
         userSelect = new TomSelect('#user', {
           ...tomDefaults,
           maxItems: 1,
@@ -87,6 +111,7 @@
           }
         });
 
+        // Enable equipment select with TomSelect
         new TomSelect('#equipment', {
           ...tomDefaults,
           plugins: ['remove_button'],
@@ -103,6 +128,7 @@
           }
         });
 
+        // Book equipment, send data to server
         $('form').submit(function (event) {
           event.preventDefault();
           $.ajax({
@@ -131,8 +157,26 @@
 
         // On page load, focus user input
         $('#user-ts-control').focus();
+
+        // Set default value for days input
+        let daysInput = $('#days');
+        let date = new Date();
+        daysInput.on('input', function () {
+          let newDate = new Date(date.getTime() + daysInput.val() * 24 * 60 * 60 * 1000);
+          let dateString = newDate.toLocaleDateString('nb-NO', {
+            weekday: 'long',
+            day: 'numeric',
+            month: 'long',
+          });
+          $('#days-text').text(dateString);
+        });
+        daysInput.val(1);
+        daysInput.trigger('input');   // Adds dateString
+        daysInput.trigger('change');  // Sets aria-invalid
       });
 
+      // When user is selected, fetch bookings and spawn table
+      // (If they have any bookings, send info toast, if they have overdue bookings, send warning toast)
       let user = $('#user');
       user.change(function () {
         let table = $('#user-bookings');
