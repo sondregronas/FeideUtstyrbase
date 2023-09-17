@@ -47,7 +47,7 @@ Some endpoints can be accessed without login using the specified `?token=<token>
 
 ## TODO:
 - [ ] Find a way to implement included_batteries (and possibly other accessories) in a way that makes sense (omitting them for now)
-- [ ] Move to a proper database?
+- [X] ~~Move to a proper database?~~ (keeping sqlite for now, doesn't seem to be a problem from my testing - though the SQL is a bit messy)
 - [ ] Tests
 - [ ] Documentation
 - [ ] Better README
