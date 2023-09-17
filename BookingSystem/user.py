@@ -47,7 +47,7 @@ class User:
         return date_from_string > datetime.now()
 
 
-class FeideUser(User):
+class FeideUser(User):  # pragma: no cover
     def update(self) -> None:
         """Get the latest information from Feide, ensuring it is up-to-date and is a valid user."""
         data = get_feide_data()

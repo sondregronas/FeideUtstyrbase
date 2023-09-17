@@ -78,26 +78,26 @@ def create_app() -> flask.Flask:
                     FQDN=urlparse(flask.request.base_url).hostname, )
 
     @app.errorhandler(401)
-    def unauthorized(_) -> flask.Response:
+    def unauthorized(_) -> tuple[flask.Response, int]:
         flask.session.clear()
         if flask.request.url != flask.url_for('app.index', _external=True):
             logger.warning(f'Unauthorized access: {flask.request.url} from {flask.request.remote_addr}')
-        return flask.redirect(flask.url_for('app.login'))
+        return flask.redirect(flask.url_for('app.login')), 401
 
     @app.errorhandler(403)
-    def unauthorized(_) -> flask.Response:
+    def unauthorized(_) -> tuple[flask.Response, int]:
         flask.session.clear()
         if flask.request.url != flask.url_for('app.index', _external=True):
             logger.warning(f'Unauthorized access: {flask.request.url} from {flask.request.remote_addr}')
-        return flask.redirect(flask.url_for('app.login'))
+        return flask.redirect(flask.url_for('app.login')), 403
 
     @app.errorhandler(404)
     def page_not_found(_) -> tuple[str, int]:
         return flask.render_template('404.html'), 404
 
     @app.errorhandler(418)
-    def teapot(_) -> flask.Response:
-        return flask.redirect('https://www.youtube.com/watch?v=dQw4w9WgXcQ')
+    def teapot(_) -> tuple[flask.Response, int]:
+        return flask.redirect('https://www.youtube.com/watch?v=dQw4w9WgXcQ'), 418
 
     @app.errorhandler(500)
     def internal_server_error(_) -> tuple[str, int]:

@@ -298,7 +298,7 @@ def registrer_avvik() -> flask.Response:
 @api.route('/send_report', methods=['POST'])
 @login_required(admin_only=True, api=True)
 @handle_api_exception
-def send_report() -> flask.Response:
+def send_report() -> flask.Response:  # pragma: no cover
     """Send a report to the specified teams webhooks.
 
     Can be used with a cron job to send reports automatically, e.g.:
