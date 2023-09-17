@@ -40,20 +40,19 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
+          pip install -r docs/requirements.txt
 
-      # TODO: Add documentation (mkdocs) build step here
-
-      - name: Run Demobuilder
+      - name: Create demo
         run: |
           python .github/demobuilder.py
-
-      - name: Copy Static Files
-        run: |
           cp -r BookingSystem/static ./demo
-
-      - name: Update relative URL FontAwesome
-        run: |
           sed -i 's/\/static/\/FeideUtstyrbase\/static/g' demo/static/css/font-awesome.min.css
+
+      - name: Build mkdocs
+        run: |
+          mkdocs build
+          mkdir ./demo/docs
+          cp -r ./site/* ./demo/docs
 
       - name: Upload Pages Artifact
         uses: actions/upload-pages-artifact@v1

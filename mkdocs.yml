@@ -1,0 +1,42 @@
+site_name: 'Feide Utsyrbase'
+
+theme:
+  name: 'material'
+  palette: # Light/Dark Mode
+    - media: "(prefers-color-scheme: light)"  # Light mode
+      scheme: default
+      primary: light blue
+      accent: cyan
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"  # Dark mode
+      scheme: slate
+      primary: light blue
+      accent: cyan
+      toggle:
+        icon: material/brightness-4
+        name: Light mode
+
+  features:
+    - navigation.indexes        # Attach index.md to parent
+    - navigation.tracking       # Automatically add #anchor to URL while scrolling
+    - navigation.top            # Back to top button
+    - navigation.prune          # Performance / size optimization
+    - navigation.footer         # Next / previous page footer
+
+markdown_extensions:
+  - admonition
+  - pymdownx.superfences
+  - pymdownx.highlight
+  - pymdownx.inlinehilite
+  - pymdownx.details
+  - pymdownx.magiclink
+  - nl2br
+  - pymdownx.tasklist:
+      custom_checkbox: true
+
+plugins:
+  - search
+  - callouts
+
