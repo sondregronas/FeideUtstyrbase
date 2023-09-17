@@ -19,12 +19,12 @@ def test_register_invalid(student_client):
     # Invalid classroom
     r = student_client.post(url_for(student_client, 'api.register_student'),
                             data={'classroom': 'h4x0r'})
-    assert r.status_code == 418
+    assert 'dQw4w9WgXcQ' in r.data.decode('utf-8')
 
     # Invalid teacher
     r = student_client.post(url_for(student_client, 'api.register_student'),
                             data={'h4x0r': 'Classroom (Teacher Name)'})
-    assert r.status_code == 418
+    assert 'dQw4w9WgXcQ' in r.data.decode('utf-8')
 
 
 def test_register(client):

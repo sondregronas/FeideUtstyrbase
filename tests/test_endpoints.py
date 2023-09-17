@@ -11,7 +11,7 @@ def test_index(client):
     """
     # Not logged in
     response = client.get('/')
-    assert response.status_code == 401
+    assert response.status_code == 302  # Redirect
     assert '/login' == response.headers['Location']
 
     # Logged in as admin
@@ -59,7 +59,7 @@ def test_admin_page(client):
     """
     # Not logged in
     response = client.get('/admin')
-    assert response.status_code == 401
+    assert response.status_code == 302  # Redirect
     assert '/login' == response.headers['Location']
 
     # Logged in as admin
@@ -75,7 +75,7 @@ def test_admin_page(client):
     # Should clear session cookie if not admin
     with client.session_transaction() as session:
         assert 'user' not in session
-    assert response.status_code == 403
+    assert response.status_code == 302  # Redirect
     assert '/login' == response.headers['Location']
 
 

@@ -82,14 +82,14 @@ def create_app() -> flask.Flask:
         flask.session.clear()
         if flask.request.url != flask.url_for('app.index', _external=True):
             logger.warning(f'Unauthorized access: {flask.request.url} from {flask.request.remote_addr}')
-        return flask.redirect(flask.url_for('app.login')), 401
+        return flask.redirect(flask.url_for('app.login')), 302
 
     @app.errorhandler(403)
     def unauthorized(_) -> tuple[flask.Response, int]:
         flask.session.clear()
         if flask.request.url != flask.url_for('app.index', _external=True):
             logger.warning(f'Unauthorized access: {flask.request.url} from {flask.request.remote_addr}')
-        return flask.redirect(flask.url_for('app.login')), 403
+        return flask.redirect(flask.url_for('app.login')), 302
 
     @app.errorhandler(404)
     def page_not_found(_) -> tuple[str, int]:
@@ -97,7 +97,7 @@ def create_app() -> flask.Flask:
 
     @app.errorhandler(418)
     def teapot(_) -> tuple[flask.Response, int]:
-        return flask.redirect('https://www.youtube.com/watch?v=dQw4w9WgXcQ'), 418
+        return flask.redirect('https://www.youtube.com/watch?v=dQw4w9WgXcQ'), 302
 
     @app.errorhandler(500)
     def internal_server_error(_) -> tuple[str, int]:
