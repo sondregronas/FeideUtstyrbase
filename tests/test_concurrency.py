@@ -11,6 +11,8 @@ from docker.models.containers import Container
 
 try:
     docker_client = docker.from_env()
+    if docker_client.version().get('Os') != 'linux':
+        pytest.skip('Skipping docker tests on non-linux host', allow_module_level=True)
 except DockerException:
     pytest.skip('Docker not available', allow_module_level=True)
 
