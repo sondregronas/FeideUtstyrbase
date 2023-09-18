@@ -29,7 +29,7 @@ MAX_LABELS = int(os.getenv('MAX_LABELS', 10))
 # Debugging / development / testing
 DEBUG = os.getenv('DEBUG', '').lower() == 'true'
 MOCK_DATA = os.getenv('MOCK_DATA', '').lower() == 'true'
-if MOCK_DATA:
+if MOCK_DATA:  # pragma: no cover
     DATABASE = Path('data') / 'mock_db.sqlite'
 
 # Logger setup

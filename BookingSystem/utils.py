@@ -11,9 +11,9 @@ from user import User, FeideUser, KioskUser
 def user_factory() -> User | None:
     """Create a user object based on the session data."""
     match flask.session.get('method'):
-        case 'feide':
+        case 'feide':  # pragma: no cover
             return FeideUser(**get_feide_data())
-        case 'kiosk':
+        case 'kiosk':  # pragma: no cover
             return KioskUser(name='Kiosk', email='', userid='kiosk', affiliations=[])
         case _:
             return None

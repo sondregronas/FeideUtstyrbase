@@ -109,7 +109,7 @@ def create_app() -> flask.Flask:
         return flask.send_from_directory(app.static_folder, 'robots.txt')
 
     # If we're in debug & mock-data mode, we can use /demo-login to skip logging in
-    if DEBUG and MOCK_DATA:
+    if DEBUG and MOCK_DATA:  # pragma: no cover
         @app.route('/demo-login')
         def debug_login() -> flask.Response:
             flask.session['user'] = user.User('demo', 'Demo User', '', ['admin'])

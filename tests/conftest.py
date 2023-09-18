@@ -23,10 +23,13 @@ class AdminUser(User):
 
 
 class StudentUser(User):
-    def __init__(self):
-        self.name = 'Student User'
-        self.email = 'student@test'
-        self.userid = 'student-userid'
+    def __init__(self,
+                 userid: str = 'student-userid',
+                 name: str = 'Student User',
+                 email: str = 'student@test'):
+        self.name = name
+        self.email = email
+        self.userid = userid
         self.affiliations = ['student']
 
     @property

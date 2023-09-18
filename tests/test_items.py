@@ -29,6 +29,14 @@ def test_add_item(admin_client):
     assert get(item.id).id in [item.id for item in all_items(admin_client)]
 
 
+def test_add_item_duplicate(admin_client):
+    item = generate_item()
+    r = admin_client.post(url_for(admin_client, 'api.add_item'), data=item.__dict__)
+    assert r.status_code == 201
+    r = admin_client.post(url_for(admin_client, 'api.add_item'), data=item.__dict__)
+    assert r.status_code == 400
+
+
 def test_edit_item(admin_client):
     # Add item
     original_name = str(uuid.uuid4())

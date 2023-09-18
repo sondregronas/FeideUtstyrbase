@@ -13,7 +13,7 @@ IntegrityError = sqlite3.IntegrityError
 # TODO: A lot needs to be done here - we want to move away from sqlite3 and use a dedicated database server
 class connect:
     def __init__(self, commit_on_close=True) -> None:
-        self.con = sqlite3.connect(DATABASE)
+        self.con = sqlite3.connect(DATABASE, timeout=20)
         self.cur = self.con.cursor()
         self.commit_on_close = commit_on_close
 
@@ -42,12 +42,12 @@ def init_db() -> None:
     with connect() as (con, cur):
         [cur.execute(query) for query in read_sql_query("tables.sql").split(';')]
 
-    if MOCK_DATA:
+    if MOCK_DATA:  # pragma: no cover
         logger.info('MOCK_DATA is enabled. Recreating mock data.')
         create_mock_data()
 
 
-def create_mock_data() -> None:
+def create_mock_data() -> None:  # pragma: no cover
     """Clear the relevant databases and add fresh mock data"""
     with connect() as (con, cur):
         cur.execute('DELETE FROM users')

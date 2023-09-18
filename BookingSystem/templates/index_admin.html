@@ -5,8 +5,6 @@
 {% endblock %}
 
 {% block content %}
-
-
     <hgroup>
         <h2>Vågen Utstyrbase</h2>
         <h3>Velkommen! Her kan du <a href="{{ url_for('app.innlevering') }}">levere inn</a> og <a
@@ -59,91 +57,91 @@
                 {% endfor %}
             </table>
         </div>
+
+
+        <script>
+          $(document).ready(function () {
+            let lang = {
+              "lengthMenu": "Vis _MENU_ rader per side",
+              "zeroRecords": "Ingen treff",
+              "info": "Viser side _PAGE_ av _PAGES_",
+              "infoEmpty": "Ingen rader tilgjengelig",
+              "infoFiltered": "(filtrert fra _MAX_ rader totalt)",
+              "search": "Søk:",
+              "paginate": {
+                "first": "Første",
+                "last": "Siste",
+                "next": "Neste",
+                "previous": "Forrige"
+              }
+            };
+            $('#active').DataTable({
+              "language": lang,
+              "order": [[3, "asc"]],
+              "pageLength": 25,
+              "lengthMenu": [[25, 50, -1], [25, 50, "Alle"]],
+            });
+          });
+
+          function postpone(id, lender, tr) {
+            $.confirm({
+              title: `Utsett levering av '${id}'`,
+              type: 'blue',
+              icon: 'fa fa-calendar-plus-o',
+              content: `<i>Lånt til ${lender}</i>` +
+                '<br><br>Utlånsfristen kan utsettes opp til 7 dager, kontaktlærer bør varsles om utsettelsen før den gjennomføres.',
+              buttons: {
+                oneDay: {
+                  text: '1 dag',
+                  btnClass: 'btn-blue',
+                  action: function () {
+                    submitPostpone(id, tr, 1)
+                  }
+                },
+                threeDays: {
+                  text: '3 dager',
+                  btnClass: 'btn-blue',
+                  action: function () {
+                    submitPostpone(id, tr, 3)
+                  }
+                },
+                sevenDays: {
+                  text: '1 uke',
+                  btnClass: 'btn-blue',
+                  action: function () {
+                    submitPostpone(id, tr, 7)
+                  }
+                },
+              },
+            })
+          }
+
+          function submitPostpone(id, tr, days) {
+            $.ajax({
+              url: "{{ url_for('api.postpone_due_date') }}",
+              data: {
+                item_id: id,
+                days: days
+              },
+              type: 'POST',
+              success: function (response, status) {
+                iziToast.success({
+                  title: 'Utsetter levering',
+                  message: response
+                });
+                tr.remove();
+                if ($('.item-row').length === 0) {
+                  $('#overdue_items').remove();
+                }
+              },
+              error: function (response, status) {
+                iziToast.error({
+                  title: 'Feil',
+                  message: response.responseText,
+                });
+              }
+            })
+          }
+        </script>
     {% endif %}
-
-    <script>
-      $(document).ready(function () {
-        let lang = {
-          "lengthMenu": "Vis _MENU_ rader per side",
-          "zeroRecords": "Ingen treff",
-          "info": "Viser side _PAGE_ av _PAGES_",
-          "infoEmpty": "Ingen rader tilgjengelig",
-          "infoFiltered": "(filtrert fra _MAX_ rader totalt)",
-          "search": "Søk:",
-          "paginate": {
-            "first": "Første",
-            "last": "Siste",
-            "next": "Neste",
-            "previous": "Forrige"
-          }
-        };
-        $('#active').DataTable({
-          "language": lang,
-          "order": [[3, "asc"]],
-          "pageLength": 25,
-          "lengthMenu": [[25, 50, -1], [25, 50, "Alle"]],
-        });
-      });
-
-      function postpone(id, lender, tr) {
-        $.confirm({
-          title: `Utsett levering av '${id}'`,
-          type: 'blue',
-          icon: 'fa fa-calendar-plus-o',
-          content: `<i>Lånt til ${lender}</i>` +
-            '<br><br>Utlånsfristen kan utsettes opp til 7 dager, kontaktlærer bør varsles om utsettelsen før den gjennomføres.',
-          buttons: {
-            oneDay: {
-              text: '1 dag',
-              btnClass: 'btn-blue',
-              action: function () {
-                submitPostpone(id, tr, 1)
-              }
-            },
-            threeDays: {
-              text: '3 dager',
-              btnClass: 'btn-blue',
-              action: function () {
-                submitPostpone(id, tr, 3)
-              }
-            },
-            sevenDays: {
-              text: '1 uke',
-              btnClass: 'btn-blue',
-              action: function () {
-                submitPostpone(id, tr, 7)
-              }
-            },
-          },
-        })
-      }
-
-      function submitPostpone(id, tr, days) {
-        $.ajax({
-          url: "{{ url_for('api.postpone_due_date') }}",
-          data: {
-            item_id: id,
-            days: days
-          },
-          type: 'POST',
-          success: function (response, status) {
-            iziToast.success({
-              title: 'Utsetter levering',
-              message: response
-            });
-            tr.remove();
-            if ($('.item-row').length === 0) {
-              $('#overdue_items').remove();
-            }
-          },
-          error: function (response, status) {
-            iziToast.error({
-              title: 'Feil',
-              message: response.responseText,
-            });
-          }
-        })
-      }
-    </script>
-
 {% endblock %}

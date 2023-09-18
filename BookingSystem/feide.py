@@ -17,7 +17,7 @@ feide = flask.Blueprint('feide', __name__)
 
 
 @feide.route('/login/feide')
-def login() -> flask.Response:
+def login() -> flask.Response:  # pragma: no cover
     """Redirect the user to the Feide login page."""
     feide_oauth = oauth.create_client('feide')
     redirect_uri = os.getenv('FEIDE_REDIRECT_URI')
@@ -26,7 +26,7 @@ def login() -> flask.Response:
 
 @feide.route('/login/feide/callback')
 @handle_oauth_exception
-def callback() -> flask.Response:
+def callback() -> flask.Response:  # pragma: no cover
     """Authorize the user and redirect them to the index page."""
     feide_oauth = oauth.create_client('feide')
     token = feide_oauth.authorize_access_token()
@@ -38,7 +38,7 @@ def callback() -> flask.Response:
 
 
 @handle_oauth_exception
-def get_feide_data() -> dict:
+def get_feide_data() -> dict:  # pragma: no cover
     """
     Return a dict with the user's name, email, userid and affiliations.
 

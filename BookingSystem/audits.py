@@ -17,7 +17,7 @@ def audit(event: str, message: str) -> None:
         })
         sql = 'SELECT COUNT(*) FROM audits'
         cur.execute(sql)
-        if cur.fetchone()[0] > 10_000:
+        if cur.fetchone()[0] > 10_000:  # pragma: no cover
             sql = 'DELETE FROM audits WHERE id IN (SELECT id FROM audits ORDER BY id ASC LIMIT 1)'
             cur.execute(sql)
 
