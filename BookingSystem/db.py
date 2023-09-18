@@ -13,7 +13,7 @@ IntegrityError = sqlite3.IntegrityError
 # TODO: A lot needs to be done here - we want to move away from sqlite3 and use a dedicated database server
 class connect:
     def __init__(self, commit_on_close=True) -> None:
-        self.con = sqlite3.connect(DATABASE)
+        self.con = sqlite3.connect(DATABASE, timeout=20)
         self.cur = self.con.cursor()
         self.commit_on_close = commit_on_close
 
