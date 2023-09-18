@@ -42,12 +42,12 @@ def init_db() -> None:
     with connect() as (con, cur):
         [cur.execute(query) for query in read_sql_query("tables.sql").split(';')]
 
-    if MOCK_DATA:
+    if MOCK_DATA:  # pragma: no cover
         logger.info('MOCK_DATA is enabled. Recreating mock data.')
         create_mock_data()
 
 
-def create_mock_data() -> None:
+def create_mock_data() -> None:  # pragma: no cover
     """Clear the relevant databases and add fresh mock data"""
     with connect() as (con, cur):
         cur.execute('DELETE FROM users')

@@ -22,7 +22,7 @@ oauth.register(
 )
 
 
-def handle_oauth_exception(f) -> callable:
+def handle_oauth_exception(f) -> callable:  # pragma: no cover
     """
     Handle exceptions that may occur during the authorization process.
 

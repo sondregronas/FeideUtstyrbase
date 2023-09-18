@@ -83,14 +83,14 @@ def get_deviation_card(new_deviations: list) -> pymsteams.connectorcard:
                          color='FFA500')
 
 
-def send_card_to_hooks(card: pymsteams.connectorcard, webhooks: list[str]) -> None:
+def send_card_to_hooks(card: pymsteams.connectorcard, webhooks: list[str]) -> None:  # pragma: no cover
     """Send a card to all webhooks."""
     for webhook in webhooks:
         card.newhookurl(webhook)
         Process(target=card.send).start()
 
 
-def send_report() -> flask.Response:
+def send_report() -> flask.Response:  # pragma: no cover
     """Send a report card to all webhooks in TEAMS_WEBHOOKS."""
     last_sent = last_sent_within_hour_treshold()
 
