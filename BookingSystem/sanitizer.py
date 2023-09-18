@@ -3,14 +3,17 @@ from enum import Enum, auto
 from functools import wraps
 
 import flask
+from werkzeug.datastructures import ImmutableMultiDict
 
 import groups
 import inventory
+import user
 from __init__ import REGEX_ITEM, logger, REGEX_ID
 
 
 class VALIDATORS(Enum):
     ID = auto()
+    USER = auto()
     UNIQUE_ID = auto()
     UNIQUE_OR_SAME_ID = auto()
     NAME = auto()
@@ -62,6 +65,10 @@ def _sanitize_form(sanitization_map: dict[any: VALIDATORS | MINMAX], form, data:
         l_val, l_ids = form.get(fkey).lower(), [i.lower() for i in inventory.get_all_ids()]
         return l_val not in l_ids
 
+    def active_user(fkey: str) -> bool:
+        # Check if the user is valid
+        return form.get(fkey) in [u['userid'] for u in user.get_all_active_users()]
+
     def email(text: str) -> bool:
         # Check if the email is valid
         r = re.compile(r"^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,7}$")
@@ -95,6 +102,11 @@ def _sanitize_form(sanitization_map: dict[any: VALIDATORS | MINMAX], form, data:
                 # Check if the ID is valid
                 if not id_pattern(key):
                     raise APIException(f'Ugyldig ID ({form.get(key)})')
+
+            case VALIDATORS.USER:
+                # Check if the user is valid
+                if not active_user(key):
+                    raise APIException(f'Ugyldig bruker ({form.get(key)})')
 
             case VALIDATORS.UNIQUE_OR_SAME_ID:
                 # Check if the ID is unique or the same as the current ID
@@ -133,6 +145,8 @@ def _sanitize_form(sanitization_map: dict[any: VALIDATORS | MINMAX], form, data:
                 all_ids = [i for i in inventory.get_all_ids()]
                 if not all(i in all_ids for i in ids):
                     raise APIException(f'En eller flere gjenstander finnes ikke ({form.getlist(key)})')
+                if not ids:
+                    raise APIException(f'Ingen gjenstander valgt')
 
             case VALIDATORS.EMAIL:
                 # Check if the email is valid
@@ -162,7 +176,7 @@ def _sanitize_form(sanitization_map: dict[any: VALIDATORS | MINMAX], form, data:
 
 
 def sanitize(validation_map: dict[any: VALIDATORS | MINMAX],
-             form: dict,
+             form: dict | ImmutableMultiDict,
              data: dict = dict) -> dict[str: any]:
     """
     Validate a form based on a validation map,

@@ -117,7 +117,7 @@ def delete_item(item_id: str) -> flask.Response:
 @api.route('/items/<item_id>/label/<variant>/preview', methods=['GET'])
 @login_required(admin_only=True)
 @handle_api_exception
-def get_label_preview(item_id: str, variant: str = 'qr') -> flask.Response:
+def get_label_preview(item_id: str, variant: str = 'qr') -> flask.Response:  # pragma: no cover
     """Get a label preview for an item."""
     item = inventory.get(item_id)
     url = f'{LABEL_SERVER}/preview?id={item.id}&name={item.name}&variant={variant}'
@@ -127,7 +127,7 @@ def get_label_preview(item_id: str, variant: str = 'qr') -> flask.Response:
 @api.route('/items/<item_id>/label/print', methods=['POST'])
 @login_required(admin_only=True)
 @handle_api_exception
-def print_label(item_id: str) -> flask.Response:
+def print_label(item_id: str) -> flask.Response:  # pragma: no cover
     # START: Validation
     validation_map = {
         'print_label_count': VALIDATORS.INT,
@@ -155,7 +155,7 @@ def book_equipment() -> flask.Response:
     """Book out equipment for a user."""
     # START: Validation
     validation_map = {
-        'user': VALIDATORS.UNIQUE_ID,
+        'user': VALIDATORS.USER,
         'days': VALIDATORS.INT,
         'days_minmax': MINMAX(MIN_DAYS, MAX_DAYS),
         'equipment': VALIDATORS.ITEM_LIST_EXISTS,
