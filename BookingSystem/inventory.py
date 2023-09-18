@@ -153,7 +153,7 @@ def add(item: Item) -> None:
             cur.execute(read_sql_query('add_item.sql'), item.__dict__)
             logger.info(f'La til {item.id}.')
             logger.debug(f'La til {item.id} med verdier: {item.__dict__}')
-        except db.IntegrityError:
+        except db.IntegrityError:  # pragma: no cover
             logger.error(f'Ukjent feil ved innlegging av {item.id}.')
             raise APIException(f'Ukjent feil ved innlegging av {item.id}.')
 
@@ -174,7 +174,7 @@ def edit(old_item_id: str, new_item: Item) -> None:
             cur.execute(sql, {**new_item.__dict__, 'old_item_id': old_item_id})
             logger.info(f'Redigerte utstyr {old_item_id}.')
             logger.debug(f'Redigerte utstyr {old_item_id}, differanse: {new_item.__dict__}')
-        except db.IntegrityError:
+        except db.IntegrityError:  # pragma: no cover
             logger.error(f'Ukjent feil ved redigering av {old_item_id}.')
             raise APIException(f'Ukjent feil ved redigering av {old_item_id}.')
 
@@ -193,7 +193,7 @@ def delete(item_id: str) -> None:
             sql = 'DELETE FROM inventory WHERE id=:id'
             cur.execute(sql, {'id': item_id})
             logger.info(f'Slettet utstyr {item_id}.')
-        except db.IntegrityError:
+        except db.IntegrityError:  # pragma: no cover
             logger.error(f'{item_id} eksisterer ikke.')
             raise APIException(f'{item_id} eksisterer ikke.', status_code=404)
 
@@ -246,7 +246,7 @@ def _update_last_seen(item_id: str) -> None:
         try:
             sql = "UPDATE inventory SET last_seen=DATETIME('now','localtime') WHERE id=:id"
             cur.execute(sql, {'id': item_id})
-        except db.IntegrityError:
+        except db.IntegrityError:  # pragma: no cover
             logger.error(f'{item_id} eksisterer ikke.')
 
 
@@ -263,7 +263,7 @@ def register_out(item_id: str, userid: str, days: str = 1) -> None:
             sql = 'UPDATE inventory SET available=0, borrowed_to=:borrowed_to, order_due_date=:order_due_date WHERE id=:id'
             cur.execute(sql, {'id': item_id, 'borrowed_to': userid, 'order_due_date': due_date})
             logger.info(f'{item_id} er ikke lenger tilgjengelig.')
-        except db.IntegrityError:
+        except db.IntegrityError:  # pragma: no cover
             logger.error(f'{item_id} eksisterer ikke.')
             raise APIException(f'{item_id} eksisterer ikke.')
 
@@ -285,7 +285,7 @@ def register_in(item_id: str) -> None:
             sql = 'UPDATE inventory SET available=1, borrowed_to=NULL, order_due_date=NULL WHERE id=:id'
             cur.execute(sql, {'id': item_id})
             logger.info(f'{item_id} er nå tilgjengelig.')
-        except db.IntegrityError:
+        except db.IntegrityError:  # pragma: no cover
             logger.error(f'{item_id} eksisterer ikke.')
             raise APIException(f'{item_id} eksisterer ikke.')
 
@@ -305,7 +305,7 @@ def postpone_due_date(item_id: str, days: int) -> None:
             sql = 'UPDATE inventory SET order_due_date=:order_due_date WHERE id=:id'
             cur.execute(sql, {'id': item_id, 'order_due_date': due_date})
             logger.info(f'{item_id} har fått utsatt frist til {due_date}.')
-        except db.IntegrityError:
+        except db.IntegrityError:  # pragma: no cover
             logger.error(f'{item_id} eksisterer ikke. (postpone)')
             raise APIException(f'{item_id} eksisterer ikke.')
 

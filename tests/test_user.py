@@ -1,3 +1,4 @@
+import db
 import groups
 from conftest import *
 
@@ -130,3 +131,29 @@ def test_register_admin(client):
 
     # Delete the user (current user)
     client.delete(url_for(client, 'api.delete_me', userid=user.userid))
+
+
+def test_prune_inactive(admin_client):
+    from test_booking import ctx_booking
+    with ctx_booking(admin_client, 1, 0) as ctx:
+        r = admin_client.get(url_for(admin_client, 'api.get_user', userid=ctx.users[0].userid)).json
+        assert r['name'] == ctx.users[0].name
+        assert r['userid'] == ctx.users[0].userid
+
+        r = admin_client.post(url_for(admin_client, 'api.prune_inactive_users'))
+        assert r.status_code == 200
+
+        r = admin_client.get(url_for(admin_client, 'api.get_user', userid=ctx.users[0].userid)).json
+        assert r['name'] == ctx.users[0].name
+        assert r['userid'] == ctx.users[0].userid
+
+        with db.connect() as (con, cur):
+            # update expires_at in users where userid = ctx.users[0].userid
+            cur.execute(
+                f"""UPDATE users SET expires_at = DATETIME('now', '-365 days') WHERE userid = '{ctx.users[0].userid}'""")
+
+        r = admin_client.post(url_for(admin_client, 'api.prune_inactive_users'))
+        assert r.status_code == 200
+
+        r = admin_client.get(url_for(admin_client, 'api.get_user', userid=ctx.users[0].userid)).json
+        assert not r

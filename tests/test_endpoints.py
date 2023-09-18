@@ -119,9 +119,12 @@ def test_template_errors_all_endpoints_without_args(client):
         if endpoint.startswith('static'):
             continue
 
-        # Skip endpoints with arguments
-        args = client.application.view_functions[endpoint].__code__.co_varnames
-        if args:
+        rules = client.application.url_map._rules_by_endpoint[endpoint][0]
+        if 'GET' not in rules.methods:
+            continue
+        if '<' in rules.rule:
+            continue
+        if endpoint in ['app.register']:  # Skip registration endpoint, covered by another test
             continue
 
         context = client.application.test_request_context()

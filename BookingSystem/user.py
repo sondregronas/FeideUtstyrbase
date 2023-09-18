@@ -87,7 +87,7 @@ def get_all_active_users() -> list[dict]:
 def prune_inactive() -> None:
     """Remove all inactive users from the database."""
     with db.connect() as (con, cur):
-        cur.execute(read_sql_query('prune_inactive_users.sql'))
+        cur.execute(read_sql_query('prune_old_users.sql'))
 
 
 def get(userid: str) -> dict:
