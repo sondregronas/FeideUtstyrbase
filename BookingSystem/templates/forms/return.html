@@ -11,10 +11,10 @@
     $.confirm({
       title: 'Gå gjennom utstyret før innlevering!',
       content: '<li>Se gjennom vesker/etui - bekreft at alt er på plass<br>' +
-        '<li>Sjekk minnekort og annet medfølgende tilbehør<br>' +
-        '<li>Sett eventuelle batterier til lading<br>' +
-        '<br>' +
-        '<b>Eventuelle avvik skal registreres.</b>',
+          '<li>Sjekk minnekort og annet medfølgende tilbehør<br>' +
+          '<li>Sett eventuelle batterier til lading<br>' +
+          '<br>' +
+          '<b>Eventuelle avvik skal registreres.</b>',
       type: 'orange',
       icon: 'fa fa-exclamation-triangle',
       buttons: {
@@ -43,8 +43,6 @@
           $('#active tr').filter(function () {
             return $(this).find('td').eq(0).text() === $('#id').val();
           }).remove();
-          // Clear the input field
-          $('#id').val('');
         },
         error: function (result) {
           iziToast.error({
@@ -53,6 +51,8 @@
           })
         }
       });
+      // Clear the input field
+      $('#id').val('');
     });
   });
 </script>
