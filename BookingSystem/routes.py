@@ -93,7 +93,16 @@ def booking() -> str:
 @app.route('/innlevering')
 @login_required(admin_only=True)
 def innlevering() -> str:
-    return flask.render_template('innlevering.html')
+    """
+    Renders the innlevering page.
+
+    Parameters:
+        warn (str): Whether to show the warning or not. Defaults to '1'.
+
+    """
+
+    return flask.render_template('innlevering.html',
+                                 show_popup=flask.request.args.get('show_popup', '1') == '1')
 
 
 @app.route('/varetelling')

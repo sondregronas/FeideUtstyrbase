@@ -1,14 +1,18 @@
 <nav>
     <li><a href="{{ url_for('app.index') }}">Utstyrbase</a></li>
     <ul>
-        <li><a href="{{ url_for('app.innlevering') }}">Innlevering</a></li>
-        <li><a href="{{ url_for('app.booking') }}">Booking</a></li>
-        <li><a href="{{ url_for('app.inventar') }}">Inventar</a></li>
+        <li><a href="{{ url_for('app.booking') }}">
+            Utlån
+        </a></li>
+        <li><a href="{{ url_for('app.innlevering') }}">
+            Innlevering
+        </a></li>
         <div class="dropdown">
-            <li><a class="dropbtn" href="{{ url_for('app.admin_settings') }}">
+            <li><a class="dropbtn" href="{{ url_for('app.inventar') }}">
                 <i class="fa fa-cogs" aria-hidden="true"></i>
             </a></li>
             <div class="dropdown-content">
+                <a href="{{ url_for('app.inventar') }}">Inventar</a>
                 <a href="{{ url_for('app.admin_settings') }}">Adminpanel</a>
                 <a href="{{ url_for('app.labelserver') }}">Etikettserver</a>
                 <a href="{{ url_for('app.audits') }}">Audits</a>

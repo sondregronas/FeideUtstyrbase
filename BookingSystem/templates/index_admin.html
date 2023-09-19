@@ -15,16 +15,23 @@
     <br>
 
     <a href="{{ url_for('app.booking') }}">
-        <button>Låne ut utstyr</button>
+        <button>
+            Låne ut utstyr
+        </button>
     </a>
     <a href="{{ url_for('app.innlevering') }}">
-        <button>Levere inn utstyr</button>
+        <button>
+            Levere inn utstyr
+        </button>
     </a>
-    <a href="{{ url_for('app.inventar') }}">
-        <button>Administrere utstyr</button>
-    </a>
+    <center>
+        <a href="{{ url_for('app.inventar') }}">
+            Administrere utstyr
+        </a>
+    </center>
 
     {% if overdue_items %}
+        <br>
         <div id="overdue_items">
             <br><br>
             <center>

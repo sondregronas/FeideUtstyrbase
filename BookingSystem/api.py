@@ -292,7 +292,8 @@ def registrer_avvik() -> flask.Response:
         txt = f'Generelt avvik: {log_text}'
 
     audits.audit('AVVIK', markupsafe.escape(txt))
-    return flask.Response(f'Avvik registrert: {markupsafe.escape(txt)}', status=200)
+    teams.send_deviation(txt)
+    return flask.Response(f'Avvik ble sendt til videre oppfølging', status=200)
 
 
 @api.route('/send_report', methods=['POST'])

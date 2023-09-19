@@ -35,7 +35,7 @@
             data: $('form').serialize(),
             success: function (response) {
               cueAlert('Suksess!', response, 'success');
-              window.location.href = '{{ url_for("app.innlevering") }}';
+              window.location.href = '{{ url_for("app.innlevering") }}?show_popup=0';
             },
             error: function (response) {
               iziToast.error({

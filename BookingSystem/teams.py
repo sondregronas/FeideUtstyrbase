@@ -5,7 +5,6 @@ import flask
 import markupsafe
 import pymsteams
 
-import audits
 import inventory
 from __init__ import TEAMS_WEBHOOKS, TEAMS_WEBHOOKS_DEVIATIONS
 from db import Settings
@@ -41,14 +40,14 @@ def formatted_overdue_items(items: list) -> str:
            '\n<small><i>Dersom du kjenner igjen utlåneren, vennligst få dem til å levere utstyret tilbake ASAP.</i></small>'
 
 
-def formatted_new_deviations(deviations: list) -> str:
+def formatted_deviation(deviation: str) -> str:
     """Return formatted HTML string of new deviations."""
-    if not deviations:
-        return ''
+    if not deviation:
+        raise APIException('Ingen avvik å rapportere.', 400)
     return '<blockquote style="border-color: #FF0000;">' + \
-           '<br>'.join([f'{markupsafe.escape(deviation)}' for deviation in deviations]) + \
+           str(markupsafe.escape(deviation)) + \
            '</blockquote>' + \
-           '<small><i><b>NB:</b> Avvik må registreres manuelt i notatblokken (inntil videre), jeg kan kun varsle om nye avvik.</i></small>'
+           '<small><i><b>NB:</b> Avvik må oppfølges manuelt av dere mennesker, jeg kan kun varsle om nye avvik.</i></small>'
 
 
 def generate_card(title, text, color, webhook=None) -> pymsteams.connectorcard:
@@ -76,10 +75,11 @@ def get_overdue_card(overdue_items: list) -> pymsteams.connectorcard:
                          color='FFA500')
 
 
-def get_deviation_card(new_deviations: list) -> pymsteams.connectorcard:
+def get_deviation_card(deviation: str) -> pymsteams.connectorcard:
     """Return a card with new deviations."""
-    return generate_card(title='Nye avvik som krever oppfølging',
-                         text=formatted_new_deviations(new_deviations),
+    title, text = deviation.split(':', 1)
+    return generate_card(title=title,
+                         text=formatted_deviation(f'Melding: {text}'),
                          color='FFA500')
 
 
@@ -90,25 +90,45 @@ def send_card_to_hooks(card: pymsteams.connectorcard, webhooks: list[str]) -> No
         Process(target=card.send).start()
 
 
+def send_deviation(deviation: str) -> flask.Response:  # pragma: no cover
+    """
+    Send a deviation to all webhooks in TEAMS_WEBHOOKS_DEVIATIONS.
+
+    Args:
+        deviation: The formatted deviation string.
+
+    Returns:
+        None (sends a card asynchronously).
+    """
+    deviation_webhooks = TEAMS_WEBHOOKS_DEVIATIONS if TEAMS_WEBHOOKS_DEVIATIONS else TEAMS_WEBHOOKS
+    print(deviation_webhooks)
+
+    if not deviation_webhooks:
+        raise APIException('Avvik ikke sendt: webhooks er ikke konfigurert', 400)
+
+    if not deviation:
+        raise APIException('Avvik ikke sendt: avviket er tomt', 400)
+
+    card = get_deviation_card(deviation)
+    send_card_to_hooks(card, deviation_webhooks)
+    return flask.Response('Avvik sendt til alle konfigurerte teamskanaler!', 200)
+
+
 def send_report() -> flask.Response:  # pragma: no cover
     """Send a report card to all webhooks in TEAMS_WEBHOOKS."""
-    last_sent = last_sent_within_hour_treshold()
+    # Throw exception if last report was sent less than an hour ago
+    last_sent_within_hour_treshold()
 
-    if TEAMS_WEBHOOKS == ['']:
+    if not TEAMS_WEBHOOKS:
         raise APIException('Rapport ikke sendt: webhooks er ikke konfigurert', 400)
-    deviation_webhooks = TEAMS_WEBHOOKS_DEVIATIONS if TEAMS_WEBHOOKS_DEVIATIONS != [''] else TEAMS_WEBHOOKS
 
     overdue_items = inventory.get_all_overdue()
-    new_deviations = audits.get_new_deviations(since=last_sent)
 
-    if not overdue_items and not new_deviations:
-        raise APIException('Rapport ikke sendt: ingen nye avvik eller utlån på overtid', 400)
+    if not overdue_items:
+        raise APIException('Rapport ikke sendt, ingen utlån på overtid', 400)
 
     if overdue_items:
         send_card_to_hooks(get_overdue_card(overdue_items), TEAMS_WEBHOOKS)
-
-    if new_deviations:
-        send_card_to_hooks(get_deviation_card(new_deviations), deviation_webhooks)
 
     # Return 200 OK, even if some webhooks failed (the process is async, so we can't catch exceptions)
     return flask.Response('Rapport ble sendt til alle konfigurerte teamskanaler!', 200)
