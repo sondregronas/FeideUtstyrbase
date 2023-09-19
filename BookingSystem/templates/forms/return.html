@@ -43,16 +43,18 @@
           $('#active tr').filter(function () {
             return $(this).find('td').eq(0).text() === $('#id').val();
           }).remove();
+          // Clear the input field
+          $('#id').val('');
         },
         error: function (result) {
           iziToast.error({
             title: 'Feil!',
             message: result.responseText,
           })
+          // Clear the input field
+          $('#id').val('');
         }
       });
-      // Clear the input field
-      $('#id').val('');
     });
   });
 </script>
