@@ -1,4 +1,4 @@
-{% extends 'layout.html' %}
+{% extends '_layout.html' %}
 
 {% block extra_head %}
     {% include 'templates/tom-select.html' %}
@@ -69,111 +69,109 @@
     <table id="user-bookings"></table>
 
     <script>
-      let userSelect
-      $(document).ready(function () {
-        // Enable user select with TomSelect
-        userSelect = new TomSelect('#user', {
-          ...tomDefaults,
-          maxItems: 1,
-          searchField: ['text', 'classroom'],
-          render: {
-            option: function (data, escape) {
-              let icon = data.classroom.trim() === 'Lærer' ? 'fa-user-circle' : 'fa-user-circle-o';
-              return `<div><i class="fa ${icon}"></i> \
+      let userSelect;
+      // Enable user select with TomSelect
+      userSelect = new TomSelect('#user', {
+        ...tomDefaults,
+        maxItems: 1,
+        searchField: ['text', 'classroom'],
+        render: {
+          option: function (data, escape) {
+            let icon = data.classroom.trim() === 'Lærer' ? 'fa-user-circle' : 'fa-user-circle-o';
+            return `<div><i class="fa ${icon}"></i> \
 <div class="option-text">${data.text}</div>\
 <div class="option-details">${data.classroom}</div></div>`
-            },
-            item: function (data, escape) {
-              let icon = data.classroom.trim() === 'Lærer' ? 'fa-user-circle' : 'fa-user-circle-o';
-              return `<div class="booking-option">\<div class="option-inline-text">${data.text}</div>\
+          },
+          item: function (data, escape) {
+            let icon = data.classroom.trim() === 'Lærer' ? 'fa-user-circle' : 'fa-user-circle-o';
+            return `<div class="booking-option">\<div class="option-inline-text">${data.text}</div>\
 <div class="option-inline-details">${data.classroom}</div></div>`
-            },
-            no_results: function (data, escape) {
-              return '<div class="no-results">Finner ingen bruker med navnet <strong>' + escape(data.input) + '</strong></div>';
-            },
           },
-          onDropdownClose: function (dropdown) {
-            // Focus days input when user is selected
-            let days = $('#days');
-            days.focus();
-            days.select();
+          no_results: function (data, escape) {
+            return '<div class="no-results">Finner ingen bruker med navnet <strong>' + escape(data.input) + '</strong></div>';
           },
-          onDropdownOpen: function (dropdown) {
-            userSelect.clear()
-          }
-        });
+        },
+        onDropdownClose: function (dropdown) {
+          // Focus days input when user is selected
+          let days = $('#days');
+          days.focus();
+          days.select();
+        },
+        onDropdownOpen: function (dropdown) {
+          userSelect.clear()
+        }
+      });
 
-        // When enter button is pressed while #days is focused, select #equipment-ts-control
-        $('#days').keypress(function (e) {
-          if (e.which === 13) {
-            e.preventDefault();
-            $('#equipment-ts-control').focus();
-          }
-        });
+      // When enter button is pressed while #days is focused, select #equipment-ts-control
+      $('#days').keypress(function (e) {
+        if (e.which === 13) {
+          e.preventDefault();
+          $('#equipment-ts-control').focus();
+        }
+      });
 
-        // Enable equipment select with TomSelect
-        new TomSelect('#equipment', {
-          ...tomDefaults,
-          plugins: ['remove_button'],
-          openOnFocus: false,
-          render: {
-            option: function (data, escape) {
-              return `<div class="booking-option">\
+      // Enable equipment select with TomSelect
+      new TomSelect('#equipment', {
+        ...tomDefaults,
+        plugins: ['remove_button'],
+        openOnFocus: false,
+        render: {
+          option: function (data, escape) {
+            return `<div class="booking-option">\
 <div class="option-inline-text">${data.text}</div>\
 <div class="option-inline-itemdetails">${data.name} (${data.category})</div></div>`
-            },
-            no_results: function (data, escape) {
-              return '<div class="no-results">Finner ingen utstyr med løpenummer <strong>' + escape(data.input) + '</strong></div>';
-            },
-          }
-        });
+          },
+          no_results: function (data, escape) {
+            return '<div class="no-results">Finner ingen utstyr med løpenummer <strong>' + escape(data.input) + '</strong></div>';
+          },
+        }
+      });
 
-        // Book equipment, send data to server
-        $('form').submit(function (event) {
-          event.preventDefault();
-          $.ajax({
-            url: "{{ url_for('api.book_equipment') }}",
-            data: $('form').serialize(),
-            type: 'POST',
-            success: function (response, status) {
-              if (status === 'success') {
-                cueAlert('Utlevert!', response, 'success')
-                window.location.href = "{{ url_for('app.index') }}";
-              } else {
-                iziToast.error({
-                  title: 'Feil',
-                  message: 'Noe gikk galt',
-                });
-              }
-            },
-            error: function (error) {
+      // Book equipment, send data to server
+      $('form').submit(function (event) {
+        event.preventDefault();
+        $.ajax({
+          url: "{{ url_for('api.book_equipment') }}",
+          data: $('form').serialize(),
+          type: 'POST',
+          success: function (response, status) {
+            if (status === 'success') {
+              cueAlert('Utlevert!', response, 'success')
+              window.location.href = "{{ url_for('app.index') }}";
+            } else {
               iziToast.error({
-                title: 'Feil!',
+                title: 'Feil',
                 message: 'Noe gikk galt',
               });
             }
-          });
+          },
+          error: function (error) {
+            iziToast.error({
+              title: 'Feil!',
+              message: 'Noe gikk galt',
+            });
+          }
         });
-
-        // On page load, focus user input
-        $('#user-ts-control').focus();
-
-        // Set default value for days input
-        let daysInput = $('#days');
-        let date = new Date();
-        daysInput.on('input', function () {
-          let newDate = new Date(date.getTime() + daysInput.val() * 24 * 60 * 60 * 1000);
-          let dateString = newDate.toLocaleDateString('nb-NO', {
-            weekday: 'long',
-            day: 'numeric',
-            month: 'long',
-          });
-          $('#days-text').text(dateString);
-        });
-        daysInput.val(1);
-        daysInput.trigger('input');   // Adds dateString
-        daysInput.trigger('change');  // Sets aria-invalid
       });
+
+      // On page load, focus user input
+      $('#user-ts-control').focus();
+
+      // Set default value for days input
+      let daysInput = $('#days');
+      let date = new Date();
+      daysInput.on('input', function () {
+        let newDate = new Date(date.getTime() + daysInput.val() * 24 * 60 * 60 * 1000);
+        let dateString = newDate.toLocaleDateString('nb-NO', {
+          weekday: 'long',
+          day: 'numeric',
+          month: 'long',
+        });
+        $('#days-text').text(dateString);
+      });
+      daysInput.val(1);
+      daysInput.trigger('input');   // Adds dateString
+      daysInput.trigger('change');  // Sets aria-invalid
 
       // When user is selected, fetch bookings and spawn table
       // (If they have any bookings, send info toast, if they have overdue bookings, send warning toast)

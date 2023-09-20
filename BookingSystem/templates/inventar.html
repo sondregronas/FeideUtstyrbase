@@ -1,4 +1,4 @@
-{% extends 'layout.html' %}
+{% extends '_layout.html' %}
 
 {% block extra_head %}
     {% include 'templates/datatables.html' %}
@@ -55,29 +55,27 @@
     </table>
 
     <script>
-      $(document).ready(function () {
-        $('#items-table').DataTable({
-          "language": {
-            "lengthMenu": "Vis _MENU_ rader per side",
-            "zeroRecords": "Ingen treff",
-            "info": "Viser side _PAGE_ av _PAGES_",
-            "infoEmpty": "Ingen rader tilgjengelig",
-            "infoFiltered": "(filtrert fra _MAX_ rader totalt)",
-            "search": "Søk:",
-            "paginate": {
-              "first": "Første",
-              "last": "Siste",
-              "next": "Neste",
-              "previous": "Forrige"
-            }
-          },
-          "columnDefs": [
-            {"orderable": false, "targets": 4}
-          ],
-          "pageLength": 25,
-          "lengthMenu": [[25, 50, -1], [25, 50, "Alle"]],
-          "stateSave": true,
-        });
+      $('#items-table').DataTable({
+        "language": {
+          "lengthMenu": "Vis _MENU_ rader per side",
+          "zeroRecords": "Ingen treff",
+          "info": "Viser side _PAGE_ av _PAGES_",
+          "infoEmpty": "Ingen rader tilgjengelig",
+          "infoFiltered": "(filtrert fra _MAX_ rader totalt)",
+          "search": "Søk:",
+          "paginate": {
+            "first": "Første",
+            "last": "Siste",
+            "next": "Neste",
+            "previous": "Forrige"
+          }
+        },
+        "columnDefs": [
+          {"orderable": false, "targets": 4}
+        ],
+        "pageLength": 25,
+        "lengthMenu": [[25, 50, -1], [25, 50, "Alle"]],
+        "stateSave": true,
       });
     </script>
 
