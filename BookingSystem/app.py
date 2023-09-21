@@ -4,6 +4,7 @@ from urllib.parse import urlparse
 
 import flask
 from dateutil import parser
+from flask_compress import Compress
 from flask_minify import Minify
 from werkzeug.middleware.proxy_fix import ProxyFix
 
@@ -22,6 +23,7 @@ from flask_session import Session
 def create_app() -> flask.Flask:
     # Flask app setup
     app = flask.Flask(__name__, template_folder='templates', static_folder='static')
+
     app.secret_key = os.getenv('SECRET_KEY')
     app.config['SESSION_TYPE'] = 'filesystem'
     app.config['PERMANENT_SESSION_LIFETIME'] = 3600
@@ -32,9 +34,6 @@ def create_app() -> flask.Flask:
     app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
 
     Session(app)
-
-    # Minify
-    Minify(app=app, static=False)
 
     # Register blueprints
     app.register_blueprint(api.api)
@@ -114,6 +113,12 @@ def create_app() -> flask.Flask:
         def debug_login() -> flask.Response:
             flask.session['user'] = user.User('demo', 'Demo User', '', ['admin'])
             return flask.redirect(flask.url_for('app.index'))
+
+    app.config['COMPRESS_MIMETYPES'] = ['text/css', 'application/json', 'application/javascript']
+
+    # Compress & minify
+    Compress(app)
+    Minify(app)
 
     return app
 

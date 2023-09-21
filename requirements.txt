@@ -9,3 +9,4 @@ Flask-Minify~=0.42
 Authlib~=1.2.1
 MarkupSafe~=2.1.1
 pymsteams~=0.2.2
+flask-compress~=1.14
