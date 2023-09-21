@@ -82,7 +82,7 @@
             <th>Message</th>
         </tr>
         </thead>
-        <tbody>
+        <tbody id="datatable-body" style="display: none;">
         {% for audit in audits %}
             <tr>
                 <td data-sort="{{ audit.timestamp | unixtime }}">{{ audit.timestamp }}</td>
@@ -119,6 +119,7 @@
         $('input[type=search]').val('{{ search }}');
         $('input[type=search]').trigger('keyup');
       {% endif  %}
+      $('#datatable-body').show();
     </script>
 
 {% endblock %}
