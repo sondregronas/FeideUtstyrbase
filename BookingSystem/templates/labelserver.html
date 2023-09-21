@@ -40,40 +40,44 @@
         </button>
     </form>
     <script>
+      let label_id = document.getElementById("label_id");
+      let label_name = document.getElementById("label_name");
+      let id = document.getElementById("id");
+      let name = document.getElementById("name");
+      let variant = document.getElementById("variant");
+
       function updatePreview() {
-        let id = document.getElementById("id").value;
-        let name = document.getElementById("name").value;
-        let variant = document.getElementById("variant").value;
-        document.getElementById("preview").src = `{{ labelserver_url }}/preview?id=${id}&name=${name}&variant=${variant}`;
+        document.getElementById("preview").src = `{{ labelserver_url }}/preview?id=${id.value}&name=${name.value}&variant=${variant.value}`;
       }
 
       function changeCategory() {
-        let variant = document.getElementById("variant").value;
-        document.getElementById("label_id").classList.remove("hidden");
-        document.getElementById("id").classList.remove("hidden");
-        document.getElementById("label_name").classList.remove("hidden");
-        document.getElementById("name").classList.remove("hidden");
-        if (variant === "text_2_lines") {
-          document.getElementById("label_id").innerText = "Linje 1";
-          document.getElementById("label_name").innerText = "Linje 2";
-          document.getElementById("id").placeholder = "Linje 1";
-          document.getElementById("name").placeholder = "Linje 2";
-        } else if (variant === "text") {
-          document.getElementById("label_name").innerText = "Tekst";
-          document.getElementById("name").placeholder = "Tekst";
-          document.getElementById("label_id").classList.add("hidden");
-          document.getElementById("id").classList.add("hidden");
-        } else if (variant === "barcode") {
-          document.getElementById("label_id").innerText = "Løpenummer";
-          document.getElementById("id").placeholder = "Løpenummer (A6500-01)";
-          document.getElementById("label_name").classList.add("hidden");
-          document.getElementById("name").classList.add("hidden");
-        } else {
-          document.getElementById("label_id").innerText = "Løpenummer";
-          document.getElementById("label_name").innerText = "Enhetsnavn";
-          document.getElementById("id").placeholder = "Løpenummer (A6500-01)";
-          document.getElementById("name").placeholder = "Enhetsnavn (Sony A6500)";
+        let visiblity_map = {
+          "qr": {
+            id: 'Løpenummer (A6500-01)',
+            label_id: 'Løpenummer',
+            name: 'Enhetsnavn (Sony A6500)',
+            label_name: 'Enhetsnavn'
+          },
+          "barcode": {id: 'Løpenummer (A6500-01)', label_id: 'Løpenummer'},
+          "text": {id: 'Tekst', label_id: 'Tekst'},
+          "text_2_lines": {
+            id: 'Linje 1',
+            label_id: 'Linje 1',
+            name: 'Linje 2',
+            label_name: 'Linje 2'
+          }
+        };
+
+        for (let element of [id, name, label_id, label_name]) {
+          if (element.id in visiblity_map[variant.value]) {
+            element.placeholder = visiblity_map[variant.value][element.id];
+            element.innerText = visiblity_map[variant.value][element.id];
+            element.classList.remove("hidden");
+          } else {
+            element.classList.add("hidden");
+          }
         }
+
         updatePreview();
       }
 
@@ -87,9 +91,9 @@
           },
           body:
             JSON.stringify({
-              id: document.getElementById("id").value,
-              name: document.getElementById("name").value,
-              variant: document.getElementById("variant").value,
+              id: id.value,
+              name: name.value,
+              variant: variant.value,
               count: document.getElementById("count").value
             })
         }).then(response => {
