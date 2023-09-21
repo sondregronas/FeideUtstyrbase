@@ -1,5 +1,110 @@
 {% extends '_layout.html' %}
 
 {% block content %}
-    <iframe src="{{ labelserver_url }}" style="width:100%; min-height: 90vh;"></iframe>
+    <hgroup>
+        <h2>Etikett Server</h2>
+        <h3>Behov for ekstra etiketter, som ikke skal registreres i systemet? Da har du kommet til rett plass.</h3>
+    </hgroup>
+    <center>
+        <img src="{{ labelserver_url }}/preview" alt="Forhåndsvisning" id="preview"
+             style="height:120px; border: 5px solid white; border-radius: 5px;">
+    </center>
+    <br>
+    <form action="{{ labelserver_url }}/print" method="POST">
+        <label for="id" id="label_id">Løpenummer</label>
+        <input type="text" name="id" id="id" placeholder="Løpenummer (A6500-01)"
+               oninput="updatePreview()" autocomplete="off">
+        <label for="name" id="label_name">Enhetsnavn</label>
+        <input type="text" name="name" id="name" placeholder="Enhetsnavn (Sony A6500)"
+               oninput="updatePreview()" autocomplete="off">
+        <table>
+            <tr>
+                <td style="padding:0 1rem 0 0">
+                    <label for="variant">Variant</label>
+                    <select name="variant" id="variant" onchange="changeCategory()">
+                        <option value="qr">QR</option>
+                        <option value="barcode">Strekkode</option>
+                        <option value="text">Tekst</option>
+                        <option value="text_2_lines">Tekst (2 linjer)</option>
+                    </select>
+                </td>
+                <td style="padding:0 0 0 1rem">
+                    <label for="count">Antall</label>
+                    <input type="number" name="count" id="count" value="1" min="1" max="9"
+                           required>
+                </td>
+            </tr>
+        </table>
+        <button type="submit">
+            Send til printer
+        </button>
+    </form>
+    <script>
+      function updatePreview() {
+        let id = document.getElementById("id").value;
+        let name = document.getElementById("name").value;
+        let variant = document.getElementById("variant").value;
+        document.getElementById("preview").src = `{{ labelserver_url }}/preview?id=${id}&name=${name}&variant=${variant}`;
+      }
+
+      function changeCategory() {
+        let variant = document.getElementById("variant").value;
+        document.getElementById("label_id").classList.remove("hidden");
+        document.getElementById("id").classList.remove("hidden");
+        document.getElementById("label_name").classList.remove("hidden");
+        document.getElementById("name").classList.remove("hidden");
+        if (variant === "text_2_lines") {
+          document.getElementById("label_id").innerText = "Linje 1";
+          document.getElementById("label_name").innerText = "Linje 2";
+          document.getElementById("id").placeholder = "Linje 1";
+          document.getElementById("name").placeholder = "Linje 2";
+        } else if (variant === "text") {
+          document.getElementById("label_name").innerText = "Tekst";
+          document.getElementById("name").placeholder = "Tekst";
+          document.getElementById("label_id").classList.add("hidden");
+          document.getElementById("id").classList.add("hidden");
+        } else if (variant === "barcode") {
+          document.getElementById("label_id").innerText = "Løpenummer";
+          document.getElementById("id").placeholder = "Løpenummer (A6500-01)";
+          document.getElementById("label_name").classList.add("hidden");
+          document.getElementById("name").classList.add("hidden");
+        } else {
+          document.getElementById("label_id").innerText = "Løpenummer";
+          document.getElementById("label_name").innerText = "Enhetsnavn";
+          document.getElementById("id").placeholder = "Løpenummer (A6500-01)";
+          document.getElementById("name").placeholder = "Enhetsnavn (Sony A6500)";
+        }
+        updatePreview();
+      }
+
+      let form = document.querySelector("form");
+      form.addEventListener("submit", function (e) {
+        e.preventDefault();
+        fetch("{{ labelserver_url }}/print", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body:
+            JSON.stringify({
+              id: document.getElementById("id").value,
+              name: document.getElementById("name").value,
+              variant: document.getElementById("variant").value,
+              count: document.getElementById("count").value
+            })
+        }).then(response => {
+          if (response.status === 200) {
+            iziToast.success({
+              title: 'Utskrift',
+              message: `Etikett ble sendt til skriver.`
+            })
+          } else {
+            iziToast.warning({
+              title: 'Utskrift',
+              message: "Klarte ikke koble til etikett tjeneren.",
+            })
+          }
+        });
+      });
+    </script>
 {% endblock %}

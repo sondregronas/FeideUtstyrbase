@@ -99,17 +99,13 @@
           success: function (response) {
             iziToast.success({
               title: 'Utskrift',
-              message: `Etikett for ${$('#id').val()} ble skrevet ut.`
+              message: `Etikett ble sendt til skriver.`
             })
           },
           error: function (response) {
-            var msg = response.responseText;
-            if (response.status === 502) {
-              msg = "Klarte ikke koble til etikett tjeneren.";
-            }
-            iziToast.error({
+            iziToast.warning({
               title: 'Utskrift',
-              message: msg,
+              message: "Klarte ikke koble til etikett tjeneren.",
             })
           }
         });
