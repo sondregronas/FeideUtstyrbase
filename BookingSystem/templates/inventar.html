@@ -31,7 +31,7 @@
             <th>Administrer</th>
         </tr>
         </thead>
-        <tbody id="items-table-items">
+        <tbody id="items-table-items" style="display:none;">
         {% for item in items %}
             <tr>
                 <td>{{ item.id }}</td>
@@ -77,6 +77,7 @@
         "lengthMenu": [[25, 50, -1], [25, 50, "Alle"]],
         "stateSave": true,
       });
+      $('#items-table-items').show();
     </script>
 
 {% endblock %}

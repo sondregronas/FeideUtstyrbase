@@ -31,18 +31,20 @@
     </hgroup>
 
     <form>
-        <label for="user">Hvem låner?</label>
-        <select name="user" id="user" data-placeholder="Søk etter bruker" required autocomplete="off">
-            <option value=""></option>
-            {% for user in users %}
-                <option value="{{ user.userid }}"
-                        data-classroom="
+        <div id="user-select" style="display: none;">
+            <label for="user">Hvem låner?</label>
+            <select name="user" id="user" data-placeholder="Søk etter bruker" required autocomplete="off">
+                <option value=""></option>
+                {% for user in users %}
+                    <option value="{{ user.userid }}"
+                            data-classroom="
                 {% if user.classroom %}
                         {{ user.classroom }}
                 {% if user.teacher %} - {{ user.teacher }}{% endif %}
                 {% else %}Lærer{% endif %}">{{ user.name }}</option>
-            {% endfor %}
-        </select>
+                {% endfor %}
+            </select>
+        </div>
 
         <label for="days">Hvor lenge (antall dager, maks 14)</label>
         <div id="days-container">
@@ -50,18 +52,21 @@
             <div id="days-text"></div>
         </div>
 
-        <label for="equipment">Liste over utstyr</label>
-        <select name="equipment" id="equipment" multiple data-placeholder="Marker dette feltet før du bruker skanneren!"
-                required autocomplete="off">
-            <option value=""></option>
-            {% for item in items %}
-                <option value="{{ item.id }}"
-                        data-name="{{ item.name }}"
-                        data-category="{{ item.category }}">
-                    {{ item.id }}
-                </option>
-            {% endfor %}
-        </select>
+        <div id="equipment-select" style="display: none;">
+            <label for="equipment">Liste over utstyr</label>
+            <select name="equipment" id="equipment" multiple
+                    data-placeholder="Marker dette feltet før du bruker skanneren!"
+                    required autocomplete="off">
+                <option value=""></option>
+                {% for item in items %}
+                    <option value="{{ item.id }}"
+                            data-name="{{ item.name }}"
+                            data-category="{{ item.category }}">
+                        {{ item.id }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
 
         <button type="submit">Lån ut</button>
     </form>
@@ -154,9 +159,6 @@
         });
       });
 
-      // On page load, focus user input
-      $('#user-ts-control').focus();
-
       // Set default value for days input
       let daysInput = $('#days');
       let date = new Date();
@@ -236,6 +238,10 @@
           }
         });
       });
+
+      $('#user-select').show();
+      $('#equipment-select').show();
+      $('#user-ts-control').focus();
     </script>
 
 {% endblock %}

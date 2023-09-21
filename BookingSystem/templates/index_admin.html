@@ -48,7 +48,7 @@
                     <th>Frist for levering</th>
                     <th>Alternativer</th>
                 </thead>
-                <tbody>
+                <tbody id="datatable-body" style="display: none;">
                 {% for item in overdue_items %}
                     <tr class="item-row item-row--overdue">
                         <td>{{ item.id }}</td>
@@ -147,6 +147,8 @@
               }
             })
           }
+
+          $('#datatable-body').show();
         </script>
     {% endif %}
 {% endblock %}

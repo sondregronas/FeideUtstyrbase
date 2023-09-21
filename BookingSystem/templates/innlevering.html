@@ -29,7 +29,7 @@
                 <th>Utlånt til</th>
                 <th>Frist for levering</th>
             </thead>
-            <tbody>
+            <tbody id="datatable-body" style="display:none;">
             {% for item in unavailable_items %}
                 {% if item.overdue %}
                     <tr class="item-row item-row--overdue">
@@ -72,5 +72,6 @@
         "pageLength": 25,
         "lengthMenu": [[25, 50, -1], [25, 50, "Alle"]],
       });
+      $('#datatable-body').show();
     </script>
 {% endblock %}
