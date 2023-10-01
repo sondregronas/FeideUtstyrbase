@@ -6,7 +6,7 @@
 
 {% block content %}
     <hgroup>
-        <h2>Vågen Utstyrbase</h2>
+        <h2>{{ g.site_name }}</h2>
         <h3>Velkommen! Her kan du <a href="{{ url_for('app.innlevering') }}">levere inn</a> og <a
                 href="{{ url_for('app.booking') }}">låne bort utstyr</a>!
         </h3>

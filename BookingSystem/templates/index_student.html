@@ -4,8 +4,7 @@
     <hgroup>
         <h2>Hei {{ session.user.name }}!</h2>
         <h3>Velkommen til utstyrsrommet! Før du kan bruke utstyrsrommet må du velge klassen og kontaktlæreren din fra
-            listen
-            under.</h3>
+            listen under.</h3>
     </hgroup>
 
     <form action="{{ url_for('api.register_student') }}" method="post">
