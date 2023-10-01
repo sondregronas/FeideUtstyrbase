@@ -11,6 +11,7 @@ services:
       # - ./overrides:/overrides  # Optional, such as custom templates or static files
       #                             (i.e.) ./logo.png:/overrides/static/logo.png
       #                             or passing an entire directory, follows the same structure as the app directory
+      #                             (you might want to override /templates/user/globals.html to add templating variables)
     environment:
       # Feide client settings (Get from https://dashboard.dataporten.no)
       # FEIDE_REDIRECT_URI must be set to <fqdn>/login/feide/callback in dataporten

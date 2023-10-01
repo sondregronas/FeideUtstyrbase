@@ -27,7 +27,8 @@
 {% block content %}
     <hgroup>
         <h2>Lån ut utstyr</h2>
-        <h3>Dersom du ikke finner eleven i listen, må eleven logge inn på nettstedet og fullføre registreringen.</h3>
+        <h3>Dersom du ikke finner eleven i listen, må eleven logge inn via <a
+                href="#">{{ g.site_url }}</a> og fullføre registreringen.</h3>
     </hgroup>
 
     <form>
@@ -46,7 +47,7 @@
             </select>
         </div>
 
-        <label for="days">Hvor lenge (antall dager, maks 14)</label>
+        <label for="days">Hvor lenge (antall dager, maks {{ MAX_DAYS }})</label>
         <div id="days-container">
             <input type="number" name="days" id="days" min="{{ MIN_DAYS }}" max="{{ MAX_DAYS }}" required>
             <div id="days-text"></div>
