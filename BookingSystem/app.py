@@ -77,14 +77,14 @@ def create_app() -> flask.Flask:
                     FQDN=urlparse(flask.request.base_url).hostname, )
 
     @app.errorhandler(401)
-    def unauthorized(_) -> tuple[flask.Response, int]:
+    def unauthorized_401(_) -> tuple[flask.Response, int]:
         flask.session.clear()
         if flask.request.url != flask.url_for('app.index', _external=True):
             logger.warning(f'Unauthorized access: {flask.request.url} from {flask.request.remote_addr}')
         return flask.redirect(flask.url_for('app.login')), 302
 
     @app.errorhandler(403)
-    def unauthorized(_) -> tuple[flask.Response, int]:
+    def unauthorized_403(_) -> tuple[flask.Response, int]:
         flask.session.clear()
         if flask.request.url != flask.url_for('app.index', _external=True):
             logger.warning(f'Unauthorized access: {flask.request.url} from {flask.request.remote_addr}')

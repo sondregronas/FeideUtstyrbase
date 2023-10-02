@@ -30,9 +30,9 @@ def formatted_overdue_items(items: list) -> str:
         '<table bordercolor="black" border="1" style="width: 100%;">' +
         '<tr style="background-color: teal; color: white;">' +
         f'<th>&nbsp;Tilhørighet: {association or "Ansatt"}</th>' +
-        f'</tr>\n' +
+        '</tr>\n' +
         '\n'.join([f'<tr><td>&nbsp;{item}</td></tr>' for item in pairs[association]]) +
-        f'</table>'
+        '</table>'
         for association in pairs.keys()]
     return '<blockquote style="border-color: #FF0000;">' + \
            '<br>'.join(strings) + \

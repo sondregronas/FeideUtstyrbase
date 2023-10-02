@@ -79,8 +79,7 @@ def add_item() -> flask.Response:
     item_dict = sanitize(validation_map, flask.request.form)
     # END: Validation
 
-    item = {key: val for key, val in item_dict.items()}
-    item = Item(**item)
+    item = Item(**item_dict)
     inventory.add(item)
     return flask.Response(f'La til {item.id} i databasen.', status=201)
 
@@ -99,8 +98,7 @@ def edit_item(item_id: str) -> flask.Response:
     item_dict = sanitize(validation_map, flask.request.form, {'id': item_id})
     # END: Validation
 
-    item = {key: val for key, val in item_dict.items()}
-    item = Item(**item)
+    item = Item(**item_dict)
     inventory.edit(item_id, item)
     return flask.Response(f'Redigerte {item_id} i databasen.', status=200)
 
@@ -142,7 +140,7 @@ def print_label(item_id: str) -> flask.Response:  # pragma: no cover
     item = inventory.get(item_id)
     url = f'{LABEL_SERVER}/print?id={item.id}&name={item.name}&variant={variant}&count={count}'
     try:
-        response = requests.post(url)
+        response = requests.post(url, timeout=5)
     except requests.exceptions.RequestException as e:
         return flask.Response(str(e), status=500)
     return flask.Response(response.text, status=response.status_code)
@@ -239,7 +237,7 @@ def register_student() -> flask.Response:
 @handle_api_exception
 def update_groups() -> flask.Response:
     """Update a class in the database."""
-    new_groups = list()
+    new_groups = []
     for group in flask.request.form.get('groups').split('\n'):
         if not group.strip():
             continue
@@ -261,7 +259,7 @@ def update_groups() -> flask.Response:
 @handle_api_exception
 def update_categories() -> flask.Response:
     """Update every category in the database."""
-    new_categories = list()
+    new_categories = []
     for category in flask.request.form.get('categories').split('\n'):
         if not category.strip():
             continue
@@ -293,7 +291,7 @@ def registrer_avvik() -> flask.Response:
 
     audits.audit('AVVIK', markupsafe.escape(txt))
     teams.send_deviation(txt)
-    return flask.Response(f'Avvik ble sendt til videre oppfølging', status=200)
+    return flask.Response('Avvik ble sendt til videre oppfølging', status=200)
 
 
 @api.route('/send_report', methods=['POST'])

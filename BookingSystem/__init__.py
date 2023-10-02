@@ -28,10 +28,10 @@ if TEAMS_WEBHOOKS_DEVIATIONS:
 REGEX_ID = r'^(?:(?![\s])[a-zA-Z0-9_\s\-]*[a-zA-Z0-9_\-]+)$'
 REGEX_ITEM = r'^(?:(?![\s])[ÆØÅæøåa-zA-Z0-9_\s\-]*[ÆØÅæøåa-zA-Z0-9_\-]+)$'
 
-MIN_DAYS = int(os.getenv('MIN_DAYS', 1))
-MAX_DAYS = int(os.getenv('MAX_DAYS', 14))
-MIN_LABELS = int(os.getenv('MIN_LABELS', 0))
-MAX_LABELS = int(os.getenv('MAX_LABELS', 10))
+MIN_DAYS = int(os.getenv('MIN_DAYS', '1'))
+MAX_DAYS = int(os.getenv('MAX_DAYS', '14'))
+MIN_LABELS = int(os.getenv('MIN_LABELS', '0'))
+MAX_LABELS = int(os.getenv('MAX_LABELS', '10'))
 
 # Debugging / development / testing
 DEBUG = os.getenv('DEBUG', '').lower() == 'true'
