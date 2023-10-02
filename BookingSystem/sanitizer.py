@@ -142,11 +142,11 @@ def _sanitize_form(sanitization_map: dict[any: VALIDATORS | MINMAX], form, data:
             case VALIDATORS.ITEM_LIST_EXISTS:
                 # Check if the item list exists
                 ids = form.getlist(key)
-                all_ids = [i for i in inventory.get_all_ids()]
+                all_ids = inventory.get_all_ids()
                 if not all(i in all_ids for i in ids):
                     raise APIException(f'En eller flere gjenstander finnes ikke ({form.getlist(key)})')
                 if not ids:
-                    raise APIException(f'Ingen gjenstander valgt')
+                    raise APIException('Ingen gjenstander valgt')
 
             case VALIDATORS.EMAIL:
                 # Check if the email is valid
@@ -186,7 +186,7 @@ def sanitize(validation_map: dict[any: VALIDATORS | MINMAX],
     """
     try:
         _sanitize_form(validation_map, form, data)
-        sanitized = dict()
+        sanitized = {}
 
         for key, sanitizer in validation_map.items():
             # Remove keys that are not in the validation map
