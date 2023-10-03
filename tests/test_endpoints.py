@@ -153,6 +153,8 @@ def test_public_endpoints(client):
         'feide.login',
         'feide.callback',
         'robots',
+        'manifest',
+        'service_worker',
     ]
 
     for endpoint in client.application.view_functions:
@@ -185,6 +187,8 @@ def test_user_endpoints(client):
         'api.register_student',
         'api.delete_me',
         'robots',
+        'manifest',
+        'service_worker',
     ]
 
     for endpoint in client.application.view_functions:

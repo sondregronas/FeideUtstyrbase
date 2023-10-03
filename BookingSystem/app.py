@@ -107,6 +107,18 @@ def create_app() -> flask.Flask:
     def robots() -> flask.Response:
         return flask.send_from_directory(app.static_folder, 'robots.txt')
 
+    @app.route('/manifest.json')
+    def manifest() -> flask.Response:
+        response = flask.make_response(app.send_static_file('manifest.json'))
+        response.headers['Content-Type'] = 'application/json'
+        return response
+
+    @app.route('/service-worker.js')
+    def service_worker() -> flask.Response:
+        response = flask.make_response(app.send_static_file('service_worker.js'))
+        response.headers['Content-Type'] = 'application/javascript'
+        return response
+
     # If we're in debug & mock-data mode, we can use /demo-login to skip logging in
     if DEBUG and MOCK_DATA:  # pragma: no cover
         @app.route('/demo-login')
