@@ -19,3 +19,7 @@
 <meta name="twitter:description"
       content="Klargjør kontoen din for utlån! Ved å autentisere deg med Feide får du tilgang til utlån av skolens utstyr. Tilgangen blir gjeldende ut skoleåret.">
 <meta name="twitter:image" content="https://{{ FQDN }}/static/logo.png">
+
+{% if session.user and session.user.is_admin %}
+    <link rel="manifest" href="/manifest.json">
+{% endif %}
