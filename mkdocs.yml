@@ -1,7 +1,13 @@
 site_name: 'Feide Utsyrbase'
 
+repo_name: 'sondregronas/FeideUtstyrbase'
+repo_url: 'https://github.com/sondregronas/FeideUtstyrbase'
+
 theme:
   name: 'material'
+  custom_dir: 'docs/overrides'
+  logo: 'logo.png'
+  favicon: 'favicon.ico'
   palette: # Light/Dark Mode
     - media: "(prefers-color-scheme: light)"  # Light mode
       scheme: default
