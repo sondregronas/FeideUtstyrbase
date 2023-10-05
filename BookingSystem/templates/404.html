@@ -1,14 +1,20 @@
 {% extends '_layout.html' %}
 
 {% block content %}
-    <hgroup>
-        <h2>404 - Fant ikke siden</h2>
-        <h3>Siden du prøvde å nå finnes ikke, eller er fjernet.</h3>
-    </hgroup>
+    <center>
+        <hgroup>
+            <h2>404 - Fant ikke siden</h2>
+            <h3>Siden du prøvde å nå finnes ikke, eller er fjernet.</h3>
+        </hgroup>
 
-    {% if error %}
-        <blockquote>
-            <strong>Feilmelding:</strong> {{ error }}
-        </blockquote>
-    {% endif %}
+
+        {% if error %}
+            <blockquote>
+                <strong>Feilmelding:</strong> {{ error }}
+            </blockquote>
+        {% endif %}
+
+        <br>
+        <img src="/static/img/pip-sad.png" alt="Pip er lei seg" width="30%"/>
+    </center>
 {% endblock %}

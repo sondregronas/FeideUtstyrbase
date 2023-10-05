@@ -1,6 +1,7 @@
 {
   "short_name": "Utstyrbase",
   "name": "Utstyrbase",
+  "description": "Få kontroll over utstyrslageret ditt, enkelt og greit.",
   "icons": [
     {
       "src": "/static/favicon.ico",
