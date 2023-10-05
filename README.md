@@ -35,11 +35,11 @@ To configure a kiosk, set up a separate reverse proxy with proper access control
 
 ## Overrides
 
-Logo and favicon can be changed by replacing the files in `/overrides/static/` with your own within the container, requiring the mapping of the `/overrides` directory. You can also change any of the files inside `BookingSystem` by putting them in `/overrides` should you need to.
+You can change any of the files inside `BookingSystem` by putting them in `/overrides`, should you need to. Files of interest are `/overrides/templates/user/globals.html` and `/overrides/static/*`
 
 ## TODO:
 
 - [ ] Find a way to implement included_batteries (and possibly other accessories) in a way that makes sense (ignoring them for now)
-- [ ] Code cleanup / refactoring, it's very inconsistent
-- [ ] Reduce coupling between modules (database, api, etc. - its a bit inconsistent)
-- [ ] Actual logo and favicon (currently a playstation shopping bag emoji)
+- [ ] Code cleanup / refactoring, it's a bit inconsistent
+- [ ] New UI / UX (In progress)
+- [ ] Reduce coupling between modules (database, api, etc. - fix inconsistensies)
