@@ -1,8 +1,15 @@
+{# Icons #}
 <link rel="shortcut icon" href="/static/favicon.ico" type="image/x-icon">
+<link rel="apple-touch-icon" sizes="180x180" href="/static/img/icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/static/img/icons/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/static/img/icons/favicon-16x16.png">
+
+{# Default settings #}
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="color-scheme" content="dark light">
 
+{# OG Tags #}
 <meta name="description"
       content="Klargjør kontoen din for utlån! Ved å autentisere deg med Feide får du tilgang til utlån av skolens utstyr. Tilgangen blir gjeldende ut skoleåret.">
 <meta property="og:url" content="https://{{ FQDN }}">
@@ -20,6 +27,12 @@
       content="Klargjør kontoen din for utlån! Ved å autentisere deg med Feide får du tilgang til utlån av skolens utstyr. Tilgangen blir gjeldende ut skoleåret.">
 <meta name="twitter:image" content="https://{{ FQDN }}/static/logo.png">
 
-{% if session.user and session.user.is_admin %}
-    <link rel="manifest" href="/manifest.json">
-{% endif %}
+{# Manifest & Service Worker #}
+<link rel="manifest" href="/static/manifest.json">
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function () {
+      navigator.serviceWorker.register('/service-worker.js');
+    });
+  }
+</script>

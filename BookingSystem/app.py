@@ -6,6 +6,7 @@ import flask
 from dateutil import parser
 from flask_compress import Compress
 from flask_minify import Minify
+from flask_session import Session
 from werkzeug.middleware.proxy_fix import ProxyFix
 
 import api
@@ -17,8 +18,6 @@ import routes
 import user
 from __init__ import logger, REGEX_ID, REGEX_ITEM, MIN_DAYS, MAX_DAYS, MIN_LABELS, MAX_LABELS, DEBUG, MOCK_DATA
 from db import init_db, Settings
-from flask_session import Session
-from utils import login_required
 
 
 def create_app() -> flask.Flask:
@@ -103,23 +102,13 @@ def create_app() -> flask.Flask:
     def internal_server_error(_) -> tuple[str, int]:
         return flask.render_template('500.html'), 500
 
-    # robots.txt
     @app.route('/robots.txt')
     def robots() -> flask.Response:
         return flask.send_from_directory(app.static_folder, 'robots.txt')
 
-    @app.route('/manifest.json')
-    def manifest() -> flask.Response:
-        response = flask.make_response(app.send_static_file('manifest.json'))
-        response.headers['Content-Type'] = 'application/json'
-        return response
-
     @app.route('/service-worker.js')
-    @login_required(admin_only=True)
     def service_worker() -> flask.Response:
-        """Allow admins to access the service worker for PWA installation
-        (not required for normal use, but nice to have)"""
-        response = flask.make_response(app.send_static_file('service_worker.js'))
+        response = flask.make_response(flask.send_from_directory(app.static_folder, 'sw.js'))
         response.headers['Content-Type'] = 'application/javascript'
         return response
 
