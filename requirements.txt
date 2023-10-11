@@ -7,6 +7,6 @@ python-dotenv~=1.0.0
 Werkzeug~=2.2.3
 Flask-Minify~=0.42
 Authlib~=1.2.1
-MarkupSafe~=2.1.1
+MarkupSafe~=2.1.3
 pymsteams~=0.2.2
 flask-compress~=1.14
