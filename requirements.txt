@@ -4,7 +4,7 @@ Flask-Session
 requests~=2.28.1
 python-dateutil~=2.8.2
 python-dotenv~=1.0.0
-Werkzeug~=2.2.3
+Werkzeug~=3.0.0
 Flask-Minify~=0.42
 Authlib~=1.2.1
 MarkupSafe~=2.1.1
