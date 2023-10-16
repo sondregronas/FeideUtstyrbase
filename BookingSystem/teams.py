@@ -6,7 +6,7 @@ import markupsafe
 import pymsteams
 
 import inventory
-from __init__ import TEAMS_WEBHOOKS, TEAMS_WEBHOOKS_DEVIATIONS
+from __init__ import TEAMS_WEBHOOKS, TEAMS_WEBHOOKS_DEVIATIONS, DEBUG
 from db import Settings
 from sanitizer import APIException
 
@@ -101,7 +101,6 @@ def send_deviation(deviation: str) -> flask.Response:  # pragma: no cover
         None (sends a card asynchronously).
     """
     deviation_webhooks = TEAMS_WEBHOOKS_DEVIATIONS if TEAMS_WEBHOOKS_DEVIATIONS else TEAMS_WEBHOOKS
-    print(deviation_webhooks)
 
     if not deviation_webhooks:
         raise APIException('Avvik ikke sendt: webhooks er ikke konfigurert', 400)
@@ -117,7 +116,8 @@ def send_deviation(deviation: str) -> flask.Response:  # pragma: no cover
 def send_report() -> flask.Response:  # pragma: no cover
     """Send a report card to all webhooks in TEAMS_WEBHOOKS."""
     # Throw exception if last report was sent less than an hour ago
-    last_sent_within_hour_treshold()
+    if not DEBUG:
+        last_sent_within_hour_treshold()
 
     if not TEAMS_WEBHOOKS:
         raise APIException('Rapport ikke sendt: webhooks er ikke konfigurert', 400)
