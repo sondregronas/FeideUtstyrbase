@@ -139,7 +139,7 @@ class Item:
 
     @property
     def exists(self) -> bool:
-        return self.id.lower() in [i.id.lower() for i in get_all()]
+        return exists(self.id)
 
 
 def add(item: Item) -> None:
@@ -233,6 +233,13 @@ def get_all_unavailable() -> list[Item]:
 def get_all_overdue() -> list[Item]:
     """Return a JSON list of all overdue items in the database."""
     return [item for item in get_all() if item.overdue]
+
+
+def exists(item_id: str) -> bool:
+    """Return True if the item with the given ID exists in the database."""
+    with db.connect() as (con, cur):
+        cur.execute("SELECT EXISTS(SELECT 1 FROM inventory WHERE id=:id COLLATE NOCASE)", {'id': item_id})
+        return cur.fetchone()[0] == 1
 
 
 def get_all_ids() -> list[str]:

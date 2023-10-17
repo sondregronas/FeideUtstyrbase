@@ -62,8 +62,8 @@ def _sanitize_form(sanitization_map: dict[any: VALIDATORS | MINMAX], form, data:
 
     def unique(fkey: str) -> bool:
         # Check if the ID is unique
-        l_val, l_ids = form.get(fkey).lower(), [i.lower() for i in inventory.get_all_ids()]
-        return l_val not in l_ids
+        item_id = form.get(fkey).lower()
+        return not inventory.exists(item_id)
 
     def active_user(fkey: str) -> bool:
         # Check if the user is valid
