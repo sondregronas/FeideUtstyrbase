@@ -6,7 +6,6 @@ import flask
 from dateutil import parser
 from flask_compress import Compress
 from flask_minify import Minify
-from flask_session import Session
 from werkzeug.middleware.proxy_fix import ProxyFix
 
 import api
@@ -18,6 +17,7 @@ import routes
 import user
 from __init__ import logger, REGEX_ID, REGEX_ITEM, MIN_DAYS, MAX_DAYS, MIN_LABELS, MAX_LABELS, DEBUG, MOCK_DATA
 from db import init_db, Settings
+from flask_session import Session
 
 
 def create_app() -> flask.Flask:
@@ -128,9 +128,8 @@ def create_app() -> flask.Flask:
     return app
 
 
+init_db()
+app = create_app()
+
 if __name__ == '__main__':
-    init_db()
-    create_app().run(host='0.0.0.0')
-else:
-    init_db()
-    app = create_app()
+    app.run(host='0.0.0.0')

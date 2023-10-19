@@ -7,9 +7,7 @@
 [![codecov](https://codecov.io/gh/sondregronas/FeideUtstyrbase/branch/main/graph/badge.svg?token=JNLY5WWC3X)](https://codecov.io/gh/sondregronas/FeideUtstyrbase)
 [![License](https://img.shields.io/github/license/sondregronas/FeideUtstyrbase)](https://github.com/sondregronas/FeideUtstyrbase/blob/main/LICENSE)
 
-
-
-For Vågen VGS, might be possible to use for other schools with some modifications. (Work in progress, not plug and play)
+For Vågen VGS, might be possible to use for other schools with some modifications. (Work in progress, this is not plug and play)
 
 ## Dev setup
 Recommended `.env` file for development:
@@ -23,23 +21,24 @@ KIOSK_FQDN=127.0.0.1:5000  # Automatically logs in as Kiosk user when visiting t
 
 ## Setup
 
-1. Register app at Dataporten (must be approved by a Feide Administrator)
-2. Set callback url to `https://<your-domain>/login/feide/callback`
-3. Setup https://github.com/VaagenIM/EtikettServer (currently not optional)
-4. Add as many Teams webhooks as you want, they need to be comma separated in the `TEAMS_WEBHOOKS` environment variable. (see cron examples in docs for how to automatically send reports to teams)
+1. Register an app at Dataporten (must be approved by your Feide Administrator) with the scopes `email`, `groups-org` and `userinfo-name`
+2. Set the callback url to `https://<FQDN>/login/feide/callback`
+3. Install the labelprinter/service https://github.com/VaagenIM/EtikettServer (currently a requirement)
+4. The application sends notifications using Teams Incoming Webhooks, they need to be comma separated in the `TEAMS_WEBHOOKS` environment variable. (see cron examples in docs for how to automatically send reports to teams)
 5. Run the `docker-compose.yml` file after setting up the environment variables.
 
-> The application must be configured through a reverse proxy, such as [NginxProxyManager](https://nginxproxymanager.com/) - you don't want to run this without SSL.
+> The application must be configured to run through a reverse proxy, such as [NginxProxyManager](https://nginxproxymanager.com/) - don't run in production without SSL.
 
-To configure a kiosk, set up a separate reverse proxy with proper access controls (limit to specified IP) and set `KIOSK_FQDN` to the FQDN of the kiosk proxy. (Remember, you can restrict access further by setting up a firewall rule)
+To configure a kiosk, set up a separate reverse proxy with proper access controls (limit to specified IP) and set `KIOSK_FQDN` to the FQDN of the kiosk proxy. (Remember to restrict access further by setting up a firewall rule)
 
 ## Overrides
 
-You can change any of the files inside `BookingSystem` by putting them in `/overrides`, should you need to. Files of interest are `/overrides/templates/user/globals.html` and `/overrides/static/*`
+You can change any of the files inside `BookingSystem` by putting them in `/overrides`, should you need to. Files of interest are `/overrides/templates/user/globals.html` and those found in `/overrides/static/*`
 
 ## TODO:
 
-- [ ] Find a way to implement included_batteries (and possibly other accessories) in a way that makes sense (ignoring them for now)
+- [ ] Find a way to implement included_batteries (and possibly other accessories) in a way that makes sense (omitted entirely them for now)
 - [ ] Code cleanup / refactoring, it's a bit inconsistent
 - [ ] New UI / UX (In progress)
-- [ ] Reduce coupling between modules (database, api, etc. - fix inconsistensies)
+- [ ] Reduce coupling between modules (database, api, etc.)
+- [ ] Add the possibility to limit access to specific Dataporten groups and limit administrator access to specific email addresses or something similar, currently every employee can access the admin panel.
