@@ -1,6 +1,15 @@
+import uuid
+
 import db
 import groups
+import user
 from conftest import *
+
+
+def user_exists(userid: str) -> bool:
+    """Check if a user exists in the database."""
+    userids = [u.get('userid') for u in user.get_all_active_users()]
+    return userid in userids
 
 
 def add_classroom(client):
@@ -16,16 +25,35 @@ def add_classroom(client):
 
 def test_register_invalid(student_client):
     add_classroom(student_client)
+    with student_client.session_transaction() as session:
+        session['user'] = StudentUser(userid=str(uuid.uuid4()))
 
     # Invalid classroom
     r = student_client.post(url_for(student_client, 'api.register_student'),
                             data={'classroom': 'h4x0r'})
     assert 'dQw4w9WgXcQ' in r.data.decode('utf-8')
 
+    # Assert the user is not registered
+    r = student_client.get(url_for(student_client, 'app.index'))
+    assert "Status: Du er klar" not in r.data.decode('utf-8')
+    assert not user_exists(session['user'].userid)
+
     # Invalid teacher
     r = student_client.post(url_for(student_client, 'api.register_student'),
                             data={'h4x0r': 'Classroom (Teacher Name)'})
     assert 'dQw4w9WgXcQ' in r.data.decode('utf-8')
+
+    # Assert the user is not registered
+    r = student_client.get(url_for(student_client, 'app.index'))
+    assert "Status: Du er klar" not in r.data.decode('utf-8')
+    assert not user_exists(session['user'].userid)
+
+    # Register with a valid classroom teacher combination to verify that the user can register
+    student_client.post(url_for(student_client, 'api.register_student'),
+                        data={'classroom': 'Classroom (Teacher Name)'})
+    r = student_client.get(url_for(student_client, 'app.index'))
+    assert "Status: Du er klar" in r.data.decode('utf-8')
+    assert user_exists(session['user'].userid)
 
 
 def test_register(client):
@@ -38,6 +66,7 @@ def test_register(client):
     # Verify that the user is not registered
     r = client.get(url_for(client, 'app.index'))
     assert "Status: Du er klar" not in r.data.decode('utf-8')
+    assert not user_exists(user.userid)
 
     # Register
     client.post(url_for(client, 'api.register_student'),
@@ -46,6 +75,7 @@ def test_register(client):
     # Verify that the user is now registered
     r = client.get(url_for(client, 'app.index'))
     assert "Status: Du er klar" in r.data.decode('utf-8')
+    assert user_exists(user.userid)
 
     # Verify that the user is registered in the database
     with client.session_transaction() as session:
