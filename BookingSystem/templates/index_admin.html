@@ -55,7 +55,7 @@
                         <td>{{ item.name }} ({{ item.category }})</td>
                         <td>{{ item.lender_name }} <small> ({{ item.classroom }}{% if item.teacher %},
                             {{ item.teacher }}{% endif %})</small></td>
-                        <td>{{ item.order_due_date|strftime }}</td>
+                        <td data-sort="{{ item.order_due_date }}">{{ item.order_due_date|strftime }}</td>
                         <td>
                             <a onclick="postpone('{{ item.id }}', '{{ item.lender }}', this.parentNode.parentNode)">Utsett
                                 frist</a>
@@ -94,7 +94,7 @@
               type: 'blue',
               icon: 'fa fa-calendar-plus-o',
               content: `<i>Lånt til ${lender}</i>` +
-                '<br><br>Utlånsfristen kan utsettes opp til 7 dager, kontaktlærer bør varsles om utsettelsen før den gjennomføres.',
+                  '<br><br>Utlånsfristen kan utsettes opp til 7 dager, kontaktlærer bør varsles om utsettelsen før den gjennomføres.',
               buttons: {
                 oneDay: {
                   text: '1 dag',

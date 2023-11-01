@@ -259,7 +259,7 @@ def _update_last_seen(item_id: str) -> None:
 
 def register_out(item_id: str, userid: str, days: str = 1) -> None:
     """Set the item with the given ID to unavailable and register the order details."""
-    due_date = datetime.now() + timedelta(days=datetime.strptime(days, '%d').day)
+    due_date = datetime.now() + timedelta(days=int(days))
 
     item = get(item_id)
     if item.available == 0:
