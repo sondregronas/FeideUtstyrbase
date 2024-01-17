@@ -52,26 +52,35 @@
     {% endif %}
 
     <script>
-      let lang = {
-        "lengthMenu": "Vis _MENU_ rader per side",
-        "zeroRecords": "Ingen treff",
-        "info": "Viser side _PAGE_ av _PAGES_",
-        "infoEmpty": "Ingen rader tilgjengelig",
-        "infoFiltered": "(filtrert fra _MAX_ rader totalt)",
-        "search": "Søk:",
-        "paginate": {
-          "first": "Første",
-          "last": "Siste",
-          "next": "Neste",
-          "previous": "Forrige"
-        }
-      };
-      $('#active').DataTable({
-        "language": lang,
-        "order": [[3, "asc"]],
-        "pageLength": 25,
-        "lengthMenu": [[25, 50, -1], [25, 50, "Alle"]],
-      });
-      $('#datatable-body').show();
+        let lang = {
+            "lengthMenu": "Vis _MENU_ rader per side",
+            "zeroRecords": "Ingen treff",
+            "info": "Viser side _PAGE_ av _PAGES_",
+            "infoEmpty": "Ingen rader tilgjengelig",
+            "infoFiltered": "(filtrert fra _MAX_ rader totalt)",
+            "search": "Søk:",
+            "paginate": {
+                "first": "Første",
+                "last": "Siste",
+                "next": "Neste",
+                "previous": "Forrige"
+            }
+        };
+        $('#active').DataTable({
+            "language": lang,
+            "order": [[3, "asc"]],
+            "pageLength": 25,
+            "lengthMenu": [[25, 50, -1], [25, 50, "Alle"]],
+        });
+        $('#datatable-body').show();
+
+        // Autofocus on the id field when no input is focused
+        $(document).ready(function () {
+            $(document).on('click', function (e) {
+                if (!$(e.target).is('input')) {
+                    $('#id').focus();
+                }
+            });
+        });
     </script>
 {% endblock %}
