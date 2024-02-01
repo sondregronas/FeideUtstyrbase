@@ -3,7 +3,7 @@ flask~=3.0.0
 Flask-Session
 requests~=2.31.0
 python-dateutil~=2.8.2
-python-dotenv~=1.0.0
+python-dotenv~=1.0.1
 Werkzeug~=3.0.1
 Flask-Minify~=0.42
 Authlib~=1.3.0
