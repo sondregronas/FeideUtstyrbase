@@ -166,7 +166,7 @@ def _sanitize_form(sanitization_map: dict[any: VALIDATORS | MINMAX], form, data:
         if key.endswith('_minmax'):
             # Check if the value is between the min and max
             mn, mx = sanitizer
-            if not mn <= int(form.get(key[:-7])) <= mx:
+            if not mn <= int(form.get(key[:-7])) <= mx:  # Remove _minmax from the key ('days_minmax' -> 'days')
                 logger.debug(f'Invalid minmax for {key} ({form.get(key[:-7])})')
                 raise APIException(f'Tallverdien er ikke mellom {mn} og {mx} ({form.get(key[:-7])})')
 
