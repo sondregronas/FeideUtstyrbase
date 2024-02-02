@@ -1,12 +1,12 @@
 gunicorn~=21.2.0
-flask~=3.0.0
+flask~=3.0.1
 Flask-Session
 requests~=2.31.0
 python-dateutil~=2.8.2
-python-dotenv~=1.0.0
+python-dotenv~=1.0.1
 Werkzeug~=3.0.1
 Flask-Minify~=0.42
 Authlib~=1.3.0
-MarkupSafe~=2.1.3
+MarkupSafe~=2.1.4
 pymsteams~=0.2.2
 flask-compress~=1.14
