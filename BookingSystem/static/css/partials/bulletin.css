@@ -1,0 +1,34 @@
+#bulletin-section {
+  background-color: var(--placeholder-bg);
+  text-align: center;
+}
+
+#bulletin-contents {
+  margin-inline: auto;
+  padding: 1rem 0;
+  color: var(--placeholder);
+}
+
+@media (min-width: 1200px) {
+  #bulletin-contents {
+    max-width: 1130px;
+  }
+}
+
+@media (max-width: 992px) {
+  #bulletin-contents {
+    max-width: 920px;
+  }
+}
+
+@media (max-width: 768px) {
+  #bulletin-contents {
+    max-width: 700px;
+  }
+}
+
+@media (max-width: 576px) {
+  #bulletin-contents {
+    max-width: 510px;
+  }
+}

@@ -1,0 +1,47 @@
+@import 'partials/variables.css';
+@import 'partials/base.css';
+@import 'partials/bulletin.css';
+
+.warning {
+  color: var(--del-color);
+}
+
+.item-row--overdue {
+  font-style: italic;
+  color: var(--del-color);
+}
+
+.label-preview {
+  width: 50%;
+  border: .5rem solid white;
+  border-radius: 1rem;
+}
+
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  border: 1px solid #ddd;
+  background-color: var(--background-color);
+  min-width: 12ch;
+  padding: 1rem;
+  z-index: 999;
+}
+
+.dropdown a {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+
+.last-seen-recent {
+  font-style: italic;
+}
+
+.last-seen-stale {
+  color: var(--del-color);
+}

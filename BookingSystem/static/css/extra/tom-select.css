@@ -1,0 +1,94 @@
+/* TODO: Refactor / re-do */
+
+/*
+:root {
+  --form-element-background-color: red;
+  --dropdown-background-color: var(--form-element-background-color);
+}
+
+.plugin-dropdown_input .dropdown-input {
+  background-color: var(--form-element-background-color) !important;
+}
+
+.ts-wrapper.plugin-remove_button:not(.rtl) .item.active .remove {
+  border-left-color: transparent;
+  border-right-color: transparent;
+}
+
+.ts-wrapper.multi .ts-control > div.active {
+  background: var(--dropdown-background-color);
+}
+
+.ts-dropdown {
+  background: var(--dropdown-background-color);
+  color: var(--color);
+}
+
+.ts-dropdown .active {
+  background: var(--dropdown-background-color);
+}
+
+.ts-control,
+.ts-wrapper.single.input-active .ts-control {
+  background: var(--form-element-background-color);
+}
+
+
+.has-items .ts-control {
+  border: var(--border-width) solid var(--form-element-valid-border-color);
+}
+
+
+
+.ts-wrapper input {
+  height: auto;
+}
+
+.ts-dropdown.single {
+  margin-top: .5rem;
+}
+
+.ts-control input {
+  width: auto;
+}
+
+ */
+
+.option-text {
+  display: inline;
+  font-weight: bold;
+  text-align: left;
+}
+
+.option-details {
+  font-size: calc(var(--font-size) * 0.75);
+  color: var(--muted-color);
+}
+
+.booking-option {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  align-items: center;
+}
+
+.booking-option > div {
+  width: 50%;
+}
+
+.option-inline-text {
+  font-weight: bold;
+}
+
+.option-inline-details {
+  text-align: right;
+  color: var(--muted-color);
+  font-size: calc(var(--font-size) * 0.75);
+  padding-right: calc(var(--spacing) + 1.5rem);
+}
+
+.option-inline-itemdetails {
+  text-align: right;
+  color: var(--muted-color);
+  font-size: calc(var(--font-size) * 0.75);
+}
