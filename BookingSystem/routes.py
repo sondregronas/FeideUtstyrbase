@@ -102,7 +102,7 @@ def innlevering() -> str:
     """
 
     return flask.render_template('innlevering.html',
-                                 show_popup=flask.request.args.get('show_popup', '1') == '1')
+                                 show_popup=False)  # show_popup=flask.request.args.get('show_popup', '1') == '1')
 
 
 @app.route('/varetelling')
