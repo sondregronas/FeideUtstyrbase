@@ -6,6 +6,7 @@ import flask
 from dateutil import parser
 from flask_compress import Compress
 from flask_minify import Minify
+from flask_session import Session
 from werkzeug.middleware.proxy_fix import ProxyFix
 
 import api
@@ -17,7 +18,6 @@ import routes
 import user
 from __init__ import logger, REGEX_ID, REGEX_ITEM, MIN_DAYS, MAX_DAYS, MIN_LABELS, MAX_LABELS, DEBUG, MOCK_DATA
 from db import init_db, Settings
-from flask_session import Session
 
 
 def create_app() -> flask.Flask:
@@ -26,7 +26,6 @@ def create_app() -> flask.Flask:
 
     app.secret_key = os.getenv('SECRET_KEY')
     app.config['SESSION_TYPE'] = 'filesystem'
-    app.config['PERMANENT_SESSION_LIFETIME'] = 3600
     if os.getenv('DEBUG') == 'True':
         app.debug = True
 

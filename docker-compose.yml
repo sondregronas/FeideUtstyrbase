@@ -25,6 +25,7 @@ services:
       # Global settings
       - MAX_DAYS=14 # Maximum days equipment can be borrowed
       - MAX_LABELS=10 # Maximum number of labels that can be printed at a time
+      - SECRET_KEY=SuperSecretKey # Random string for session security
 
       # Teams Webhooks (for sending notifications to teams channel) - comma separated
       - TEAMS_WEBHOOKS=

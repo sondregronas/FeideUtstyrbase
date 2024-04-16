@@ -11,6 +11,7 @@ ENV MIN_DAYS='1'
 ENV MAX_DAYS='90'
 ENV MIN_LABELS='0'
 ENV MAX_LABELS='10'
+ENV SECRET_KEY='SuperSecretKeyHere'
 
 # FEIDE OAuth2
 ENV FEIDE_REDIRECT_URI='https://<fqdn>/login/feide/callback'
