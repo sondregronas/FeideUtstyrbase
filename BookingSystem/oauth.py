@@ -40,7 +40,7 @@ def handle_oauth_exception(f) -> callable:  # pragma: no cover
         except AuthlibBaseError:
             logger.error(f'Authlib error: {flask.request.url} from {flask.request.remote_addr}')
             flask.session.clear()
-            flask.abort(500)
+            flask.abort(401)
         except(requests.exceptions.ConnectionError, requests.exceptions.HTTPError):
             logger.error(f'Connection error: {flask.request.url} from {flask.request.remote_addr}')
             flask.abort(500)
