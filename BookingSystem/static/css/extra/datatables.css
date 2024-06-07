@@ -1,0 +1,35 @@
+/*
+.dataTables_length, .dataTables_filter {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  width: 50%;
+}
+
+.dataTables_filter {
+  justify-content: flex-end;
+}
+
+.dataTables_length select {
+  width: 4rem;
+  padding-left: .5em !important;
+  margin-left: 0.5em;
+}
+
+.dataTables_length * {
+  margin-right: 1em;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  width: 100%;
+  margin: auto 0.5em auto 0;
+}
+
+
+.dataTables_filter input {
+  padding-left: 3rem !important;
+  margin-left: 1rem !important;
+  width: 75% !important;
+  height: 50% !important;
+}
+ */
