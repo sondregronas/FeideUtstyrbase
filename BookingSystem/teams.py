@@ -35,9 +35,9 @@ def formatted_overdue_items(items: list) -> str:
         '</table>'
         for association in pairs.keys()]
     return '<blockquote style="border-color: #FF0000;">' + \
-           '<br>'.join(strings) + \
-           '</blockquote>' + \
-           '\n<small><i>Dersom du kjenner igjen utlåneren, vennligst få dem til å levere utstyret tilbake ASAP.</i></small>'
+        '<br>'.join(strings) + \
+        '</blockquote>' + \
+        '\n<small><i>Dersom du kjenner igjen utlåneren, vennligst få dem til å levere utstyret tilbake ASAP.</i></small>'
 
 
 def formatted_deviation(deviation: str) -> str:
@@ -45,9 +45,9 @@ def formatted_deviation(deviation: str) -> str:
     if not deviation:
         raise APIException('Ingen avvik å rapportere.', 400)
     return '<blockquote style="border-color: #FF0000;">' + \
-           str(markupsafe.escape(deviation)) + \
-           '</blockquote>' + \
-           '<small><i><b>NB:</b> Avvik må oppfølges manuelt av dere mennesker, jeg kan kun varsle om nye avvik.</i></small>'
+        str(markupsafe.escape(deviation)) + \
+        '</blockquote>' + \
+        '<small><i><b>NB:</b> Avvik må oppfølges manuelt av dere mennesker, jeg kan kun varsle om nye avvik.</i></small>'
 
 
 def generate_card(title, text, color, webhook=None) -> pymsteams.connectorcard:
@@ -116,6 +116,9 @@ def send_deviation(deviation: str) -> flask.Response:  # pragma: no cover
 def send_report() -> flask.Response:  # pragma: no cover
     """Send a report card to all webhooks in TEAMS_WEBHOOKS."""
     # Throw exception if last report was sent less than an hour ago
+    if not Settings.get('send_reports') == '1':
+        raise APIException('Rapport ikke sendt: rapporter er deaktivert', 400)
+
     if not DEBUG:
         last_sent_within_hour_treshold()
 

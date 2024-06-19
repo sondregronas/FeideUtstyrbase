@@ -4,8 +4,6 @@ Routes to interact with the database. (API endpoints.)
 This should be called from the frontend to get data from the database.
 Filtering and sorting should be done on the frontend, not the backend.
 """
-import os
-import shutil
 from datetime import datetime
 
 import flask
@@ -17,7 +15,7 @@ import db
 import inventory
 import teams
 import user
-from __init__ import DATABASE, LABEL_SERVER, MIN_DAYS, MAX_DAYS, MIN_LABELS, MAX_LABELS
+from __init__ import LABEL_SERVER, MIN_DAYS, MAX_DAYS, MIN_LABELS, MAX_LABELS
 from db import Settings
 from inventory import Item
 from sanitizer import VALIDATORS, MINMAX, sanitize, handle_api_exception, APIException
@@ -318,19 +316,6 @@ def send_report() -> flask.Response:  # pragma: no cover
     return teams.send_report()
 
 
-@api.route('/users/prune_inactive', methods=['POST'], endpoint='prune_inactive_users')
-@login_required(admin_only=True, api=True)
-def prune_inactive_users() -> flask.Response:
-    """Prune users that have not been updated in a while.
-
-    Example cronjob:
-    0 1 1 7 * curl -X POST "http://localhost:5000/users/prune_inactive?token=<token>"
-    """
-    # TODO: run this every day as a background task here instead of an external cronjob?
-    user.prune_inactive()
-    return flask.Response('Inaktive brukere ble fjernet.', status=200)
-
-
 @api.route('/users/me', methods=['DELETE'])
 @login_required()
 def delete_me() -> flask.Response:
@@ -339,25 +324,6 @@ def delete_me() -> flask.Response:
     user.delete(u.userid)
     flask.session.clear()
     return flask.Response(f'Bruker {u.name} ble slettet.', status=200)
-
-
-@api.route('/backup/<filename>', methods=['POST'])
-@login_required(admin_only=True, api=True)
-@handle_api_exception
-def backup(filename: str) -> flask.Response:
-    """Backup the database with the given filename to the data/backups folder.
-
-    Recommended to use a cronjob to run this every week, e.g.:
-    0 1 * * 1 curl -X POST "http://localhost:5000/backup/backup-$(date +\%Y-w\%V).sqlite?token=<token>"
-    """
-    if not filename.endswith('.sqlite'):
-        raise APIException('Ugyldig filnavn (Må avsluttes med .sqlite).', 400)
-
-    if not os.path.exists('data/backups'):
-        os.mkdir('data/backups')
-
-    shutil.copyfile(DATABASE, f'data/backups/{filename}')
-    return flask.Response(f'Databasen ble sikkerhetskopiert til {filename}.', status=200)
 
 
 @api.route('/bulletin', methods=['PUT'])
@@ -371,3 +337,13 @@ def update_bulletin() -> flask.Response:
     Settings.set('bulletin_title', markupsafe.escape(bulletin_title))
     Settings.set('bulletin', markupsafe.escape(bulletin))
     return flask.Response('Bulletin ble oppdatert.', status=200)
+
+
+@api.route('/toggle-reports', methods=['POST'])
+@login_required(admin_only=True)
+@handle_api_exception
+def update_send_reports() -> flask.Response:
+    """Toggles the send_reports setting in the database."""
+    send_reports = Settings.get('send_reports') == '1'
+    Settings.set('send_reports', '0' if send_reports else '1')
+    return flask.Response('Dagsrapporter er nå slått ' + ('av' if send_reports else 'på') + '.', status=200)

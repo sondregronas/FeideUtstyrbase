@@ -3,6 +3,8 @@ import uuid
 import db
 import groups
 import user
+
+from BookingSystem.user import prune_inactive
 from conftest import *
 
 
@@ -170,8 +172,9 @@ def test_prune_inactive(admin_client):
         assert r['name'] == ctx.users[0].name
         assert r['userid'] == ctx.users[0].userid
 
-        r = admin_client.post(url_for(admin_client, 'api.prune_inactive_users'))
-        assert r.status_code == 200
+        # r = admin_client.post(url_for(admin_client, 'api.prune_inactive_users'))
+        # assert r.status_code == 200
+        prune_inactive()
 
         r = admin_client.get(url_for(admin_client, 'api.get_user', userid=ctx.users[0].userid)).json
         assert r['name'] == ctx.users[0].name
@@ -182,8 +185,9 @@ def test_prune_inactive(admin_client):
             cur.execute(
                 f"""UPDATE users SET expires_at = DATETIME('now', '-365 days') WHERE userid = '{ctx.users[0].userid}'""")
 
-        r = admin_client.post(url_for(admin_client, 'api.prune_inactive_users'))
-        assert r.status_code == 200
+        # r = admin_client.post(url_for(admin_client, 'api.prune_inactive_users'))
+        # assert r.status_code == 200
+        prune_inactive()
 
         r = admin_client.get(url_for(admin_client, 'api.get_user', userid=ctx.users[0].userid)).json
         assert not r

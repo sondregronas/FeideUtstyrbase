@@ -7,6 +7,14 @@
         <h3>Dersom du er forvirret av denne siden, så kan du trygt forlate den :)</h3>
     </hgroup>
 
+    <a onclick="updateSendReports()">
+        {% if send_reports %}
+            <button id="toggle-reports--btn">Dagsrapporter sendes 10:00</button>
+        {% else %}
+            <button class="red-button" id="toggle-reports--btn">Dagsrapporter er deaktivert</button>
+        {% endif %}
+    </a>
+
     {% if last_sent %}
         <a onclick="sendReport()">
             <button id="send-report--btn">Send rapport (Sist sendt {{ last_sent | strfunixtime }})</button>
@@ -36,36 +44,53 @@
     {% include 'forms/bulletin.html' %}
 
     <script>
-      let last_sent = "{{last_sent}}";
+        let last_sent = "{{last_sent}}";
 
-      function sendReport() {
-        let last_sent_day = new Date(last_sent * 1000).getDate();
-        let today = new Date().getDate();
-        if (last_sent_day === today) {
-          confirmMail("Bekreft utsendelse", "Det er allerede sendt ut rapport idag. Vil du likevel sende en ny?", _send)
-        } else {
-          _send()
+        function sendReport() {
+            let last_sent_day = new Date(last_sent * 1000).getDate();
+            let today = new Date().getDate();
+            if (last_sent_day === today) {
+                confirmMail("Bekreft utsendelse", "Det er allerede sendt ut rapport idag. Vil du likevel sende en ny?", _send)
+            } else {
+                _send()
+            }
         }
-      }
 
-      function _send() {
-        last_sent = new Date().getTime() / 1000;
-        $('#send-report--btn').html('Send rapport (Sist sendt ' + new Date().toLocaleDateString('nb-NO', {
-          day: '2-digit',
-          month: '2-digit',
-          year: 'numeric'
-        }) + ')');
-        $.ajax({
-          url: "{{url_for('api.send_report')}}",
-          type: 'POST',
-          success: function (result) {
-            customAlert('Sendt!', result, 'success', true)
-          },
-          error: function (result) {
-            customAlert('Info', result.responseText, 'info', true)
-          }
-        });
-      }
+        function updateSendReports() {
+            $.ajax({
+                url: "{{url_for('api.update_send_reports')}}",
+                type: 'POST',
+                success: function (result) {
+                    customAlert('Oppdatert!', result, 'success', true)
+                    $('#toggle-reports--btn').html(function (i, text) {
+                        return text === 'Dagsrapporter sendes 10:00' ? 'Dagsrapporter er deaktivert' : 'Dagsrapporter sendes 10:00';
+                    });
+                    $('#toggle-reports--btn').toggleClass('red-button')
+                },
+                error: function (result) {
+                    customAlert('Info', result.responseText, 'info', true)
+                }
+            });
+        }
+
+        function _send() {
+            last_sent = new Date().getTime() / 1000;
+            $('#send-report--btn').html('Send rapport (Sist sendt ' + new Date().toLocaleDateString('nb-NO', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric'
+            }) + ')');
+            $.ajax({
+                url: "{{url_for('api.send_report')}}",
+                type: 'POST',
+                success: function (result) {
+                    customAlert('Sendt!', result, 'success', true)
+                },
+                error: function (result) {
+                    customAlert('Info', result.responseText, 'info', true)
+                }
+            });
+        }
     </script>
 
 {% endblock %}

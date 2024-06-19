@@ -216,8 +216,9 @@ def test_api_endpoints(client):
         'api.get_items_by_userid',
         'api.get_user',
         'api.send_report',
-        'api.prune_inactive_users',
-        'api.backup',
+        #    'api.prune_inactive_users',
+        #    'api.backup',
+        'api.update_send_reports'
     ]
 
     for endpoint in client.application.view_functions:

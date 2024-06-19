@@ -71,3 +71,14 @@ class Settings:
         """Set a setting by key."""
         with connect() as (con, cur):
             cur.execute('REPLACE INTO settings (name, value) VALUES (?, ?)', (key, value))
+
+    @staticmethod
+    def set_if_not_exists(key: str, value: str) -> None:
+        """Set a setting by key if it doesn't already exist."""
+        if not Settings.get(key):
+            Settings.set(key, value)
+
+    @staticmethod
+    def verify_settings_exist() -> None:
+        """Ensure settings exist in the database."""
+        Settings.set_if_not_exists('send_reports', '1')

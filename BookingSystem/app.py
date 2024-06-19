@@ -1,4 +1,5 @@
 import os
+import threading
 from datetime import datetime
 from urllib.parse import urlparse
 
@@ -18,6 +19,7 @@ import routes
 import user
 from __init__ import logger, REGEX_ID, REGEX_ITEM, MIN_DAYS, MAX_DAYS, MIN_LABELS, MAX_LABELS, DEBUG, MOCK_DATA
 from db import init_db, Settings
+from routine_tasks import start_routine
 
 
 def create_app() -> flask.Flask:
@@ -131,4 +133,6 @@ init_db()
 app = create_app()
 
 if __name__ == '__main__':
+    Settings.verify_settings_exist()
+    threading.Thread(target=start_routine).start()
     app.run(host='0.0.0.0')
