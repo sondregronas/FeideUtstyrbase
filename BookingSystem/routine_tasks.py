@@ -7,18 +7,9 @@ import time
 
 import schedule
 
-from db import Settings, DATABASE
+from db import DATABASE
 from teams import send_report
 from user import prune_inactive
-
-
-def _routine_send_report():
-    if Settings.get('send_reports') == '1':
-        send_report()
-
-
-def _routine_prune_inactive_users():
-    prune_inactive()
 
 
 def _routine_backup():
@@ -44,8 +35,8 @@ def start_routine():
         schedule.every().friday.at(at_time).do(run_threaded, job_func)
 
     # TODO: Add a setting to change the time of the day these run
-    run_mon_to_fri_at_time(_routine_send_report, "10:00")
-    schedule.every().sunday.at("01:00").do(run_threaded, _routine_prune_inactive_users)
+    run_mon_to_fri_at_time(send_report, "10:00")
+    schedule.every().sunday.at("01:00").do(run_threaded, prune_inactive)
     schedule.every().sunday.at("01:05").do(run_threaded, _routine_backup)
 
     while True:
