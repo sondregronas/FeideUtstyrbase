@@ -124,7 +124,7 @@ def create_app() -> flask.Flask:
 
     # Compress & minify
     Compress(app)
-    Minify(app, static=False)  # Some static files don't minify well (breaks JS)
+    Minify(app, static=False, go=False)  # Some static files don't minify well (breaks JS)
 
     return app
 
