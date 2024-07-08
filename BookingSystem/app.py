@@ -2,6 +2,7 @@ import os
 from datetime import datetime
 from urllib.parse import urlparse
 
+import cachelib
 import flask
 from dateutil import parser
 from flask_compress import Compress
@@ -27,6 +28,7 @@ def create_app() -> flask.Flask:
 
     app.secret_key = os.getenv('SECRET_KEY')
     app.config['SESSION_TYPE'] = 'cachelib'
+    app.config['SESSION_CACHELIB'] = cachelib.FileSystemCache(cache_dir='./flask_session', threshold=500)
     if os.getenv('DEBUG') == 'True':
         app.debug = True
 
