@@ -27,9 +27,10 @@ def create_app() -> flask.Flask:
     app = flask.Flask(__name__, template_folder='templates', static_folder='static')
 
     app.secret_key = os.getenv('SECRET_KEY')
+    app.config['TESTING'] = os.getenv('TESTING', 'false').lower() == 'true'
     app.config['SESSION_TYPE'] = 'cachelib'
     app.config['SESSION_CACHELIB'] = cachelib.FileSystemCache(cache_dir='./flask_session', threshold=500)
-    if os.getenv('DEBUG') == 'True':
+    if os.getenv('DEBUG', 'false').lower() == 'true':
         app.debug = True
 
     # We're behind a reverse proxy, so we need to fix the scheme and host
@@ -127,14 +128,15 @@ def create_app() -> flask.Flask:
     Compress(app)
     Minify(app, static=False, go=False)  # Some static files don't minify well (breaks JS)
 
+    init_db()
+    Settings.verify_settings_exist()
+    if not DEBUG and not app.config['TESTING']:
+        start_routine()
+
     return app
 
 
-init_db()
 app = create_app()
-Settings.verify_settings_exist()
-if not DEBUG:
-    start_routine()
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0')

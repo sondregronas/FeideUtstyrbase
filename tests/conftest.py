@@ -1,10 +1,12 @@
+import os
 import sys
 from pathlib import Path
 
 import flask
 import pytest
 
-sys.path.append(str(Path(__file__).parent.parent) + '\\BookingSystem')
+sys.path.append(str(Path(__file__).parent.parent) + '\\BookingSystem')  # Add BookingSystem to path for imports
+os.environ['TESTING'] = 'true'  # Set TESTING to true before importing app
 import BookingSystem.app as app
 from BookingSystem.db import init_db
 from BookingSystem.user import User
@@ -40,7 +42,6 @@ class StudentUser(User):
 @pytest.fixture
 def client():
     flask_app = app.create_app()
-    flask_app.config['TESTING'] = True
     init_db()
     yield flask_app.test_client()
 
