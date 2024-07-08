@@ -1,5 +1,4 @@
 import os
-import threading
 from datetime import datetime
 from urllib.parse import urlparse
 
@@ -134,5 +133,6 @@ app = create_app()
 
 if __name__ == '__main__':
     Settings.verify_settings_exist()
-    threading.Thread(target=start_routine).start()
+    if not DEBUG:
+        start_routine()
     app.run(host='0.0.0.0')
