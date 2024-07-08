@@ -26,7 +26,7 @@ def create_app() -> flask.Flask:
     app = flask.Flask(__name__, template_folder='templates', static_folder='static')
 
     app.secret_key = os.getenv('SECRET_KEY')
-    app.config['SESSION_TYPE'] = 'filesystem'
+    app.config['SESSION_TYPE'] = 'cachelib'
     if os.getenv('DEBUG') == 'True':
         app.debug = True
 
