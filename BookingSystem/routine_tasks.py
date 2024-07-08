@@ -7,6 +7,7 @@ import time
 
 import schedule
 
+from __init__ import logger
 from db import DATABASE
 from teams import send_report
 from user import prune_inactive
@@ -47,8 +48,11 @@ def start_routine():
 
     # TODO: Add a setting to change the time of the day these run
     run_mon_to_fri_at_time(send_report, "10:00")
+    logger.info("Scheduled send_report to run Mon-Fri at 10:00")
     schedule.every().sunday.at("01:00").do(prune_inactive)
+    logger.info("Scheduled prune_inactive to run on Sundays at 01:00")
     schedule.every().sunday.at("01:05").do(_routine_backup)
+    logger.info("Scheduled _routine_backup to run on Sundays at 01:05")
 
     # Run the schedule
     return run_continuously()

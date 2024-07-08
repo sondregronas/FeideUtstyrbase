@@ -130,9 +130,9 @@ def create_app() -> flask.Flask:
 
 init_db()
 app = create_app()
+Settings.verify_settings_exist()
+if not DEBUG or 1:
+    start_routine()
 
 if __name__ == '__main__':
-    Settings.verify_settings_exist()
-    if not DEBUG:
-        start_routine()
     app.run(host='0.0.0.0')
