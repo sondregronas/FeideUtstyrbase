@@ -56,9 +56,9 @@ def start_routine():
     _prune_inactive = lambda: _task(prune_inactive)
     
     # TODO: Add a setting to change the time of the day these run
-    run_mon_to_fri_at_time(_send_report, "10:00", name="Send Dagsrapport"))
+    run_mon_to_fri_at_time(_send_report, "10:00", name="Dagsrapport")
     logger.info("Scheduled send_report to run Mon-Fri at 10:00")
-    schedule.every().sunday.at("01:00").do(_prune_inactive, name="Oppryddning")
+    schedule.every().sunday.at("01:00").do(_prune_inactive, name="Cleanup")
     logger.info("Scheduled prune_inactive to run on Sundays at 01:00")
     schedule.every().sunday.at("01:05").do(_routine_backup, name="Backup")
     logger.info("Scheduled _routine_backup to run on Sundays at 01:05")
