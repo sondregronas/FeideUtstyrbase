@@ -46,21 +46,21 @@ def start_routine():
             logger.error(e)
     
     def run_mon_to_fri_at_time(job_func, at_time, name):
-        schedule.every().monday.at(at_time).do(job_func, name=name)
-        schedule.every().tuesday.at(at_time).do(job_func, name=name)
-        schedule.every().wednesday.at(at_time).do(job_func, name=name)
-        schedule.every().thursday.at(at_time).do(job_func, name=name)
-        schedule.every().friday.at(at_time).do(job_func, name=name)
+        schedule.every().monday.at(at_time).do(job_func).tag(name)
+        schedule.every().tuesday.at(at_time).do(job_func).tag(name)
+        schedule.every().wednesday.at(at_time).do(job_func).tag(name)
+        schedule.every().thursday.at(at_time).do(job_func).tag(name)
+        schedule.every().friday.at(at_time).do(job_func).tag(name)
 
     _send_report = lambda: _task(send_report)
     _prune_inactive = lambda: _task(prune_inactive)
     
     # TODO: Add a setting to change the time of the day these run
-    run_mon_to_fri_at_time(_send_report, "10:00", name="Dagsrapport")
+    run_mon_to_fri_at_time(_send_report, "10:00").tag("Dagsrapport")
     logger.info("Scheduled send_report to run Mon-Fri at 10:00")
-    schedule.every().sunday.at("01:00").do(_prune_inactive, name="Cleanup")
+    schedule.every().sunday.at("01:00").do(_prune_inactive).tag("Cleanup")
     logger.info("Scheduled prune_inactive to run on Sundays at 01:00")
-    schedule.every().sunday.at("01:05").do(_routine_backup, name="Backup")
+    schedule.every().sunday.at("01:05").do(_routine_backup).tag("Backup")
     logger.info("Scheduled _routine_backup to run on Sundays at 01:05")
 
     # Run the schedule
