@@ -12,6 +12,8 @@ from db import DATABASE
 from teams import send_report
 from user import prune_inactive
 
+from functools import partial
+
 
 def run_continuously(interval=1):
     cease_continuous_run = threading.Event()
@@ -39,6 +41,12 @@ def _routine_backup():
 
 
 def start_routine():
+    def _task(job_func):
+        try:
+            job_func()
+        except Exception as e:
+            logger.error(e)
+    
     def run_mon_to_fri_at_time(job_func, at_time):
         schedule.every().monday.at(at_time).do(job_func)
         schedule.every().tuesday.at(at_time).do(job_func)
@@ -46,10 +54,13 @@ def start_routine():
         schedule.every().thursday.at(at_time).do(job_func)
         schedule.every().friday.at(at_time).do(job_func)
 
+    _send_report = partial(_task(send_report))
+    _prune_inactive = partial(_task(prune_inactive))
+    
     # TODO: Add a setting to change the time of the day these run
-    run_mon_to_fri_at_time(send_report, "10:00")
+    run_mon_to_fri_at_time(_send_report, "10:00")
     logger.info("Scheduled send_report to run Mon-Fri at 10:00")
-    schedule.every().sunday.at("01:00").do(prune_inactive)
+    schedule.every().sunday.at("01:00").do(_prune_inactive)
     logger.info("Scheduled prune_inactive to run on Sundays at 01:00")
     schedule.every().sunday.at("01:05").do(_routine_backup)
     logger.info("Scheduled _routine_backup to run on Sundays at 01:05")
