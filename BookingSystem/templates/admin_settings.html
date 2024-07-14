@@ -56,9 +56,9 @@
             <th>Neste kjøring</th>
         </tr>
         </thead>
-        {% for job in routine_tasks.jobs.values() %}
+        {% for job_name, job in routine_tasks.jobs.items() %}
             <tr>
-                <td>{{ job.name }}</td>
+                <td>{{ job_name.replace('_',' ').strip() | capitalize }}</td>
                 <td>{{ job.last_run }}</td>
                 <td>{{ job.next_run }}</td>
             </tr>
