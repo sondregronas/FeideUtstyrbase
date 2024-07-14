@@ -12,8 +12,6 @@ from db import DATABASE
 from teams import send_report
 from user import prune_inactive
 
-from functools import partial
-
 
 def run_continuously(interval=1):
     cease_continuous_run = threading.Event()
@@ -54,8 +52,8 @@ def start_routine():
         schedule.every().thursday.at(at_time).do(job_func)
         schedule.every().friday.at(at_time).do(job_func)
 
-    _send_report = partial(_task(send_report))
-    _prune_inactive = partial(_task(prune_inactive))
+    _send_report = lambda: _task(send_report)
+    _prune_inactive = lambda: _task(prune_inactive)
     
     # TODO: Add a setting to change the time of the day these run
     run_mon_to_fri_at_time(_send_report, "10:00")
