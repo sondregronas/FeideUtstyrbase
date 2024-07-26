@@ -148,7 +148,6 @@ try:
 
     app = App()
 except Exception as e:
-    logger.error(e)
     start_routine()
     app = create_app()
 
