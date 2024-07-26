@@ -126,14 +126,15 @@ def create_app() -> flask.Flask:
     # Compress & minify
     Compress(app)
     Minify(app, static=False, go=False)  # Some static files don't minify well (breaks JS)
+    
+    init_db()
+    Settings.verify_settings_exist()
+    start_routine()  # Will not run if TESTING is set to True in the environment variables
 
     return app
 
 
 app = create_app()
-init_db()
-Settings.verify_settings_exist()
-start_routine()  # Will not run if TESTING is set to True in the environment variables
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0')
