@@ -141,9 +141,9 @@ try:
 
 
     class App(gunicorn.app.base.BaseApplication):
-        def __init__(self):
+        def __init__(self, app=None, options: dict = {}):
             start_routine()
-            self.options = {}
+            self.options = options
             self.application = _app
             super().__init__()
 
