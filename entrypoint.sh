@@ -10,7 +10,7 @@ run_app() {
     cp -r /overrides/* /app;
   fi
 
-  gunicorn --bind 0.0.0.0:5000 -t 60 app:app &
+  gunicorn --bind 0.0.0.0:5000 --preload routine_tasks:start_routine() -t 60 app:create_app()  &
   PID=$!
   wait $PID
 }

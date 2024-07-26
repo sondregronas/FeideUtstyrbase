@@ -129,12 +129,10 @@ def create_app() -> flask.Flask:
 
     init_db()
     Settings.verify_settings_exist()
-    start_routine()
 
     return app
 
 
-app = create_app()
-
 if __name__ == '__main__':
-    app.run(host='0.0.0.0')
+    start_routine()
+    create_app().run(host='0.0.0.0')
