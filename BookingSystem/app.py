@@ -157,7 +157,7 @@ try:
             return self.application
 
 
-    app = App()
+    app = App
 except Exception as e:
     logger.error(e)
     start_routine()
