@@ -39,16 +39,10 @@ def _routine_backup():
 
 
 def start_routine():
+    # Skip routine tasks in testing environment
     if os.getenv('TESTING', 'false').lower() == 'true':
         logger.info("Skipping routine tasks in testing environment")
         return
-
-    if os.path.exists('/tmp/feideutstyrbase.pid'):
-        with open('/tmp/feideutstyrbase.pid', 'r') as f:
-            pid = int(f.read())
-        if os.getpid() != pid:
-            logger.info("Skipping routine tasks on worker process")
-            return
 
     def _task(job_func):
         try:
