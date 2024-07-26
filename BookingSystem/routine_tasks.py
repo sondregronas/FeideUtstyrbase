@@ -43,6 +43,9 @@ def start_routine():
         logger.info("Skipping routine tasks in testing environment")
         return
 
+    if os.getpid() != int(os.getenv('GUNICORN_PID')):
+        return
+
     def _task(job_func):
         try:
             job_func()

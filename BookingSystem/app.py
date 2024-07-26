@@ -129,39 +129,12 @@ def create_app() -> flask.Flask:
 
     init_db()
     Settings.verify_settings_exist()
+    start_routine()
 
     return app
 
 
-_app = create_app()
-# We need to create an app object for gunicorn to use with the routine tasks only running on the main thread, not the
-# workers. But since gunicorn doesn't run on Windows we need to catch the exception and run the app normally
-try:
-    import gunicorn.app.base
-
-
-    class App(gunicorn.app.base.BaseApplication):
-        def __init__(self, app=None, options=None):
-            start_routine()
-            self.options = options or {}
-            self.application = _app
-            super().__init__()
-
-        def load_config(self):
-            config = {key: value for key, value in self.options.items()
-                      if key in self.cfg.settings and value is not None}
-            for key, value in config.items():
-                self.cfg.set(key.lower(), value)
-
-        def load(self):
-            return self.application
-
-
-    app = App
-except Exception as e:
-    logger.error(e)
-    start_routine()
-    app = _app
+app = create_app()
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0')
