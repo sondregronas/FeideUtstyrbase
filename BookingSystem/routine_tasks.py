@@ -39,28 +39,38 @@ def _routine_backup():
 
 
 def start_routine():
+    pid = os.environ.get('FeideUtstyrbaseRoutinePID', '')
+    if pid:
+        logger.info(f"Routine tasks already running with PID {pid}")
+        return
+    os.environ['FeideUtstyrbaseRoutinePID'] = str(os.getpid())
+
     def _task(job_func):
         try:
             job_func()
         except Exception as e:
             logger.error(e)
-    
-    def run_mon_to_fri_at_time(job_func, at_time, name):
-        schedule.every().monday.at(at_time).do(job_func).tag(name)
-        schedule.every().tuesday.at(at_time).do(job_func).tag(name)
-        schedule.every().wednesday.at(at_time).do(job_func).tag(name)
-        schedule.every().thursday.at(at_time).do(job_func).tag(name)
-        schedule.every().friday.at(at_time).do(job_func).tag(name)
 
-    _send_report = lambda: _task(send_report)
-    _prune_inactive = lambda: _task(prune_inactive)
-    
-    # TODO: Add a setting to change the time of the day these run
-    run_mon_to_fri_at_time(_send_report, "10:00", name="Dagsrapport")
+    def run_mon_to_fri_at_time(job_func, at_time):
+        schedule.every().monday.at(at_time).do(job_func)
+        schedule.every().tuesday.at(at_time).do(job_func)
+        schedule.every().wednesday.at(at_time).do(job_func)
+        schedule.every().thursday.at(at_time).do(job_func)
+        schedule.every().friday.at(at_time).do(job_func)
+
+    __routine_backup = lambda: _task(_routine_backup)
+    __send_report = lambda: _task(send_report)
+    __prune_inactive = lambda: _task(prune_inactive)
+    __routine_backup.__name__ = 'Ukentlig backup'
+    __send_report.__name__ = 'Send Dagsrapport'
+    __prune_inactive.__name__ = 'Rydd opp brukere'
+
+    # TODO: Add a setting to change the time of the day these run from frontend
+    run_mon_to_fri_at_time(__send_report, "10:00")
     logger.info("Scheduled send_report to run Mon-Fri at 10:00")
-    schedule.every().sunday.at("01:00").do(_prune_inactive).tag("Cleanup")
+    schedule.every().sunday.at("01:00").do(__prune_inactive)
     logger.info("Scheduled prune_inactive to run on Sundays at 01:00")
-    schedule.every().sunday.at("01:05").do(_routine_backup).tag("Backup")
+    schedule.every().sunday.at("01:05").do(__routine_backup)
     logger.info("Scheduled _routine_backup to run on Sundays at 01:05")
 
     # Run the schedule
