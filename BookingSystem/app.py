@@ -133,6 +133,8 @@ def create_app() -> flask.Flask:
     return app
 
 
+app = create_app()
+
 if __name__ == '__main__':
     start_routine()
-    create_app().run(host='0.0.0.0')
+    app.run(host='0.0.0.0')
