@@ -36,6 +36,7 @@ class Container:
             'WEB_CONCURRENCY': workers,
             'KIOSK_FQDN': f'localhost:{port}',
             'AUTO_UPDATE': 'True',
+            'TESTING': 'True',
         }
 
     @staticmethod
