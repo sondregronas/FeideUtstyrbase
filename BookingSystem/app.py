@@ -129,6 +129,7 @@ def create_app() -> flask.Flask:
 
     init_db()
     Settings.verify_settings_exist()
+    start_routine()
 
     return app
 
@@ -136,5 +137,4 @@ def create_app() -> flask.Flask:
 app = create_app()
 
 if __name__ == '__main__':
-    start_routine()
     app.run(host='0.0.0.0')

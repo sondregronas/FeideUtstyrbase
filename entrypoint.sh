@@ -10,7 +10,7 @@ run_app() {
     cp -r /overrides/* /app;
   fi
 
-  gunicorn --bind 0.0.0.0:5000 -t 60 --preload routine_tasks:start_routine() app:app  &
+  gunicorn --bind 0.0.0.0:5000 -t 60 -p /tmp/feideutstyrbase.pid app:app &
   PID=$!
   wait $PID
 }
