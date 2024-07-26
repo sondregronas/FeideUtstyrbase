@@ -19,7 +19,6 @@ import routes
 import user
 from __init__ import logger, REGEX_ID, REGEX_ITEM, MIN_DAYS, MAX_DAYS, MIN_LABELS, MAX_LABELS, DEBUG, MOCK_DATA
 from db import init_db, Settings
-from routine_tasks import start_routine
 
 
 def create_app() -> flask.Flask:
@@ -130,13 +129,22 @@ def create_app() -> flask.Flask:
 
     init_db()
     Settings.verify_settings_exist()
-    if not DEBUG and not app.config['TESTING']:
-        start_routine()
 
     return app
 
 
-app = create_app()
-
 if __name__ == '__main__':
-    app.run(host='0.0.0.0')
+    create_app().run(host='0.0.0.0')
+else:
+    import gunicorn
+    from routine_tasks import start_routine
+
+
+    class App(gunicorn.app.base.BaseApplication):
+        def __init__(self):
+            start_routine()
+            self.application = create_app()
+            super().__init__()
+
+
+    app = App()

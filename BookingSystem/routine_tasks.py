@@ -39,12 +39,6 @@ def _routine_backup():
 
 
 def start_routine():
-    pid = os.environ.get('FeideUtstyrbaseRoutinePID', '')
-    if pid:
-        logger.info(f"Routine tasks already running with PID {pid}")
-        return
-    os.environ['FeideUtstyrbaseRoutinePID'] = str(os.getpid())
-
     def _task(job_func):
         try:
             job_func()

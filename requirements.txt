@@ -11,3 +11,4 @@ MarkupSafe==2.1.5
 pymsteams==0.2.2
 flask-compress==1.15
 schedule==1.2.2
+gunicorn==22.0.0
