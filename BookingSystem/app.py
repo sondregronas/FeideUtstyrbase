@@ -19,6 +19,7 @@ import routes
 import user
 from __init__ import logger, REGEX_ID, REGEX_ITEM, MIN_DAYS, MAX_DAYS, MIN_LABELS, MAX_LABELS, DEBUG, MOCK_DATA
 from db import init_db, Settings
+from routine_tasks import start_routine
 
 
 def create_app() -> flask.Flask:
@@ -26,7 +27,6 @@ def create_app() -> flask.Flask:
     app = flask.Flask(__name__, template_folder='templates', static_folder='static')
 
     app.secret_key = os.getenv('SECRET_KEY')
-    app.config['TESTING'] = os.getenv('TESTING', 'false').lower() == 'true'
     app.config['SESSION_TYPE'] = 'cachelib'
     app.config['SESSION_CACHELIB'] = cachelib.FileSystemCache(cache_dir='./flask_session', threshold=500)
     if os.getenv('DEBUG', 'false').lower() == 'true':
@@ -133,11 +133,10 @@ def create_app() -> flask.Flask:
     return app
 
 
-if __name__ == '__main__':
-    create_app().run(host='0.0.0.0')
-else:
+# We need to create an app object for gunicorn to use with the routine tasks only running on the main thread, not the
+# workers. But since gunicorn doesn't run on Windows we need to catch the exception and run the app normally
+try:
     import gunicorn.app.base
-    from routine_tasks import start_routine
 
 
     class App(gunicorn.app.base.BaseApplication):
@@ -148,3 +147,10 @@ else:
 
 
     app = App()
+except Exception as e:
+    logger.error(e)
+    start_routine()
+    app = create_app()
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0')
