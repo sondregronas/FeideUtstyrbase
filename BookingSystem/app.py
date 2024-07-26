@@ -136,7 +136,7 @@ def create_app() -> flask.Flask:
 if __name__ == '__main__':
     create_app().run(host='0.0.0.0')
 else:
-    import gunicorn
+    import gunicorn.app.base
     from routine_tasks import start_routine
 
 
