@@ -51,10 +51,16 @@ def start_routine():
             logger.error(e)
 
     def run_mon_to_fri_at_time(job_func, at_time):
+        func_name = job_func.__name__
+        job_func.__name__ = f'{func_name} (Mandag)'
         schedule.every().monday.at(at_time).do(job_func)
+        job_func.__name__ = f'{func_name} (Tirsdag)'
         schedule.every().tuesday.at(at_time).do(job_func)
+        job_func.__name__ = f'{func_name} (Onsdag)'
         schedule.every().wednesday.at(at_time).do(job_func)
+        job_func.__name__ = f'{func_name} (Torsdag)'
         schedule.every().thursday.at(at_time).do(job_func)
+        job_func.__name__ = f'{func_name} (Fredag)'
         schedule.every().friday.at(at_time).do(job_func)
 
     __routine_backup = lambda: _task(_routine_backup)
