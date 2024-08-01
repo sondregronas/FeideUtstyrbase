@@ -94,14 +94,17 @@ def create_app() -> flask.Flask:
 
     @app.errorhandler(404)
     def page_not_found(_) -> tuple[str, int]:
+        logger.warning(f'A user tried to access a non-existing page: {flask.request.url}')
         return flask.render_template('404.html'), 404
 
     @app.errorhandler(418)
     def teapot(_) -> tuple[flask.Response, int]:
+        logger.warning(f'A user fell victim to the teapot at {flask.request.url}')
         return flask.redirect('https://www.youtube.com/watch?v=dQw4w9WgXcQ'), 302
 
     @app.errorhandler(500)
     def internal_server_error(_) -> tuple[str, int]:
+        logger.error(f'An internal server error occurred at {flask.request.url}')
         return flask.render_template('500.html'), 500
 
     @app.route('/robots.txt')
