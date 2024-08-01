@@ -1,4 +1,3 @@
-import os
 import sys
 from pathlib import Path
 
@@ -6,7 +5,6 @@ import flask
 import pytest
 
 sys.path.append(str(Path(__file__).parent.parent) + '\\BookingSystem')  # Add BookingSystem to path for imports
-os.environ['TESTING'] = 'true'  # Set TESTING to true before importing app
 import BookingSystem.app as app
 from BookingSystem.db import init_db
 from BookingSystem.user import User

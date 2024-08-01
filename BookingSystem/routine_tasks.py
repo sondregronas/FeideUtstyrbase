@@ -40,11 +40,6 @@ def _routine_backup():
 
 
 def start_routine():
-    # Skip routine tasks in testing environment
-    if os.getenv('TESTING', 'false').lower() == 'true':
-        logger.info("Skipping routine tasks in testing environment")
-        return
-
     def _task(job_func):
         try:
             job_func()
