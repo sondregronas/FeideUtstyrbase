@@ -43,28 +43,6 @@
     </hgroup>
     {% include 'forms/bulletin.html' %}
 
-    <hgroup>
-        <h2>Rutinestatus</h2>
-        <h3>Informasjon om rutineoppgaver (kjøres automagisk)</h3>
-    </hgroup>
-
-    <table>
-        <thead>
-        <tr>
-            <th>Oppgave</th>
-            <th>Sist kjørt</th>
-            <th>Neste kjøring</th>
-        </tr>
-        </thead>
-        {% for job_name, job in routine_tasks.jobs.items() %}
-            <tr>
-                <td>{{ job_name.replace('_',' ').strip() | capitalize }}</td>
-                <td>{{ job.last_run }}</td>
-                <td>{{ job.next_run }}</td>
-            </tr>
-        {% endfor %}
-    </table>
-
     <script>
         let last_sent = "{{last_sent}}";
 

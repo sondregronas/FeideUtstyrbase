@@ -19,7 +19,7 @@ import routes
 import user
 from __init__ import logger, REGEX_ID, REGEX_ITEM, MIN_DAYS, MAX_DAYS, MIN_LABELS, MAX_LABELS, DEBUG, MOCK_DATA
 from db import init_db, Settings
-from routine_tasks import start_routine
+from routine_tasks import threaded_start_routine
 
 
 def create_app() -> flask.Flask:
@@ -126,10 +126,9 @@ def create_app() -> flask.Flask:
     # Compress & minify
     Compress(app)
     Minify(app, static=False, go=False)  # Some static files don't minify well (breaks JS)
-    
     init_db()
     Settings.verify_settings_exist()
-    start_routine()  # Will not run if TESTING is set to True in the environment variables
+    threaded_start_routine(os.getpid())
 
     return app
 

@@ -22,6 +22,7 @@ def run_continuously(interval=1):
             while not cease_continuous_run.is_set():
                 schedule.run_pending()
                 time.sleep(interval)
+                # TODO: Post to API when a task is run? (for debugging)
 
     continuous_thread = ScheduleThread()
     continuous_thread.start()
@@ -82,12 +83,24 @@ def start_routine():
     return run_continuously()
 
 
-def get_job_status():
-    return {
-        'jobs': {
-            job.job_func.__name__: {'last_run': job.last_run.isoformat() if job.last_run else '',
-                                    'next_run': job.next_run.isoformat(),
-                                    'last_run_dt': job.last_run,
-                                    'next_run_dt': job.next_run}
-            for job in schedule.get_jobs()}
-    }
+def threaded_start_routine(main_pid: int) -> None:
+    # NOTE: This (nested threads) shouldn't be necessary, but I could not get the atexit.register to work properly
+    # with the main gunicorn process. This is a workaround to ensure that the routine tasks are stopped when the main
+    # process exits.
+    import atexit
+
+    t = threading.Thread(target=start_routine, args=(), daemon=True)
+    t.start()
+
+    @atexit.register
+    def cleanup():
+        # Cleanup on exit
+        logger.info(f"Cleaning up {os.getpid()}... (Parent PID: {main_pid})")
+        if main_pid == os.getpid():
+            # Exit routine tasks process (only if main process is exiting)
+            t.join()
+            logger.info("Stopping routine tasks...")
+        else:
+            # Exit child processes
+            logger.info(f"Exiting child process with PID {os.getpid()}")
+            os._exit(0)  # Exit without calling cleanup

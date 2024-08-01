@@ -1,7 +1,6 @@
 import flask
 
 import inventory
-import routine_tasks
 from __init__ import KIOSK_FQDN, LABEL_SERVER
 from db import add_admin, Settings
 from sanitizer import handle_api_exception
@@ -52,8 +51,7 @@ def logout() -> flask.Response:
 def admin_settings() -> str:
     return flask.render_template('admin_settings.html',
                                  last_sent=Settings.get('report_last_sent') or 0,
-                                 send_reports=Settings.get('send_reports') == '1',
-                                 routine_tasks=routine_tasks.get_job_status())
+                                 send_reports=Settings.get('send_reports') == '1')
 
 
 @app.route('/audits')
