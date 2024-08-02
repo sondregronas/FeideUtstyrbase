@@ -76,7 +76,8 @@ def create_app() -> flask.Flask:
                     MAX_DAYS=MAX_DAYS,
                     MIN_LABELS=MIN_LABELS,
                     MAX_LABELS=MAX_LABELS,
-                    FQDN=urlparse(flask.request.base_url).hostname, )
+                    FQDN=urlparse(flask.request.base_url).hostname,
+                    server_start_time=Settings.get('last_start_time'))
 
     @app.errorhandler(401)
     def unauthorized_401(_) -> tuple[flask.Response, int]:
@@ -131,6 +132,7 @@ def create_app() -> flask.Flask:
     Minify(app, static=False, go=False)  # Some static files don't minify well (breaks JS)
     init_db()
     Settings.verify_settings_exist()
+    Settings.set('last_start_time', str(datetime.now().timestamp()))
     threaded_start_routine(os.getpid())
 
     return app

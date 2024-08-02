@@ -1,3 +1,5 @@
+import json
+
 import flask
 
 import inventory
@@ -51,7 +53,8 @@ def logout() -> flask.Response:
 def admin_settings() -> str:
     return flask.render_template('admin_settings.html',
                                  last_sent=Settings.get('report_last_sent') or 0,
-                                 send_reports=Settings.get('send_reports') == '1')
+                                 send_reports=Settings.get('send_reports') == '1',
+                                 routine_tasks_info=json.loads(Settings.get('routine_tasks') or '{}'))
 
 
 @app.route('/audits')

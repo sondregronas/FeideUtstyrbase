@@ -43,6 +43,32 @@
     </hgroup>
     {% include 'forms/bulletin.html' %}
 
+    {% if routine_tasks %}
+        <hgroup>
+            <h2>Rutineoppgaver</h2>
+            <h3>Status på rutineoppgaver (debugging)</h3>
+        </hgroup>
+        <table>
+            <tr>
+                <th>Oppgave</th>
+                <th>Sist kjørt</th>
+                <th>Utføringer</th>
+            </tr>
+            {% for task, values in routine_tasks_info.items() %}
+                <tr>
+                    <td>{{ task }}</td>
+                    <td>{{ values['last_run'] | strfunixtime('%H:%M:%S %d.%m.%Y') }}</td>
+                    <td>{{ values['runs'] }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    {% endif %}
+
+    <center>
+        <small>Applikasjonen har kjørt siden
+            {{ server_start_time | strfunixtime }}</small>
+    </center>
+
     <script>
         let last_sent = "{{last_sent}}";
 

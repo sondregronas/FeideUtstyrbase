@@ -1,14 +1,16 @@
 # Run cron jobs within this file as python functions
 
+import json
 import os
 import shutil
 import threading
 import time
+from datetime import datetime
 
 import schedule
 
 from __init__ import logger
-from db import DATABASE
+from db import DATABASE, Settings
 from teams import send_report
 from user import prune_inactive
 
@@ -22,7 +24,6 @@ def run_continuously(interval=1):
             while not cease_continuous_run.is_set():
                 schedule.run_pending()
                 time.sleep(interval)
-                # TODO: Post to API when a task is run? (for debugging)
 
     continuous_thread = ScheduleThread()
     continuous_thread.start()
@@ -40,9 +41,20 @@ def _routine_backup():
 
 
 def start_routine():
-    def _task(job_func):
+    def update_db(fn_name):
+        data = json.loads(Settings.get('routine_tasks') or '{}')
+        if not data.get(fn_name):
+            data[fn_name] = dict({'last_run': None, 'runs': 0})
+
+        data[fn_name]['last_run'] = datetime.now().timestamp()
+        data[fn_name]['runs'] += 1
+
+        Settings.set('routine_tasks', json.dumps(data))
+
+    def _task(job_func, job_name=''):
         try:
             job_func()
+            update_db(job_name)
         except Exception as e:
             logger.error(e)
 
@@ -59,12 +71,12 @@ def start_routine():
         job_func.__name__ = f'{func_name} (Fredag)'
         schedule.every().friday.at(at_time).do(job_func)
 
-    __routine_backup = lambda: _task(_routine_backup)
-    __send_report = lambda: _task(send_report)
-    __prune_inactive = lambda: _task(prune_inactive)
-    __routine_backup.__name__ = 'Ukentlig backup'
-    __send_report.__name__ = 'Send Dagsrapport'
-    __prune_inactive.__name__ = 'Rydd opp brukere'
+    __routine_backup = lambda: _task(_routine_backup, 'Ukentlig backup')
+    __send_report = lambda: _task(send_report, 'Send Dagsrapport')
+    __prune_inactive = lambda: _task(prune_inactive, 'Rydd opp brukere')
+    __routine_backup.__name__ = 'Ukentlig backup'  # Set name for scheduler
+    __send_report.__name__ = 'Send Dagsrapport'  # Set name for scheduler
+    __prune_inactive.__name__ = 'Rydd opp brukere'  # Set name for scheduler
 
     # TODO: Add a setting to change the time of the day these run from frontend
     run_mon_to_fri_at_time(__send_report, "10:00")
