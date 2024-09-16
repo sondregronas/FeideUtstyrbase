@@ -1,0 +1,11 @@
+.jconfirm.jconfirm-modern .jconfirm-box, .jconfirm-bg {
+  background-color: var(--card-background-color) !important;
+}
+
+.jconfirm-title {
+  color: var(--h1-color) !important;
+}
+
+.jconfirm-content {
+  color: var(--color) !important;
+}

@@ -1,0 +1,29 @@
+/* Dark Mode */
+:root[data-theme="dark"] {
+  --color: #f5f5f5;
+  --h1-color: #f5f5f5;
+
+  --background-color: #212121;
+  --card-background-color: #1e1e1e;
+
+  --form-element-background-color: #1e1e1e;
+  --del-color: #ff5252;
+}
+
+/* Light Mode */
+:root[data-theme="light"] {
+  --color: #212121;
+  --h1-color: #212121;
+
+  --background-color: #f5f5f5;
+  --card-background-color: #ffffff;
+
+  --form-element-background-color: #ffffff;
+  --del-color: #ff5252;
+}
+
+/* Default */
+:root {
+  --placeholder: pink;
+  --placeholder-bg: deeppink;
+}
