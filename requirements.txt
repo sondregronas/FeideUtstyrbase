@@ -1,5 +1,5 @@
 gunicorn==23.0.0
-flask==3.0.3
+flask==3.1.0
 Flask-Session
 requests==2.32.3
 python-dateutil==2.9.0.post0
