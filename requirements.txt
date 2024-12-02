@@ -1,10 +1,10 @@
 gunicorn==23.0.0
-flask==3.0.3
+flask==3.1.0
 Flask-Session
 requests==2.32.3
 python-dateutil==2.9.0.post0
 python-dotenv==1.0.1
-Werkzeug==3.1.0
+Werkzeug==3.1.3
 Flask-Minify==0.48
 Authlib==1.3.2
 MarkupSafe==3.0.2
