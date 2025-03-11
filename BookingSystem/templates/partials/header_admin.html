@@ -1,35 +1,35 @@
-<nav>
-    <li><a href="{{ url_for('app.index') }}">Utstyrbase</a></li>
-    <ul>
-        <li><a href="{{ url_for('app.booking') }}">
-            Utlån
-        </a></li>
-        <li><a href="{{ url_for('app.innlevering') }}">
-            Innlevering
-        </a></li>
-        <div class="dropdown">
-            <li><a class="dropbtn" href="{{ url_for('app.inventar') }}">
-                <i class="fa fa-cogs" aria-hidden="true"></i>
-            </a></li>
-            <div class="dropdown-content">
-                <a href="{{ url_for('app.inventar') }}">Inventar</a>
-                <a href="{{ url_for('app.admin_settings') }}">Adminpanel</a>
-                <a href="{{ url_for('app.labelserver') }}">Etikettserver</a>
-                <a href="{{ url_for('app.audits') }}">Audits</a>
-                {% if not session.method == 'kiosk' %}
-                    <a href="https://github.com/sondregronas/FeideUtstyrbase" target="_blank">Kildekode</a>
-                    <a href="{{ url_for('app.privacy') }}">Personvern</a>
-                    <a href="{{ url_for('app.logout') }}">Logg ut</a>
-                {% endif %}
-            </div>
-        </div>
+<div class="header">
+    <div class="header-left">
+      <a href="{{ url_for('app.index') }}" class="logo">Utstyrbase</a>
+    </div>
+    <div class="header-right">
+      <ul class="menu">
         <li>
-            <a id="theme-switcher" onclick="switchTheme()" data-toggle="tooltip" data-placement="bottom"
-               title="Bytt tema">
-                <i class="fa fa-adjust"></i>
-            </a>
+          <a href="{{ url_for('app.inventar') }}">
+            <i class="fa fa-box" aria-hidden="true"></i> Se Utstyr
+          </a>
         </li>
-    </ul>
-</nav>
-
-
+        <li class="dropdown">
+          <a class="dropbtn" href="#">
+            <i class="fa fa-cogs" aria-hidden="true"></i>
+          </a>
+          <ul class="dropdown-content">
+            <li><a href="{{ url_for('app.inventar') }}">Inventar</a></li>
+            <li><a href="{{ url_for('app.admin_settings') }}">Adminpanel</a></li>
+            <li><a href="{{ url_for('app.labelserver') }}">Etikettserver</a></li>
+            <li><a href="{{ url_for('app.audits') }}">Audits</a></li>
+            {% if not session.method == 'kiosk' %}
+              <li><a href="https://github.com/sondregronas/FeideUtstyrbase" target="_blank">Kildekode</a></li>
+              <li><a href="{{ url_for('app.privacy') }}">Personvern</a></li>
+              <li><a href="{{ url_for('app.logout') }}">Logg ut</a></li>
+            {% endif %}
+          </ul>
+        </li>
+        <li>
+          <a id="theme-switcher" onclick="switchTheme()" data-toggle="tooltip" data-placement="bottom" title="Bytt tema">
+            <i class="fa fa-adjust"></i>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>

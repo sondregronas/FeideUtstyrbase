@@ -3,14 +3,24 @@ html {
   background-color: var(--background-color);
 }
 
+
 html, body {
   margin: 0;
   padding: 0;
 }
 
+body {
+  font-family: 'Gabarito', sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: var(--background-color);
+  color: var(--color);
+}
+
+
 header, main, footer {
-  padding-top: 1rem !important;
-  padding-bottom: 1rem !important;
+  padding-top: 0rem !important;
+  padding-bottom: 0rem !important;
 }
 
 .red-button {

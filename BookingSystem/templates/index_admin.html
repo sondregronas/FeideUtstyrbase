@@ -1,154 +1,243 @@
 {% extends '_layout.html' %}
 
 {% block extra_head %}
-    {% include 'templates/datatables.html' %}
+  {% include 'templates/datatables.html' %}
 {% endblock %}
 
 {% block content %}
-    <hgroup>
-        <h2>{{ g.site_name }}</h2>
-        <h3>Velkommen! Her kan du <a href="{{ url_for('app.innlevering') }}">levere inn</a> og <a
-                href="{{ url_for('app.booking') }}">låne bort utstyr</a>!
-        </h3>
-    </hgroup>
+<div class="main-body">
 
-    <br>
+  <!-- MAIN CONTAINER AREA -->
+  <div id="main-container">
 
-    <a href="{{ url_for('app.booking') }}">
-        <button>
-            Låne ut utstyr
-        </button>
-    </a>
-    <a href="{{ url_for('app.innlevering') }}">
-        <button>
-            Levere inn utstyr
-        </button>
-    </a>
-    <center>
-        <a href="{{ url_for('app.inventar') }}">
-            Administrere utstyr
-        </a>
-    </center>
+    <!-- INFORMATION -->
+    <div class="info-field">
+      <div class="info-description">
+        Her kan du 
+        <a class="link info-link" href="{{ url_for('app.booking') }}">låne bort</a> 
+        og 
+        <a class="link info-link" href="{{ url_for('app.innlevering') }}">levere inn</a> utstyr!
+      </div>
+    </div>
 
-    {% if overdue_items %}
-        <br>
-        <div id="overdue_items">
-            <br><br>
-            <center>
-                <h4>
-                    Overskredet utstyr:
-                </h4>
-            </center>
-            <table id="active">
-                <thead>
-                <tr>
-                    <th>Løpenummer</th>
-                    <th>Utstyr</th>
-                    <th>Utlånt til</th>
-                    <th>Frist for levering</th>
-                    <th>Alternativer</th>
-                </thead>
-                <tbody id="datatable-body" style="display: none;">
-                {% for item in overdue_items %}
-                    <tr class="item-row item-row--overdue">
-                        <td>{{ item.id }}</td>
-                        <td>{{ item.name }} ({{ item.category }})</td>
-                        <td>{{ item.lender_name }} <small> ({{ item.classroom }}{% if item.teacher %},
-                            {{ item.teacher }}{% endif %})</small></td>
-                        <td data-sort="{{ item.order_due_date }}">{{ item.order_due_date|strftime }}</td>
-                        <td>
-                            <a onclick="postpone('{{ item.id }}', '{{ item.lender }}', this.parentNode.parentNode)">Utsett
-                                frist</a>
-                        </td>
-                    </tr>
-                {% endfor %}
-            </table>
+    <!-- CARDS -->
+    <div id="card-container">
+      <!-- A CARD BUTTON -->
+      <a class="card tall-button" href="{{ url_for('app.booking') }}">
+        <div class="card-inner">
+          <div class="card-background">
+            <img class="card-background-image" src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&q=80" alt="Lån ut utstyr bilde">
+            <div class="card-gradient-cover"></div>
+          </div>
+          <div class="card-content-wrapper">
+            <div class="card-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-camera text-white/90 w-10 h-10"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"></path><circle cx="12" cy="13" r="3"></circle></svg>
+            </div>
+            <div class="card-content">
+              <div class="card-info">
+                <div class="card-title">
+                  Låne ut utstyr
+                </div>
+                <div class="card-description">
+                  Registrer nytt utlån av kamera, lys eller lydutstyr
+                </div>
+              </div>
+              <div class="link card-link">
+                Klikk her
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-right transform transition-transform duration-300 group-hover:translate-x-1"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
+              </div>
+            </div>
+          </div>
         </div>
+      </a>      
 
+      <a class="card tall-button" href="{{ url_for('app.innlevering') }}">
+        <div class="card-inner">
+          <div class="card-background">
+            <img class="card-background-image" src="https://images.unsplash.com/photo-1578575437130-527eed3abbec?auto=format&fit=crop&q=80" alt="Lån ut utstyr bilde">
+            <div class="card-gradient-cover"></div>
+          </div>
+          <div class="card-content-wrapper">
+            <div class="card-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-upload text-white/90 w-10 h-10"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" x2="12" y1="3" y2="15"></line></svg>
+            </div>
+            <div class="card-content">
+              <div class="card-info">
+                <div class="card-title">
+                  Lever inn utstyr
+                </div>
+                <div class="card-description">
+                  Registrer innlevering av utstyr
+                </div>
+              </div>
+              <div class="link card-link">
+                Klikk her
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-right transform transition-transform duration-300 group-hover:translate-x-1"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
+              </div>
+            </div>
+          </div>
+        </div>
+      </a>
+      
+    </div>
 
-        <script>
-          let lang = {
-            "lengthMenu": "Vis _MENU_ rader per side",
-            "zeroRecords": "Ingen treff",
-            "info": "Viser side _PAGE_ av _PAGES_",
-            "infoEmpty": "Ingen rader tilgjengelig",
-            "infoFiltered": "(filtrert fra _MAX_ rader totalt)",
-            "search": "Søk:",
-            "paginate": {
-              "first": "Første",
-              "last": "Siste",
-              "next": "Neste",
-              "previous": "Forrige"
-            }
-          };
-          $('#active').DataTable({
-            "language": lang,
-            "order": [[3, "asc"]],
-            "pageLength": 25,
-            "lengthMenu": [[25, 50, -1], [25, 50, "Alle"]],
-          });
+    <!-- ADMINISTER BUTTON -->
+    <a class="wide-button" href="{{ url_for('app.inventar') }}">
+      <div class="wide-button-inner">
+        <div class="wide-icon"></div>
+        <div class="wide-description">
+          Administrer utstyr
+        </div>
+      </div>
+    </a>    
 
-          function postpone(id, lender, tr) {
-            $.confirm({
-              title: `Utsett levering av '${id}'`,
-              type: 'blue',
-              icon: 'fa fa-calendar-plus-o',
-              content: `<i>Lånt til ${lender}</i>` +
-                  '<br><br>Utlånsfristen kan utsettes opp til 7 dager, kontaktlærer bør varsles om utsettelsen før den gjennomføres.',
-              buttons: {
-                oneDay: {
-                  text: '1 dag',
-                  btnClass: 'btn-blue',
-                  action: function () {
-                    submitPostpone(id, tr, 1)
-                  }
-                },
-                threeDays: {
-                  text: '3 dager',
-                  btnClass: 'btn-blue',
-                  action: function () {
-                    submitPostpone(id, tr, 3)
-                  }
-                },
-                sevenDays: {
-                  text: '1 uke',
-                  btnClass: 'btn-blue',
-                  action: function () {
-                    submitPostpone(id, tr, 7)
-                  }
-                },
-              },
-            })
+    <h2 class="overdue-title">Overskredet utstyr:</h2>
+  
+    <!-- OVERDUE TABLE CONTAINER -->
+    <div id="overdue-container">
+      <!-- Container for the DataTables toolbar -->
+      <div class="dt-toolbar">
+        <div class="dt-col-search">
+          <div class="custom-search">
+            <input type="text" id="custom-search" placeholder="Søk etter utstyr eller person...">
+            <span class="search-icon"></span>
+          </div>
+        </div>
+        <div class="dt-col-info"></div>
+        <div class="dt-col-length"></div>
+      </div>
+      <table id="active" class="overdue-table display">
+        <thead id="datatable-head">
+          <tr>
+            <th class="overdue-head">Løpenummer</th>
+            <th class="overdue-head">Utstyr</th>
+            <th class="overdue-head">Utlånt til</th>
+            <th class="overdue-head">Frist for levering</th>
+            <th class="overdue-head">Alternativer</th>
+          </tr>
+        </thead>
+        <tbody id="datatable-body" style="display: none;">
+          {% for item in overdue_items %}
+            <tr class="item-row item-row--overdue overdue-row">
+              <td class="overdue-data">{{ item.id }}</td>
+              <td class="overdue-data">{{ item.name }} ({{ item.category }})</td>
+              <td class="overdue-data">
+                {{ item.lender_name }} 
+                <small> ({{ item.classroom }}{% if item.teacher %}, {{ item.teacher }}{% endif %})</small>
+              </td>
+              <td class="overdue-data" data-sort="{{ item.order_due_date }}">
+                {{ item.order_due_date|strftime }}
+                <br>
+                <span class="overdue-status">
+                  {{ item.days_overdue }} dager over fristen
+                </span>
+              </td>
+              <td class="overdue-data">
+                <button class="postpone-btn" onclick="postpone('{{ item.id }}', '{{ item.lender }}', this.parentNode.parentNode)">
+                  Utsett
+                </button>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  
+    <!-- DataTables initialization script -->
+    <script>
+      // Initialize DataTables without the search field (f) in the DOM,
+      // so that our external search bar is used instead.
+      var dt = $('#active').DataTable({
+        language: {
+          "lengthMenu": "Vis _MENU_ rader per side",
+          "zeroRecords": "Ingen treff",
+          "info": "Viser _TOTAL_ resultater",
+          "infoEmpty": "Ingen rader tilgjengelig",
+          "infoFiltered": "(filtrert fra _MAX_ rader totalt)",
+          "paginate": {
+            "first": "Første",
+            "last": "Siste",
+            "next": "Neste",
+            "previous": "Forrige"
           }
-
-          function submitPostpone(id, tr, days) {
-            $.ajax({
-              url: "{{ url_for('api.postpone_due_date') }}",
-              data: {
-                item_id: id,
-                days: days
-              },
-              type: 'POST',
-              success: function (response, status) {
-                iziToast.success({
-                  title: 'Utsetter levering',
-                  message: response
-                });
-                tr.remove();
-                if ($('.item-row').length === 0) {
-                  $('#overdue_items').remove();
-                }
-              },
-              error: function (response, status) {
-                iziToast.error({
-                  title: 'Feil',
-                  message: response.responseText,
-                });
+        },
+        // Custom DOM without the search element:
+        dom: "<'dt-toolbar'<'dt-col-info'i><'dt-col-length'l>>" +
+             "<'dt-table't>" +
+             "<'dt-pagination'p>",
+        order: [[3, "asc"]],
+        pageLength: 25,
+        lengthMenu: [[25, 50, -1], [25, 50, "Alle"]]
+      });
+  
+      // Bind external search input to the DataTables search API
+      $('#custom-search').on('keyup', function () {
+        dt.search(this.value).draw();
+      });
+  
+      // Existing postpone functions remain unchanged
+      function postpone(id, lender, tr) {
+        $.confirm({
+          title: `Utsett levering av '${id}'`,
+          type: 'blue',
+          icon: 'fa fa-calendar-plus-o',
+          content: `<i>Lånt til ${lender}</i>` +
+                   '<br><br>Utlånsfristen kan utsettes opp til 7 dager, kontaktlærer bør varsles om utsettelsen før den gjennomføres.',
+          buttons: {
+            oneDay: {
+              text: '1 dag',
+              btnClass: 'btn-blue',
+              action: function () {
+                submitPostpone(id, tr, 1);
               }
-            })
+            },
+            threeDays: {
+              text: '3 dager',
+              btnClass: 'btn-blue',
+              action: function () {
+                submitPostpone(id, tr, 3);
+              }
+            },
+            sevenDays: {
+              text: '1 uke',
+              btnClass: 'btn-blue',
+              action: function () {
+                submitPostpone(id, tr, 7);
+              }
+            }
           }
-
-          $('#datatable-body').show();
-        </script>
-    {% endif %}
+        });
+      }
+  
+      function submitPostpone(id, tr, days) {
+        $.ajax({
+          url: "{{ url_for('api.postpone_due_date') }}",
+          data: {
+            item_id: id,
+            days: days
+          },
+          type: 'POST',
+          success: function (response, status) {
+            iziToast.success({
+              title: 'Utsetter levering',
+              message: response
+            });
+            tr.remove();
+            if ($('.item-row').length === 0) {
+              $('#overdue_items').remove();
+            }
+          },
+          error: function (response, status) {
+            iziToast.error({
+              title: 'Feil',
+              message: response.responseText,
+            });
+          }
+        });
+      }
+  
+      $('#datatable-body').show();
+    </script>
+  </div>
+</div>
 {% endblock %}

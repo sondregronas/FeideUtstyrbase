@@ -45,3 +45,427 @@
 .last-seen-stale {
   color: var(--del-color);
 }
+
+/*****************\
+|* INDEX STYLING *|
+\*****************/
+
+/* Main Body covers remaining space and centers content */
+.main-body {
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100vh - 100px); /* Adjust header/footer height as needed */
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+/* Main container centered with side margins */
+#main-container {
+  flex: 1;
+  margin: 0 auto;
+  max-width: 40rem;
+}
+
+/* INFO FIELD */
+/* Calming background with no border; consistent border radius */
+.info-field {
+  background-color: var(--neutral-color);
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+/* Centered text and links without underline */
+.info-description {
+  text-align: center;
+  font-size: 1.1em;
+}
+
+.info-description .link {
+  text-decoration: none;
+}
+
+.link {
+  color: rgb(96 165 250);
+}
+
+.link:hover:not(.card-link) {
+  color: rgb(157, 201, 255);
+  transition: 0.3s;
+}
+
+/* CARD CONTAINER */
+/* Two columns with gap */
+#card-container {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+/* CARDS */
+/* CARD BASE */
+.card {
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  aspect-ratio: 3/4; /* Changed aspect ratio to 3/4 */
+  text-decoration: none;
+  background-color: var(--card-background-color);
+  color: var(--color);
+  transition: transform 0.3s ease; /* For scaling the card on hover */
+}
+
+/* Gradient border pseudo-element at the bottom */
+.card::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 4px;
+  width: 100%;
+  background: linear-gradient(to right, rgb(0, 238, 255), rgb(255, 0, 242));
+  transform: scaleX(0);
+  transform-origin: middle;
+  transition: transform 0.3s ease;
+  z-index: 2;
+}
+
+/* Inner wrapper for stacking context */
+.card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+/* Background container: positioned absolutely behind content */
+.card-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+/* Background image with its own transition */
+.card-background-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.3s ease;
+}
+
+/* Gradient cover remains as before */
+.card-gradient-cover {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  /* Gradient from dark at the bottom to transparent at the top */
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.7) 0%, transparent 100%);
+  pointer-events: none;
+}
+
+/* Content wrapper: positioned above the background */
+.card-content-wrapper {
+  position: relative;
+  z-index: 3;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;  /* Aligns content to the bottom */
+  padding: 20px;
+  box-sizing: border-box;
+  transition: transform 0.3s ease; /* For raising text on hover */
+}
+
+/* Card icon positioned at top right (still within the content wrapper) */
+.card-icon {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 40px !important;
+  height: 40px !important;
+  z-index: 4;
+}
+
+.card-icon svg {
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+}
+
+
+/* Card content styling */
+.card-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+/* Card info styling: center the text */
+.card-info {
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.card-title {
+  font-size: 1.5em;
+  margin-bottom: 5px;
+  font-weight: 700;
+}
+
+.card-description {
+  font-size: 1em;
+}
+
+/* Card link styling: aligned to bottom left, no underline */
+.card-link {
+  text-decoration: none;
+  font-weight: bold;
+  align-self: flex-start;
+  z-index: 3;
+  transition: filter 0.3s ease;
+}
+
+.card-link svg {
+  width: 1em;
+  height: 1em;
+  vertical-align: middle;
+  margin-left: 0.3em;
+}
+
+/* Hover Effects */
+.card:hover {
+  transform: scale(1.03); /* Subtly increase card size */
+}
+
+.card:hover .card-background-image {
+  transform: scale(1.08); /* Increase background image size more than the card */
+}
+
+.card:hover::after {
+  transform: scaleX(1); /* Animate gradient border to full width */
+}
+
+.card:hover .card-content-wrapper {
+  transform: translateY(-5px); /* Slightly raise the text inside the card */
+}
+
+.card:hover .card-link {
+  filter: brightness(1.2); /* Subtly brighten the links */
+}
+
+/* WIDE BUTTON */
+.wide-button {
+  display: block; /* Make it block-level */
+  background-color: var(--neutral-color);
+  padding: 25px 20px;
+  border-radius: 8px;
+  text-decoration: none;
+  margin: 0 20px; /* 20px margin on both left and right */
+  box-sizing: border-box;
+  transition: background-color 0.3s ease;
+}
+
+.wide-button:hover {
+  background-color: var(--card-background-color);
+}
+
+/* Inner wrapper to center the icon and text */
+.wide-button-inner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+/* Icon positioned directly to the left of the text */
+.wide-icon {
+  width: 24px;
+  height: 24px;
+  margin-right: 10px;
+}
+
+/* Description styling */
+.wide-description {
+  font-size: 1.1em;
+  color: inherit;
+  text-decoration: none;
+}
+
+/* ================= *\
+|        TABLE        |
+\* ================= */
+
+/* Title styling */
+.overdue-title {
+  font-size: 1.5em;
+  font-weight: 700;
+  margin: 20px auto 15px;
+  color: var(--color);
+  font-family: 'Gabarito', sans-serif;
+  max-width: 1200px;
+  padding: 0 20px;
+}
+
+/* OVERDUE CONTAINER */
+#overdue-container {
+  margin: 0 auto 20px;
+  padding: 20px;
+  background-color: var(--neutral-color);
+  border-radius: 8px;
+  max-width: 1200px;
+}
+
+/* DATATABLES TOOLBAR LAYOUT */
+.dt-toolbar {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+/* --- CUSTOM SEARCH BAR (External) --- */
+.dt-col-search {
+  flex: 1;
+  margin-right: 10px;
+}
+.custom-search {
+  position: relative;
+}
+.custom-search input {
+  width: 100%;
+  padding: 5px 35px 5px 35px; /* extra left padding for the icon */
+  background-color: var(--card-background-color);
+  border: 1px solid var(--neutral-color);
+  border-radius: 4px;
+  color: var(--color);
+  box-sizing: border-box;
+  transition: border-color 0.3s ease;
+}
+.custom-search input:focus {
+  border-color: var(--color);
+  outline: none;
+}
+.custom-search .search-icon {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  background: url('data:image/svg+xml;utf8,<svg fill="%23f5f5f5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M505 442.7l-99.7-99.7c28.4-34.5 45.7-78.4 45.7-126C451 98 353 0 225.5 0S0 98 0 219.9 98 439.9 225.5 439.9c47.6 0 91.5-17.3 126-45.7l99.7 99.7c4.5 4.5 10.5 6.1 16.2 6.1s11.7-2.2 16.2-6.7c8.9-8.9 8.9-23.3.1-32.4zM225.5 399.9c-99.1 0-179.9-80.8-179.9-179.9S126.4 40.1 225.5 40.1 405.4 120.9 405.4 219.9 324.6 399.9 225.5 399.9z"/></svg>') no-repeat center center;
+  background-size: 16px 16px;
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+/* DataTables info (middle column) */
+.dt-col-info {
+  flex: 0 0 auto;
+  text-align: center;
+  font-size: 0.95em;
+  margin-right: 10px;
+  color: var(--color);
+}
+
+/* Length menu (right column) */
+/* DataTables will place the select box here; we style it to match the search bar */
+.dt-col-length select {
+  background-color: var(--card-background-color);
+  color: var(--color);
+  border: 1px solid var(--neutral-color);
+  border-radius: 4px;
+  padding: 5px 10px;
+  outline: none;
+  cursor: pointer;
+}
+
+/* OVERDUE TABLE STYLING */
+.overdue-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: 'Gabarito', sans-serif;
+}
+.overdue-table thead {
+  background-color: var(--card-background-color);
+}
+.overdue-table thead th {
+  padding: 12px;
+  text-align: left;
+  font-weight: 600;
+  border-bottom: 2px solid var(--neutral-color);
+  color: var(--color);
+}
+.overdue-table tbody {
+  background-color: var(--background-color);
+}
+.overdue-table tbody tr {
+  transition: background-color 0.2s ease;
+}
+.overdue-table tbody td {
+  padding: 12px;
+  border-bottom: 1px solid var(--neutral-color);
+  color: var(--color);
+}
+.overdue-table tbody tr:nth-child(even) {
+  background-color: var(--card-background-color);
+}
+.overdue-table tbody tr:hover {
+  background-color: var(--card-background-color);
+}
+
+/* Overdue status in red */
+.overdue-status {
+  color: var(--del-color);
+  font-weight: 600;
+}
+
+/* "Utsett" button styling */
+.postpone-btn {
+  background-color: var(--del-color);
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 6px 12px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: filter 0.3s ease;
+}
+.postpone-btn:hover {
+  filter: brightness(1.1);
+}
+
+/* DataTables pagination */
+.dataTables_paginate .paginate_button {
+  background-color: var(--card-background-color);
+  border: none;
+  border-radius: 4px;
+  padding: 5px 10px;
+  margin: 0 2px;
+  color: var(--color);
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+.dataTables_paginate .paginate_button.current {
+  background-color: var(--neutral-color);
+  color: var(--color);
+}
+.dataTables_paginate .paginate_button:hover {
+  background-color: var(--neutral-color);
+}
+
+/* DataTables info text */
+.dataTables_info {
+  font-size: 0.9em;
+  color: var(--color);
+}
+
+/* DataTables filter (hidden, since we’re using external input) */
+/* You can hide the default search container if it’s generated */
+.dataTables_filter {
+  display: none;
+}

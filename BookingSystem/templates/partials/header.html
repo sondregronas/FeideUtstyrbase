@@ -1,19 +1,14 @@
-<nav>
-    <li><a href="{{ url_for('app.index') }}">Utstyrbase</a></li>
-    <ul>
+<div class="header">
+    <ul class="header-menu">
+        <li><a href="{{ url_for('app.index') }}" class="logo">Utstyrbase</a></li>
         <li><a href="{{ url_for('app.privacy') }}">Personvern</a></li>
         {% if session.user %}
-            <li>
-                <a href="{{ url_for('app.logout') }}">
-                    Logg ut
-                </a>
-            </li>
+            <li><a href="{{ url_for('app.logout') }}">Logg ut</a></li>
         {% endif %}
         <li>
-            <a id="theme-switcher" onclick="switchTheme()" data-toggle="tooltip" data-placement="bottom"
-               title="Bytt tema">
+            <a id="theme-switcher" onclick="switchTheme()" data-toggle="tooltip" data-placement="bottom" title="Bytt tema">
                 <i class="fa fa-adjust"></i>
             </a>
         </li>
     </ul>
-</nav>
+</div>
