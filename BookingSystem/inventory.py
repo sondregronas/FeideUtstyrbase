@@ -18,7 +18,7 @@ Schema for items and functions to interact with the database.
 def all_categories() -> list[str]:
     """Get all categories."""
     with db.connect() as (con, cur):
-        sql = 'SELECT * FROM categories'
+        sql = "SELECT * FROM categories"
         cur.execute(sql)
         categories = [row[1] for row in cur.fetchall()]
 
@@ -43,42 +43,47 @@ class Item:
 
     def api_repr(self) -> dict:
         return {
-            'id': self.id,
-            'name': self.name,
-            'category': self.category,
-            'available': self.available,
-            'borrowed_to': self.borrowed_to,
-            'order_due_date': self.order_due_date,
-            'last_seen': self.last_seen
+            "id": self.id,
+            "name": self.name,
+            "category": self.category,
+            "available": self.available,
+            "borrowed_to": self.borrowed_to,
+            "order_due_date": self.order_due_date,
+            "last_seen": self.last_seen,
         }
 
     def html_repr(self) -> str:
-        return f'<strong>{self.lender_name}: </strong> {self.id}' \
-               f'<br><small>({self.name}, {self.category}, Frist: {self.order_due_date_fmt})</small>'
+        return (
+            f"<strong>{self.lender_name}: </strong> {self.id}"
+            f"<br><small>({self.name}, {self.category}, Frist: {self.order_due_date_fmt})</small>"
+        )
+
+    def message_repr(self) -> str:
+        return f"* <b>{self.name}</b> - {self.category} <i>(Lånt til: {self.order_due_date_fmt})</i>"
 
     def __str__(self) -> str:
         if self.order_due_date:
-            return f'{self.lender_name}: {self.id} - {self.name} ({self.category}, {self.order_due_date_fmt})'
-        return f'{self.id} - {self.name} - {self.category}'
+            return f"{self.lender_name}: {self.id} - {self.name} ({self.category}, {self.order_due_date_fmt})"
+        return f"{self.id} - {self.name} - {self.category}"
 
     @property
     def order_due_date_fmt(self) -> str:
         if not self.order_due_date:
-            return ''
-        return parser.parse(self.order_due_date).strftime('%d.%m.%Y')
+            return ""
+        return parser.parse(self.order_due_date).strftime("%d.%m.%Y")
 
     @property
     def last_seen_td_html(self) -> str:
         if not self.last_seen:
-            return ''
+            return ""
         parsed = parser.parse(self.last_seen)
         now = datetime.now()
-        innertext = parsed.strftime('%d.%m.%Y')
+        innertext = parsed.strftime("%d.%m.%Y")
 
         # Modify text and class if necessary (recently seen, stale)
-        inject_class = ''
+        inject_class = ""
         if parsed > now - timedelta(hours=3):
-            innertext = 'Nå nettopp'
+            innertext = "Nå nettopp"
             inject_class = ' class="last-seen-recent"'
         elif parsed < now - timedelta(days=300):  # School year is ~300 days (10 months)
             innertext += ' <i class="fa fa-warning"></i>'
@@ -95,39 +100,45 @@ class Item:
 
     @property
     def lender_name(self) -> str:
-        if not self.user.get('name'):
-            return 'Slettet bruker'
-        return self.user.get('name')
+        if not self.user.get("name"):
+            return "Slettet bruker"
+        return self.user.get("name")
+
+    @property
+    def lender_email(self) -> str:
+        if not self.user.get("email"):
+            return ""
+        return self.user.get("email")
 
     @property
     def lender_association(self) -> str:
-        if not self.user.get('name'):
-            return 'Sjekk historikk'
-        return self.user.get('classroom') or 'Lærer'
+        if not self.user.get("name"):
+            return "Sjekk historikk"
+        return self.user.get("classroom") or "Lærer"
 
     @property
     def lender_association_html(self) -> str:
-        if not self.user.get('name'):
-            return 'Slettet bruker [Sjekk historikk]'
-        if not self.user.get('classroom'):
-            return 'Ansatt'
-        return f'{self.classroom} (<at>{self.teacher}</at>)'
+        if not self.user.get("name"):
+            return "Slettet bruker [Sjekk historikk]"
+        if not self.user.get("classroom"):
+            return "Ansatt"
+        return f"{self.classroom} (<at>{self.teacher}</at>)"
 
     @property
     def classroom(self) -> str:
-        if '(' in self.lender_association:
-            return self.lender_association.split('(')[0].strip()
+        if "(" in self.lender_association:
+            return self.lender_association.split("(")[0].strip()
         return self.lender_association
 
     @property
     def teacher(self) -> str:
-        if '(' in self.lender_association:
-            return self.lender_association.split('(')[1].strip(')')
-        return ''
+        if "(" in self.lender_association:
+            return self.lender_association.split("(")[1].strip(")")
+        return ""
 
     @property
     def lender(self) -> str:
-        return f'{self.lender_name} ({self.lender_association})'
+        return f"{self.lender_name} ({self.lender_association})"
 
     @property
     def overdue(self) -> bool:
@@ -145,76 +156,83 @@ class Item:
 def add(item: Item) -> None:
     """Add the given item to the database."""
     if item.exists:
-        logger.error(f'{item.id} er allerede i bruk.')
-        raise APIException(f'{item.id} er allerede i bruk.')
+        logger.error(f"{item.id} er allerede i bruk.")
+        raise APIException(f"{item.id} er allerede i bruk.")
 
     with db.connect() as (con, cur):
         try:
-            cur.execute(read_sql_query('add_item.sql'), item.__dict__)
-            logger.info(f'La til {item.id}.')
-            logger.debug(f'La til {item.id} med verdier: {item.__dict__}')
+            cur.execute(read_sql_query("add_item.sql"), item.__dict__)
+            logger.info(f"La til {item.id}.")
+            logger.debug(f"La til {item.id} med verdier: {item.__dict__}")
         except db.IntegrityError:  # pragma: no cover
-            logger.error(f'Ukjent feil ved innlegging av {item.id}.')
-            raise APIException(f'Ukjent feil ved innlegging av {item.id}.')
+            logger.error(f"Ukjent feil ved innlegging av {item.id}.")
+            raise APIException(f"Ukjent feil ved innlegging av {item.id}.")
 
     _update_last_seen(item.id)
-    audits.audit('ITEM_NEW', f'{item.id} ble lagt til. ({item})')
+    audits.audit("ITEM_NEW", f"{item.id} ble lagt til. ({item})")
 
 
 def edit(old_item_id: str, new_item: Item) -> None:
     """Edit the item with the given ID in the database."""
     old = get(old_item_id)
     if old_item_id.lower() != new_item.id.lower() and new_item.exists:
-        logger.error(f'{new_item.id} er allerede i bruk.')
-        raise APIException(f'{new_item.id} er allerede i bruk.')
+        logger.error(f"{new_item.id} er allerede i bruk.")
+        raise APIException(f"{new_item.id} er allerede i bruk.")
 
     with db.connect() as (con, cur):
         try:
-            sql = 'UPDATE inventory SET id=:id, name=:name, category=:category, included_batteries=:included_batteries WHERE id=:old_item_id'
-            cur.execute(sql, {**new_item.__dict__, 'old_item_id': old_item_id})
-            logger.info(f'Redigerte utstyr {old_item_id}.')
-            logger.debug(f'Redigerte utstyr {old_item_id}, differanse: {new_item.__dict__}')
+            sql = "UPDATE inventory SET id=:id, name=:name, category=:category, included_batteries=:included_batteries WHERE id=:old_item_id"
+            cur.execute(sql, {**new_item.__dict__, "old_item_id": old_item_id})
+            logger.info(f"Redigerte utstyr {old_item_id}.")
+            logger.debug(
+                f"Redigerte utstyr {old_item_id}, differanse: {new_item.__dict__}"
+            )
         except db.IntegrityError:  # pragma: no cover
-            logger.error(f'Ukjent feil ved redigering av {old_item_id}.')
-            raise APIException(f'Ukjent feil ved redigering av {old_item_id}.')
+            logger.error(f"Ukjent feil ved redigering av {old_item_id}.")
+            raise APIException(f"Ukjent feil ved redigering av {old_item_id}.")
 
     _update_last_seen(new_item.id)
-    diff = ', '.join([f'{key}: {old.__dict__[key]}->{new_item.__dict__[key]}' for key in old.__dict__
-                      if old.__dict__[key] != new_item.__dict__[key]
-                      and new_item.__dict__[key] is not None])
+    diff = ", ".join(
+        [
+            f"{key}: {old.__dict__[key]}->{new_item.__dict__[key]}"
+            for key in old.__dict__
+            if old.__dict__[key] != new_item.__dict__[key]
+            and new_item.__dict__[key] is not None
+        ]
+    )
     if diff:
-        audits.audit('ITEM_EDIT', f'{old_item_id} ble redigert ({diff}).')
+        audits.audit("ITEM_EDIT", f"{old_item_id} ble redigert ({diff}).")
 
 
 def delete(item_id: str) -> None:
     """Delete the item with the given ID from the database."""
     with db.connect() as (con, cur):
         try:
-            sql = 'DELETE FROM inventory WHERE id=:id'
-            cur.execute(sql, {'id': item_id})
-            logger.info(f'Slettet utstyr {item_id}.')
+            sql = "DELETE FROM inventory WHERE id=:id"
+            cur.execute(sql, {"id": item_id})
+            logger.info(f"Slettet utstyr {item_id}.")
         except db.IntegrityError:  # pragma: no cover
-            logger.error(f'{item_id} eksisterer ikke.')
-            raise APIException(f'{item_id} eksisterer ikke.', status_code=404)
+            logger.error(f"{item_id} eksisterer ikke.")
+            raise APIException(f"{item_id} eksisterer ikke.", status_code=404)
 
-    audits.audit('ITEM_REM', f'{item_id} ble slettet.')
+    audits.audit("ITEM_REM", f"{item_id} ble slettet.")
 
 
 def get(item_id: str) -> Item:
     """Return a JSON object of the item with the given ID."""
     with db.connect() as (con, cur):
-        item = cur.execute(read_sql_query('get_item.sql'), {'id': item_id}).fetchone()
+        item = cur.execute(read_sql_query("get_item.sql"), {"id": item_id}).fetchone()
 
     if not item:
-        logger.error(f'{item_id} eksisterer ikke.')
-        raise APIException(f'{item_id} eksisterer ikke.')
+        logger.error(f"{item_id} eksisterer ikke.")
+        raise APIException(f"{item_id} eksisterer ikke.")
     return Item(*item)
 
 
 def get_all() -> list[Item]:
     """Return a JSON list of all items in the database."""
     with db.connect() as (con, cur):
-        cur.execute(read_sql_query('get_all_items.sql'))
+        cur.execute(read_sql_query("get_all_items.sql"))
         items = [Item(*row) for row in cur.fetchall()]
 
     return items
@@ -238,7 +256,10 @@ def get_all_overdue() -> list[Item]:
 def exists(item_id: str) -> bool:
     """Return True if the item with the given ID exists in the database."""
     with db.connect() as (con, cur):
-        cur.execute("SELECT EXISTS(SELECT 1 FROM inventory WHERE id=:id COLLATE NOCASE)", {'id': item_id})
+        cur.execute(
+            "SELECT EXISTS(SELECT 1 FROM inventory WHERE id=:id COLLATE NOCASE)",
+            {"id": item_id},
+        )
         return cur.fetchone()[0] == 1
 
 
@@ -252,9 +273,9 @@ def _update_last_seen(item_id: str) -> None:
     with db.connect() as (con, cur):
         try:
             sql = "UPDATE inventory SET last_seen=DATETIME('now','localtime') WHERE id=:id"
-            cur.execute(sql, {'id': item_id})
+            cur.execute(sql, {"id": item_id})
         except db.IntegrityError:  # pragma: no cover
-            logger.error(f'{item_id} eksisterer ikke.')
+            logger.error(f"{item_id} eksisterer ikke.")
 
 
 def register_out(item_id: str, userid: str, days: str = 1) -> None:
@@ -267,17 +288,21 @@ def register_out(item_id: str, userid: str, days: str = 1) -> None:
 
     with db.connect() as (con, cur):
         try:
-            sql = 'UPDATE inventory SET available=0, borrowed_to=:borrowed_to, order_due_date=:order_due_date WHERE id=:id'
-            cur.execute(sql, {'id': item_id, 'borrowed_to': userid, 'order_due_date': due_date})
-            logger.info(f'{item_id} er ikke lenger tilgjengelig.')
+            sql = "UPDATE inventory SET available=0, borrowed_to=:borrowed_to, order_due_date=:order_due_date WHERE id=:id"
+            cur.execute(
+                sql, {"id": item_id, "borrowed_to": userid, "order_due_date": due_date}
+            )
+            logger.info(f"{item_id} er ikke lenger tilgjengelig.")
         except db.IntegrityError:  # pragma: no cover
-            logger.error(f'{item_id} eksisterer ikke.')
-            raise APIException(f'{item_id} eksisterer ikke.')
+            logger.error(f"{item_id} eksisterer ikke.")
+            raise APIException(f"{item_id} eksisterer ikke.")
 
     _update_last_seen(item_id)
     u = user.get(userid)
-    audits.audit('REG_OUT',
-                 f'{item_id} ble registrert ut til {u.get("name")} ({u.get("classroom") or "Lærer"}) i {days} dager.')
+    audits.audit(
+        "REG_OUT",
+        f'{item_id} ble registrert ut til {u.get("name")} ({u.get("classroom") or "Lærer"}) i {days} dager.',
+    )
 
 
 def register_in(item_id: str) -> None:
@@ -285,33 +310,33 @@ def register_in(item_id: str) -> None:
     try:
         get(item_id)
     except TypeError:
-        raise APIException(f'{item_id} eksisterer ikke.')
+        raise APIException(f"{item_id} eksisterer ikke.")
 
     with db.connect() as (con, cur):
         try:
-            sql = 'UPDATE inventory SET available=1, borrowed_to=NULL, order_due_date=NULL WHERE id=:id'
-            cur.execute(sql, {'id': item_id})
-            logger.info(f'{item_id} er nå tilgjengelig.')
+            sql = "UPDATE inventory SET available=1, borrowed_to=NULL, order_due_date=NULL WHERE id=:id"
+            cur.execute(sql, {"id": item_id})
+            logger.info(f"{item_id} er nå tilgjengelig.")
         except db.IntegrityError:  # pragma: no cover
-            logger.error(f'{item_id} eksisterer ikke.')
-            raise APIException(f'{item_id} eksisterer ikke.')
+            logger.error(f"{item_id} eksisterer ikke.")
+            raise APIException(f"{item_id} eksisterer ikke.")
 
     _update_last_seen(item_id)
-    audits.audit('REG_IN', f'{item_id} er nå tilgjengelig.')
+    audits.audit("REG_IN", f"{item_id} er nå tilgjengelig.")
 
 
 def postpone_due_date(item_id: str, days: int) -> None:
     """Postpone the due date of the item with the given ID by the given number of days."""
     item = get(item_id)
     if item.available:
-        raise APIException(f'{item_id} er ikke utlånt.')
+        raise APIException(f"{item_id} er ikke utlånt.")
     due_date = datetime.now() + timedelta(days=days)
 
     with db.connect() as (con, cur):
         try:
-            sql = 'UPDATE inventory SET order_due_date=:order_due_date WHERE id=:id'
-            cur.execute(sql, {'id': item_id, 'order_due_date': due_date})
-            logger.info(f'{item_id} har fått utsatt frist til {due_date}.')
+            sql = "UPDATE inventory SET order_due_date=:order_due_date WHERE id=:id"
+            cur.execute(sql, {"id": item_id, "order_due_date": due_date})
+            logger.info(f"{item_id} har fått utsatt frist til {due_date}.")
         except db.IntegrityError:  # pragma: no cover
             logger.error(f'{item_id} eksisterer ikke. (postpone)')
             raise APIException(f'{item_id} eksisterer ikke.')

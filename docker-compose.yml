@@ -30,6 +30,9 @@ services:
       # Teams Webhooks (for sending notifications to teams channel) - comma separated
       - TEAMS_WEBHOOKS=
       - TEAMS_WEBHOOKS_DEVIATIONS=
+      # A workflow webhook that sends a message to `items('attachments')?['recipient']` with the message
+      # `items('attachments')?['message']` (for each `attachments` in the request)
+      - TEAMS_MSG_WEBHOOK=
 
       # Reverse proxy for kiosk mode (No login, all visitors are administrators
       # If you don't know what this is, leave it blank
