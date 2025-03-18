@@ -33,11 +33,12 @@ def get_overdue_users(items: list) -> list[dict]:
 
 def format_user_message(user: dict) -> str:
     """Return a formatted message for a user."""
+    items_list = "\n".join(user["items"])
     return f"""\
 <h1>Hei {user["name"]}!</h1>
 Du står registrert med følgende utstyr som er på overtid:
 
-{"\n".join(user["items"])}
+{items_list}
 
 <i>Vennligst lever utstyret tilbake så snart som mulig, eller ta kontakt med din kontaktlærer ved behov.
 <br>Denne meldingen er automatisk generert og kan ikke besvares.</i>"""
