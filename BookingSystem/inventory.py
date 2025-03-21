@@ -59,7 +59,7 @@ class Item:
         )
 
     def message_repr(self) -> str:
-        return f"* <b>{self.name}</b> - {self.category} <i>(Lånt til: {self.order_due_date_fmt})</i>"
+        return f"* <b>{self.name}</b> - {self.category} <i>(Lånt til: {self.order_due_date_fmt}). ID {self.id}</i>"
 
     def __str__(self) -> str:
         if self.order_due_date:
