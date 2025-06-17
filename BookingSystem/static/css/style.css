@@ -46,6 +46,97 @@
   color: var(--del-color);
 }
 
+/******************\
+|* HEADER STYLING *|
+\******************/
+
+/* Header Container */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 50px;
+  background-color: var(--header-color, #313131);
+  color: var(--color, #f5f5f5);
+  font-family: 'Gabarito', sans-serif;
+}
+
+/* Left Side (Logo) */
+.header-left {
+  display: flex;
+  align-items: center;
+}
+
+.header-logo {
+  font-size: 2rem;
+  font-weight: 700;
+  background: linear-gradient(to right, #3b82f6, #a855f7);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-decoration: none;
+}
+
+/* Right Side (Menu) */
+.header-right {
+  display: flex;
+  align-items: center;
+}
+
+.header-menu {
+  display: flex;
+  align-items: center;
+  gap: 20px; /* Space between menu items */
+}
+
+/* Menu Item Base Styling */
+.header-menu-item {
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  color: inherit;
+  text-decoration: none;
+}
+
+/* Hover state: light background (same as wide button on hover) */
+.header-menu-item:hover {
+  background-color: var(--button-hover);
+}
+
+/* Icon Styling for Menu Items */
+.header-menu-item svg {
+  margin: 0px 3px 0px 3px;
+  width: 20px !important;
+  height: 20px !important;
+}
+
+/* When there's text (like in the 'utstyr-button'), add a little margin to the icon */
+.header-menu-item svg + * {
+  margin-left: 8px;
+}
+
+/************************\
+|* THEME BUTTON STYLING *|
+\************************/
+
+/* Initially assume dark theme */
+[data-theme="dark"] #theme-button .lucide-sun {
+  display: block;
+}
+[data-theme="dark"] #theme-button .lucide-moon {
+  display: none;
+}
+
+/* For light theme, swap visibility */
+[data-theme="light"] #theme-button .lucide-sun {
+  display: none;
+}
+[data-theme="light"] #theme-button .lucide-moon {
+  display: block;
+}
+
 /*****************\
 |* INDEX STYLING *|
 \*****************/
@@ -63,15 +154,15 @@
 #main-container {
   flex: 1;
   margin: 0 auto;
-  max-width: 40rem;
+  max-width: 50rem;
 }
 
 /* INFO FIELD */
 /* Calming background with no border; consistent border radius */
 .info-field {
   background-color: var(--neutral-color);
-  padding: 20px;
-  border-radius: 8px;
+  padding: 25px;
+  border-radius: var(--border-radius);
   margin-bottom: 20px;
 }
 
@@ -95,7 +186,6 @@
 }
 
 /* CARD CONTAINER */
-/* Two columns with gap */
 #card-container {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -104,16 +194,15 @@
 }
 
 /* CARDS */
-/* CARD BASE */
 .card {
   position: relative;
-  border-radius: 8px;
+  border-radius: var(--border-radius);
   overflow: hidden;
-  aspect-ratio: 3/4; /* Changed aspect ratio to 3/4 */
+  aspect-ratio: 3/4;
   text-decoration: none;
   background-color: var(--card-background-color);
-  color: var(--color);
-  transition: transform 0.3s ease; /* For scaling the card on hover */
+  color: var(--card-color);
+  transition: transform 0.3s ease; 
 }
 
 /* Gradient border pseudo-element at the bottom */
@@ -124,7 +213,7 @@
   left: 0;
   height: 4px;
   width: 100%;
-  background: linear-gradient(to right, rgb(0, 238, 255), rgb(255, 0, 242));
+  background: linear-gradient(to right, #3b82f6, #a855f7);
   transform: scaleX(0);
   transform-origin: middle;
   transition: transform 0.3s ease;
@@ -138,7 +227,6 @@
   height: 100%;
 }
 
-/* Background container: positioned absolutely behind content */
 .card-background {
   position: absolute;
   top: 0;
@@ -148,7 +236,6 @@
   z-index: 1;
 }
 
-/* Background image with its own transition */
 .card-background-image {
   width: 100%;
   height: 100%;
@@ -165,7 +252,7 @@
   width: 100%;
   height: 100%;
   /* Gradient from dark at the bottom to transparent at the top */
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.7) 0%, transparent 100%);
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.2) 100%);
   pointer-events: none;
 }
 
@@ -188,8 +275,8 @@
   position: absolute;
   top: 10px;
   right: 10px;
-  width: 40px !important;
-  height: 40px !important;
+  width: 35px !important;
+  height: 35px !important;
   z-index: 4;
 }
 
@@ -263,7 +350,7 @@
   display: block; /* Make it block-level */
   background-color: var(--neutral-color);
   padding: 25px 20px;
-  border-radius: 8px;
+  border-radius: var(--border-radius);
   text-decoration: none;
   margin: 0 20px; /* 20px margin on both left and right */
   box-sizing: border-box;
@@ -271,7 +358,7 @@
 }
 
 .wide-button:hover {
-  background-color: var(--card-background-color);
+  background-color: var(--button-hover);
 }
 
 /* Inner wrapper to center the icon and text */
@@ -287,185 +374,188 @@
   width: 24px;
   height: 24px;
   margin-right: 10px;
+  color: var(--link-color);
 }
 
 /* Description styling */
 .wide-description {
-  font-size: 1.1em;
-  color: inherit;
+  font-size: 1.3em;
+  color: var(--color);
   text-decoration: none;
+}
+
+.wide-button .wide-icon svg {
+  transition: transform 0.3s ease;
+}
+
+.wide-button:hover .wide-icon svg {
+  transform: rotate(45deg);
 }
 
 /* ================= *\
 |        TABLE        |
 \* ================= */
 
-/* Title styling */
-.overdue-title {
-  font-size: 1.5em;
-  font-weight: 700;
-  margin: 20px auto 15px;
-  color: var(--color);
-  font-family: 'Gabarito', sans-serif;
-  max-width: 1200px;
-  padding: 0 20px;
-}
-
-/* OVERDUE CONTAINER */
-#overdue-container {
-  margin: 0 auto 20px;
-  padding: 20px;
-  background-color: var(--neutral-color);
-  border-radius: 8px;
-  max-width: 1200px;
-}
-
-/* DATATABLES TOOLBAR LAYOUT */
+/* Toolbar Layout */
 .dt-toolbar {
   display: flex;
   align-items: center;
+  justify-content: space-between;
+  padding: 0 2rem;
+  gap: 10px;
   margin-bottom: 1rem;
-  flex-wrap: wrap;
 }
 
-/* --- CUSTOM SEARCH BAR (External) --- */
-.dt-col-search {
-  flex: 1;
-  margin-right: 10px;
+.custom-length, .custom-info, .custom-filter {
+  display: flex;
+  align-items: center;
+  font-family: 'Gabarito', sans-serif;
+  font-size: 0.9rem;
+  color: var(--color);
+  font-style: normal;
 }
-.custom-search {
+
+.custom-filter label {
   position: relative;
-}
-.custom-search input {
-  width: 100%;
-  padding: 5px 35px 5px 35px; /* extra left padding for the icon */
-  background-color: var(--card-background-color);
-  border: 1px solid var(--neutral-color);
-  border-radius: 4px;
-  color: var(--color);
-  box-sizing: border-box;
-  transition: border-color 0.3s ease;
-}
-.custom-search input:focus {
-  border-color: var(--color);
-  outline: none;
-}
-.custom-search .search-icon {
-  position: absolute;
-  left: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 16px;
-  height: 16px;
-  background: url('data:image/svg+xml;utf8,<svg fill="%23f5f5f5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M505 442.7l-99.7-99.7c28.4-34.5 45.7-78.4 45.7-126C451 98 353 0 225.5 0S0 98 0 219.9 98 439.9 225.5 439.9c47.6 0 91.5-17.3 126-45.7l99.7 99.7c4.5 4.5 10.5 6.1 16.2 6.1s11.7-2.2 16.2-6.7c8.9-8.9 8.9-23.3.1-32.4zM225.5 399.9c-99.1 0-179.9-80.8-179.9-179.9S126.4 40.1 225.5 40.1 405.4 120.9 405.4 219.9 324.6 399.9 225.5 399.9z"/></svg>') no-repeat center center;
-  background-size: 16px 16px;
-  opacity: 0.7;
-  pointer-events: none;
+  margin: 0;
 }
 
-/* DataTables info (middle column) */
-.dt-col-info {
-  flex: 0 0 auto;
-  text-align: center;
-  font-size: 0.95em;
-  margin-right: 10px;
-  color: var(--color);
-}
-
-/* Length menu (right column) */
-/* DataTables will place the select box here; we style it to match the search bar */
-.dt-col-length select {
-  background-color: var(--card-background-color);
-  color: var(--color);
-  border: 1px solid var(--neutral-color);
-  border-radius: 4px;
-  padding: 5px 10px;
-  outline: none;
-  cursor: pointer;
-}
-
-/* OVERDUE TABLE STYLING */
+/* Overdue Table Styling */
 .overdue-table {
   width: 100%;
   border-collapse: collapse;
   font-family: 'Gabarito', sans-serif;
+  font-size: 0.9rem;
+  font-style: normal;
+  margin: 0;
+  border-radius: var(--border-radius, 0.85rem);
+  box-shadow: 0px 5px 5px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
 }
+
 .overdue-table thead {
   background-color: var(--card-background-color);
 }
+
 .overdue-table thead th {
   padding: 12px;
   text-align: left;
   font-weight: 600;
   border-bottom: 2px solid var(--neutral-color);
   color: var(--color);
+  background-color: var(--neutral-color);
 }
+
 .overdue-table tbody {
-  background-color: var(--background-color);
+  background-color: var(--neutral-color);
 }
+
 .overdue-table tbody tr {
   transition: background-color 0.2s ease;
 }
+
 .overdue-table tbody td {
   padding: 12px;
-  border-bottom: 1px solid var(--neutral-color);
   color: var(--color);
 }
-.overdue-table tbody tr:nth-child(even) {
-  background-color: var(--card-background-color);
+
+.overdue-table tbody tr:nth-child(odd) {
+  background-color: var(--table-color);
 }
+
 .overdue-table tbody tr:hover {
   background-color: var(--card-background-color);
 }
 
-/* Overdue status in red */
+#rows-per-page {
+  border-radius: var(--border-radius);
+  padding: 5px 10px 5px 10px;
+  background-color: var(--background-color);
+  color: var(--color);
+  border: 1px solid var(--color);
+}
+
+.search-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--background-color);
+  border-radius: var(--border-radius, 0.85rem);
+  border: 1px solid var(--color);
+  color: var(--color);
+  transition: border-color 0.3s ease;
+  font-size: 0.9rem;
+  font-style: normal;
+  box-sizing: border-box;
+  padding: 7px;
+}
+
+.search-box input {
+  border: none;
+  background-color: transparent;
+  color: var(--color);
+  width: 200px;
+}
+
+.search-box svg {
+  width: 0.9rem;
+  height: 0.9rem;
+  margin: 0px 5px 0px 5px;
+}
+
+
+.custom-filter input:focus {
+  border-color: var(--color);
+  outline: none;
+}
+
 .overdue-status {
-  color: var(--del-color);
-  font-weight: 600;
+  font-weight: bold;
 }
 
-/* "Utsett" button styling */
-.postpone-btn {
-  background-color: var(--del-color);
-  color: #fff;
-  border: none;
-  border-radius: 4px;
-  padding: 6px 12px;
+.overdue-status.one-day {
+  color: orange;
+}
+
+.overdue-status.multi-day {
+  color: var(--over-color);
+}
+
+#overdue_items {
+  border-radius: var(--border-radius) !important;
+}
+
+.delay-button {
+  display: inline-block;
+  pointer-events: all;
+  background-color: var(--delay-color);
+  padding: 12px 10px;
+  border-radius: var(--border-radius);
+  color: var(--delay-color-text);
+  font-style: normal;
+  font-weight: 200;
+  font-size: 0.85rem;
+  text-align: center;
+  min-width: 75px;
+  transition: 0.2s;
+}
+
+.delay-button svg {
+  width: 0.85rem;
+  height: 0.85rem;
+  margin-right: 5px;
+}
+
+.delay-button:hover {
   cursor: pointer;
-  text-decoration: none;
-  transition: filter 0.3s ease;
-}
-.postpone-btn:hover {
-  filter: brightness(1.1);
+  background-color: var(--delay-hover);
+  transition: 0.2s;
 }
 
-/* DataTables pagination */
-.dataTables_paginate .paginate_button {
-  background-color: var(--card-background-color);
-  border: none;
-  border-radius: 4px;
-  padding: 5px 10px;
-  margin: 0 2px;
-  color: var(--color);
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-.dataTables_paginate .paginate_button.current {
-  background-color: var(--neutral-color);
-  color: var(--color);
-}
-.dataTables_paginate .paginate_button:hover {
-  background-color: var(--neutral-color);
-}
+/***********\
+|* SHADOWS *|
+\***********/
 
-/* DataTables info text */
-.dataTables_info {
-  font-size: 0.9em;
-  color: var(--color);
-}
-
-/* DataTables filter (hidden, since we’re using external input) */
-/* You can hide the default search container if it’s generated */
-.dataTables_filter {
-  display: none;
+header, .info-field, .card, .wide-button, #overdue_items {
+  box-shadow: 0px 5px 5px rgba(0, 0, 0, 0.1);
 }

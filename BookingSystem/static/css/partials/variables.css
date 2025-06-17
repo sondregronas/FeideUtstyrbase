@@ -1,37 +1,61 @@
 /* Dark Mode */
 :root[data-theme="dark"] {
   --color: #f5f5f5;
+  --color-bright: #f5f5f5;
+  --card-color: #f5f5f5;
   --h1-color: #f5f5f5;
 
-  --link-color: #f5f5f5;
+  --link-color: rgb(96, 165, 250);
 
-  --background-color: #212121;
+  --background-color: rgb(17, 24, 39);
   --card-background-color: #1e1e1e;
 
-  --neutral-color: #313131;
-  --header-color: #313131;
+  --neutral-color: rgb(31, 41, 55);
+  --header-color: rgb(31, 41, 55);
+
+  --table-color: rgb(45, 54, 66);
 
   --form-element-background-color: #1e1e1e;
-  --del-color: #ff5252;
+  --delay-color: rgba(30, 64, 175, 0.438);
+  --delay-hover: rgba(91, 116, 197, 0.438);
+  --delay-color-text: rgb(133, 154, 221);
+
+  --over-color: rgb(219, 45, 45);
+
+  --button-hover: rgb(54, 64, 78);
 }
 
-/* Light Mode */
 :root[data-theme="light"] {
-  --color: #212121;
-  --h1-color: #212121;
-
-  --background-color: #f5f5f5;
+  --color: #333333;
+  --color-bright: #f5f5f5;
+  --card-color: #f5f5f5;
+  --h1-color: #222222;
+  
+  --link-color: #2563eb;
+  
+  --background-color: #f9fafb;
   --card-background-color: #ffffff;
+  
+  --neutral-color: #f9fafb;
+  --header-color: #ffffff;
 
-  --neutral-color: #e5e5e5;
-  --header-color: #e5e5e5;
-
+  --table-color: #edeff1;
+  
   --form-element-background-color: #ffffff;
-  --del-color: #ff5252;
+  --delay-color: rgba(30, 64, 175, 0.25);
+  --delay-hover: rgba(111, 137, 223, 0.25);
+  --delay-color-text: rgb(30, 64, 175);
+
+  --over-color: rgb(219, 45, 45);
+  
+  --button-hover: #e5e7eb;
 }
+
 
 /* Default */
 :root {
   --placeholder: pink;
   --placeholder-bg: deeppink;
+
+  --border-radius: 0.85rem;
 }

@@ -84,98 +84,139 @@
     <!-- ADMINISTER BUTTON -->
     <a class="wide-button" href="{{ url_for('app.inventar') }}">
       <div class="wide-button-inner">
-        <div class="wide-icon"></div>
+        <div class="wide-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-settings2 text-blue-600 dark:text-blue-400 transition-transform duration-200 group-hover:rotate-45"><path d="M20 7h-9"></path><path d="M14 17H5"></path><circle cx="17" cy="17" r="3"></circle><circle cx="7" cy="7" r="3"></circle></svg>
+        </div>
         <div class="wide-description">
           Administrer utstyr
         </div>
       </div>
     </a>    
 
-    <h2 class="overdue-title">Overskredet utstyr:</h2>
-  
-    <!-- OVERDUE TABLE CONTAINER -->
-    <div id="overdue-container">
-      <!-- Container for the DataTables toolbar -->
+    <h2 class="overdue-title" style="text-align: center;">Overskredet utstyr:</h2>
+    {% if overdue_items %}
+    <div id="overdue_items">
+    
+      <!-- Toolbar: length menu, info text, and search -->
       <div class="dt-toolbar">
-        <div class="dt-col-search">
-          <div class="custom-search">
-            <input type="text" id="custom-search" placeholder="Søk etter utstyr eller person...">
-            <span class="search-icon"></span>
-          </div>
+        <!-- Rows per page (length menu) -->
+        <div class="custom-length">
+          <label>
+            Viser 
+            <select id="rows-per-page">
+              <option value="10">10 per side</option>
+              <option value="20">20 per side</option>
+              <option value="30">30 per side</option>
+              <option value="-1">Alle</option>
+            </select>
+          </label>
         </div>
-        <div class="dt-col-info"></div>
-        <div class="dt-col-length"></div>
+    
+        <!-- Info text: "Viser X resultater" -->
+        <div class="custom-info" id="custom-info">
+          <!-- Populated by JS, e.g. "Viser 12 resultater" -->
+        </div>
+    
+        <!-- Search box -->
+        <div class="custom-filter">
+          <label class="search-box">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search h-5 w-5 text-gray-400"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg>
+            <input 
+              type="text" 
+              id="custom-search" 
+              placeholder="Søk etter utstyr eller person..."
+            >
+          </label>
+        </div>
       </div>
-      <table id="active" class="overdue-table display">
-        <thead id="datatable-head">
-          <tr>
-            <th class="overdue-head">Løpenummer</th>
-            <th class="overdue-head">Utstyr</th>
-            <th class="overdue-head">Utlånt til</th>
-            <th class="overdue-head">Frist for levering</th>
-            <th class="overdue-head">Alternativer</th>
-          </tr>
-        </thead>
-        <tbody id="datatable-body" style="display: none;">
-          {% for item in overdue_items %}
-            <tr class="item-row item-row--overdue overdue-row">
-              <td class="overdue-data">{{ item.id }}</td>
-              <td class="overdue-data">{{ item.name }} ({{ item.category }})</td>
-              <td class="overdue-data">
-                {{ item.lender_name }} 
-                <small> ({{ item.classroom }}{% if item.teacher %}, {{ item.teacher }}{% endif %})</small>
+    
+      <!-- Table -->
+      <div id="overdue-table-wrapper">
+        <table id="active" class="overdue-table">
+          <thead>
+            <tr>
+              <th>Løpenummer</th>
+              <th>Utstyr</th>
+              <th>Utlånt til</th>
+              <th>Leveringsfrist</th>
+              <th>Alternativer</th>
+            </tr>
+          </thead>
+          <tbody id="datatable-body" style="display: none;">
+            {% for item in overdue_items %}
+            <tr class="item-row item-row--overdue">
+              <td>{{ item.id }}</td>
+              <td>{{ item.name }} ({{ item.category }})</td>
+              <td>
+                {{ item.lender_name }}
+                <small>
+                  ({{ item.classroom }}{% if item.teacher %}, {{ item.teacher }}{% endif %})
+                </small>
               </td>
-              <td class="overdue-data" data-sort="{{ item.order_due_date }}">
+              <td data-sort="{{ item.order_due_date }}" class="">
                 {{ item.order_due_date|strftime }}
-                <br>
-                <span class="overdue-status">
-                  {{ item.days_overdue }} dager over fristen
-                </span>
               </td>
-              <td class="overdue-data">
-                <button class="postpone-btn" onclick="postpone('{{ item.id }}', '{{ item.lender }}', this.parentNode.parentNode)">
+              <td>
+                <a class="delay-button" onclick="postpone('{{ item.id }}', '{{ item.lender }}', this.parentNode.parentNode)">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-calendar "><path d="M8 2v4"></path><path d="M16 2v4"></path><rect width="18" height="18" x="3" y="4" rx="2"></rect><path d="M3 10h18"></path></svg>
                   Utsett
-                </button>
+                </a>
               </td>
             </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
     </div>
-  
-    <!-- DataTables initialization script -->
+    
     <script>
-      // Initialize DataTables without the search field (f) in the DOM,
-      // so that our external search bar is used instead.
-      var dt = $('#active').DataTable({
-        language: {
-          "lengthMenu": "Vis _MENU_ rader per side",
-          "zeroRecords": "Ingen treff",
-          "info": "Viser _TOTAL_ resultater",
-          "infoEmpty": "Ingen rader tilgjengelig",
-          "infoFiltered": "(filtrert fra _MAX_ rader totalt)",
-          "paginate": {
-            "first": "Første",
-            "last": "Siste",
-            "next": "Neste",
-            "previous": "Forrige"
-          }
-        },
-        // Custom DOM without the search element:
-        dom: "<'dt-toolbar'<'dt-col-info'i><'dt-col-length'l>>" +
-             "<'dt-table't>" +
-             "<'dt-pagination'p>",
-        order: [[3, "asc"]],
-        pageLength: 25,
-        lengthMenu: [[25, 50, -1], [25, 50, "Alle"]]
-      });
-  
-      // Bind external search input to the DataTables search API
-      $('#custom-search').on('keyup', function () {
-        dt.search(this.value).draw();
-      });
-  
-      // Existing postpone functions remain unchanged
+      // Show the table body once the page loads
+      document.getElementById('datatable-body').style.display = '';
+    
+      // 1) Grab references to DOM elements
+      const searchInput  = document.getElementById('custom-search');
+      const lengthSelect = document.getElementById('rows-per-page');
+      const infoDisplay  = document.getElementById('custom-info');
+      const tableBody    = document.getElementById('datatable-body');
+    
+      // 2) Convert table rows to an array for easy filtering
+      let allRows = Array.from(tableBody.querySelectorAll('tr'));
+    
+      // 3) Function to filter rows based on the search input
+      function filterRows() {
+        const searchTerm = searchInput.value.toLowerCase();
+        return allRows.filter(row => {
+          // Check if any cell text matches the search term
+          const cellsText = row.innerText.toLowerCase();
+          return cellsText.includes(searchTerm);
+        });
+      }
+    
+      // 4) Function to render the filtered rows with the selected row limit
+      function renderTable() {
+        const filtered = filterRows();
+        const limit = parseInt(lengthSelect.value, 10);
+    
+        // Clear table body
+        tableBody.innerHTML = '';
+    
+        // If limit is -1, show all rows; otherwise show only 'limit' rows
+        const rowsToShow = (limit === -1) ? filtered : filtered.slice(0, limit);
+    
+        rowsToShow.forEach(row => tableBody.appendChild(row));
+    
+        // Update info text
+        infoDisplay.textContent = `Viser ${filtered.length} resultater`;
+      }
+    
+      // 5) Attach event listeners for search and length changes
+      searchInput.addEventListener('keyup',  renderTable);
+      lengthSelect.addEventListener('change', renderTable);
+    
+      // 6) Initial render
+      renderTable();
+    
+      // Existing postpone logic, unchanged
       function postpone(id, lender, tr) {
         $.confirm({
           title: `Utsett levering av '${id}'`,
@@ -208,7 +249,7 @@
           }
         });
       }
-  
+    
       function submitPostpone(id, tr, days) {
         $.ajax({
           url: "{{ url_for('api.postpone_due_date') }}",
@@ -223,8 +264,9 @@
               message: response
             });
             tr.remove();
-            if ($('.item-row').length === 0) {
-              $('#overdue_items').remove();
+            // If no rows remain, remove the entire container
+            if (!document.querySelector('.item-row')) {
+              document.getElementById('overdue_items').remove();
             }
           },
           error: function (response, status) {
@@ -235,9 +277,10 @@
           }
         });
       }
-  
-      $('#datatable-body').show();
     </script>
+    {% endif %}
+    
+
   </div>
 </div>
 {% endblock %}

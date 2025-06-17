@@ -39,5 +39,38 @@
         {% endif %}
     {% endblock %}
 </footer>
+
+<!-- THEME SWITCHER SCRIPT -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const themeButton = document.getElementById('theme-button');
+        const htmlElement = document.documentElement;
+        
+        const storedTheme = localStorage.getItem('dataTheme') || 'dark';
+        htmlElement.setAttribute('data-theme', storedTheme);
+        
+        function updateThemeIcons() {
+          const currentTheme = htmlElement.getAttribute('data-theme');
+          if (currentTheme === 'dark') {
+            themeButton.querySelector('.lucide-sun').style.display = 'block';
+            themeButton.querySelector('.lucide-moon').style.display = 'none';
+          } else {
+            themeButton.querySelector('.lucide-sun').style.display = 'none';
+            themeButton.querySelector('.lucide-moon').style.display = 'block';
+          }
+        }
+        
+        updateThemeIcons();
+        
+        themeButton.addEventListener('click', function() {
+          let currentTheme = htmlElement.getAttribute('data-theme');
+          currentTheme = currentTheme === 'dark' ? 'light' : 'dark';
+          htmlElement.setAttribute('data-theme', currentTheme);
+          localStorage.setItem('dataTheme', currentTheme);
+          updateThemeIcons();
+        });
+      });
+</script>
+
 </body>
 </html>
