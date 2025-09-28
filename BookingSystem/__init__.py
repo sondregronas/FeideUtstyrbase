@@ -15,6 +15,7 @@ Path("data").mkdir(exist_ok=True)
 DATABASE = Path("data") / "db.sqlite"
 LABEL_SERVER = os.getenv("LABEL_SERVER")
 KIOSK_FQDN = os.getenv("KIOSK_FQDN")
+KIOSK_SECRET = os.getenv("KIOSK_SECRET")
 API_TOKEN = os.getenv("API_TOKEN")
 
 # Teams webhooks

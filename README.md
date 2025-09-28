@@ -37,7 +37,8 @@ KIOSK_FQDN=127.0.0.1:5000  # Automatically logs in as Kiosk user when visiting t
 > as [NginxProxyManager](https://nginxproxymanager.com/) - don't run in production without SSL.
 
 To configure a kiosk, set up a separate reverse proxy with proper access controls (limit to specified IP) and
-set `KIOSK_FQDN` to the FQDN of the kiosk proxy. (Remember to restrict access further by setting up a firewall rule)
+set `KIOSK_FQDN` to the FQDN of the kiosk proxy. (Remember to restrict access further by setting up a firewall rule) and
+add a `X-Internal-Auth` header in your proxy corresponding to the `KIOSK_SECRET` environment variable.
 
 ## Overrides
 

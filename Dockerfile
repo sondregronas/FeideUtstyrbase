@@ -27,6 +27,7 @@ ENV TEAMS_WEBHOOKS_DEVIATIONS=''
 
 # Kiosk (Admin access without login) (FQDN)
 ENV KIOSK_FQDN=''
+ENV KIOSK_SECRET=''
 
 # API token
 ENV API_TOKEN=''

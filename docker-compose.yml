@@ -38,6 +38,8 @@ services:
       # If you don't know what this is, leave it blank
       # Ensure access list only allows your kiosk client, or you will have a bad time
       - KIOSK_FQDN=
+      # KIOSK_SECRET = X-Internal-Auth header value, must be the same as in your reverse proxy
+      - KIOSK_SECRET=
 
       # Misc
       - DEBUG=False        # Don't use debug mode in production (only responds to "True")
