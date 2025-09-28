@@ -1,4 +1,3 @@
-version: "3.7"
 services:
   app:
     # build: .
@@ -44,7 +43,7 @@ services:
       # Misc
       - DEBUG=False        # Don't use debug mode in production (only responds to "True")
       - WEB_CONCURRENCY=4  # Number of workers for gunicorn (default 1)
-      - AUTO_UPDATE=True   # Automatically update app on startup (default True) (only responds to "True")
+      - AUTO_UPDATE=True   # Automatically update app on startup (only responds to "True")
 
       # API Token (for API access, see documentation for endpoints, send automatic reports etc)
       - API_TOKEN=

@@ -37,12 +37,8 @@ ENV DEBUG='False'
 ENV AUTO_UPDATE='True'
 ENV WEB_CONCURRENCY='1'
 
-RUN pip install -U pip && pip install setuptools wheel
-
-RUN git clone https://github.com/sondregronas/FeideUtstyrbase &&  \
-    pip install -r /FeideUtstyrbase/requirements.txt &&  \
-    mkdir /app &&  \
-    cp -r /FeideUtstyrbase/BookingSystem/* /app
+COPY requirements.txt .
+RUN pip install -U pip && pip install setuptools wheel && pip install -r requirements.txt
 
 RUN echo  \
     "cd /FeideUtstyrbase && \
@@ -50,9 +46,12 @@ RUN echo  \
     pip install -q -r requirements.txt && \
     cp -r /FeideUtstyrbase/BookingSystem/* /app" > /usr/local/bin/auto-update.sh
 
+RUN git clone https://github.com/sondregronas/FeideUtstyrbase
+
+WORKDIR /app
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
+COPY BookingSystem /app
 
 EXPOSE 5000
-WORKDIR /app
 VOLUME /app/data
 CMD ["sh", "/usr/local/bin/entrypoint.sh"]

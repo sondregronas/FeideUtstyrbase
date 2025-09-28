@@ -8,7 +8,7 @@
 [![License](https://img.shields.io/github/license/sondregronas/FeideUtstyrbase)](https://github.com/sondregronas/FeideUtstyrbase/blob/main/LICENSE)
 
 For Vågen VGS, might be possible to use for other schools with some modifications. (Work in progress, this is not plug
-and play)
+and play).
 
 ## Dev setup
 
