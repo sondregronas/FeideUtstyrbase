@@ -4,7 +4,7 @@ from datetime import datetime
 from flask import request
 
 import db
-from __init__ import KIOSK_FQDN, KIOSK_SECRET, logger
+from __init__ import KIOSK_FQDN, KIOSK_SECRET, logger, DEBUG
 from db import read_sql_query
 from feide import get_feide_data
 
@@ -59,14 +59,25 @@ class FeideUser(User):  # pragma: no cover
         self.affiliations = data["affiliations"]
 
 
+def verify_kiosk_user(req: request) -> bool:
+    # TODO: This could be improved.
+    verify_secret = req.headers.get("X-Internal-Auth") == KIOSK_SECRET
+    verify_host = req.headers.get("Host") == KIOSK_FQDN
+    # Allow bypassing secret in debug mode
+    if verify_host and DEBUG:
+        return True
+    # Make sure kiosk is properly configured
+    elif not all([KIOSK_FQDN, KIOSK_SECRET]):
+        logger.warning("Kiosk mode is not properly configured.")
+        return False
+    return all([verify_secret, verify_host])
+
+
 class KioskUser(User):
     @property
     def is_admin(self) -> bool:
-        if not all([KIOSK_SECRET, KIOSK_FQDN]):
-            return False
-        verify_secret = request.headers.get("X-Internal-Auth") == KIOSK_SECRET
-        verify_host = request.headers.get("Host") == KIOSK_FQDN
-        return all([verify_secret, verify_host])
+        """Kiosk users should always be admins."""
+        return verify_kiosk_user(request)
 
 
 def separate_classroom_teacher(classroom: str) -> tuple[str, str]:
