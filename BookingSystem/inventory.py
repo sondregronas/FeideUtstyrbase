@@ -52,10 +52,10 @@ class Item:
             "last_seen": self.last_seen,
         }
 
-    def html_repr(self) -> str:
+    def daily_report_text(self) -> str:
         return (
-            f"<strong>{self.lender_name}: </strong> {self.id}"
-            f"<br><small>({self.name}, {self.category}, Frist: {self.order_due_date_fmt})</small>"
+            f"- **{self.lender_name}:** {self.id}  \n"
+            f"  {self.name} · {self.category} · Frist: {self.order_due_date_fmt}"
         )
 
     def message_repr(self) -> str:
@@ -338,7 +338,10 @@ def postpone_due_date(item_id: str, days: int) -> None:
             cur.execute(sql, {"id": item_id, "order_due_date": due_date})
             logger.info(f"{item_id} har fått utsatt frist til {due_date}.")
         except db.IntegrityError:  # pragma: no cover
-            logger.error(f'{item_id} eksisterer ikke. (postpone)')
-            raise APIException(f'{item_id} eksisterer ikke.')
+            logger.error(f"{item_id} eksisterer ikke. (postpone)")
+            raise APIException(f"{item_id} eksisterer ikke.")
 
-    audits.audit('POSTPONE', f'{item_id} har fått utsatt frist til {due_date:%d.%m.%Y} ({item.lender}).')
+    audits.audit(
+        "POSTPONE",
+        f"{item_id} har fått utsatt frist til {due_date:%d.%m.%Y} ({item.lender}).",
+    )

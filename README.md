@@ -29,16 +29,17 @@ KIOSK_FQDN=127.0.0.1:5000  # Automatically logs in as Kiosk user when visiting t
    and `userinfo-name`
 2. Set the callback url to `https://<FQDN>/login/feide/callback`
 3. Install the labelprinter/service https://github.com/VaagenIM/EtikettServer (currently a requirement)
-4. The application sends notifications using Teams Incoming Webhooks, they need to be comma separated in
-   the `TEAMS_WEBHOOKS` environment variable. (see cron examples in docs for how to automatically send reports to teams)
+4. The application sends notifications using `Send webhook alerts to a channel`, they need to be comma separated in the
+   `TEAMS_WEBHOOKS`
+   environment variable. (see cron examples in docs for how to automatically send reports to teams)
 5. Run the `docker-compose.yml` file after setting up the environment variables.
 
 > The application must be configured to run through a reverse proxy, such
 > as [NginxProxyManager](https://nginxproxymanager.com/) - don't run in production without SSL.
 
-To configure a kiosk, set up a separate reverse proxy with proper access controls (limit to specified IP) and
-set `KIOSK_FQDN` to the FQDN of the kiosk proxy. (Remember to restrict access further by setting up a firewall rule) and
-add a `X-Internal-Auth` header in your proxy corresponding to the `KIOSK_SECRET` environment variable.
+To configure a kiosk, set up a separate reverse proxy with proper access controls (limit to specified IP) and set
+`KIOSK_FQDN` to the FQDN of the kiosk proxy. (Remember to restrict access further by setting up a firewall rule) and add
+a `X-Internal-Auth` header in your proxy corresponding to the `KIOSK_SECRET` environment variable.
 
 ## Overrides
 

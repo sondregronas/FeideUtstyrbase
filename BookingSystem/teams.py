@@ -1,10 +1,11 @@
 from datetime import datetime
 from multiprocessing import Process
+import json
+import urllib.request
 
 import flask
 import markupsafe
 import msteamsapi as ms
-import pymsteams
 
 import inventory
 from __init__ import TEAMS_WEBHOOKS, TEAMS_WEBHOOKS_DEVIATIONS, DEBUG, TEAMS_MSG_WEBHOOK
@@ -61,7 +62,7 @@ def _message_users(users_pairs: list[dict]):  # pragma: no cover
     try:
         webhook.send()
     except Exception:
-        print(f"Failed to send message to student, error with the webhook.")
+        print("Failed to send message to student, error with the webhook.")
 
 
 def message_users(users: list[dict]) -> None:
@@ -77,7 +78,7 @@ def get_overdue_items_pairs(items: list) -> dict:
     """Return a dictionary of overdue items grouped by lender association (in html representation)."""
     pairs = {
         item.lender_association_html: [
-            item2.html_repr()
+            item2.daily_report_text()
             for item2 in items
             if item2.lender_association_html == item.lender_association_html
         ]
@@ -86,48 +87,121 @@ def get_overdue_items_pairs(items: list) -> dict:
     return {key: pairs[key] for key in sorted(pairs) if pairs[key]}
 
 
-def formatted_overdue_items(items: list) -> str:
-    """Return formatted HTML string of overdue items."""
+def formatted_overdue_items(items: list) -> list:
+    """Return formatted overdue items."""
     if not items:
-        return ""
+        return []
     pairs = get_overdue_items_pairs(items)
 
-    strings = [
-        '<table bordercolor="black" border="1" style="width: 100%;">'
-        + '<tr style="background-color: teal; color: white;">'
-        + f'<th>&nbsp;Tilhørighet: {association or "Ansatt"}</th>'
-        + "</tr>\n"
-        + "\n".join([f"<tr><td>&nbsp;{item}</td></tr>" for item in pairs[association]])
-        + "</table>"
-        for association in pairs.keys()
-    ]
-    return (
-        '<blockquote style="border-color: #FF0000;">'
-        + "<br>".join(strings)
-        + "</blockquote>"
-        + "\n<small><i>Dersom du kjenner igjen utlåneren, vennligst få dem til å levere utstyret tilbake ASAP.</i></small>"
+    strings = []
+    for association in pairs.keys():
+        strings.append(
+            {
+                "type": "Container",
+                "style": "emphasis",
+                "spacing": "Medium",
+                "items": [
+                    {
+                        "type": "TextBlock",
+                        "text": f"Tilhørighet: {association or 'Ansatt'}",
+                        "weight": "Bolder",
+                        "size": "Medium",
+                        "wrap": True,
+                    },
+                    *[
+                        {
+                            "type": "Container",
+                            "spacing": "Small",
+                            "items": [
+                                {
+                                    "type": "TextBlock",
+                                    "text": item,
+                                    "wrap": True,
+                                    "spacing": "None",
+                                }
+                            ],
+                        }
+                        for item in pairs[association]
+                    ],
+                ],
+            }
+        )
+
+    strings.append(
+        {
+            "type": "TextBlock",
+            "text": "Dersom du kjenner igjen utlåneren, vennligst få dem til å levere utstyret tilbake ASAP.",
+            "isSubtle": True,
+            "italic": True,
+            "wrap": True,
+            "spacing": "Medium",
+        }
     )
 
+    return strings
 
-def formatted_deviation(deviation: str) -> str:
-    """Return formatted HTML string of new deviations."""
+
+def formatted_deviation(deviation: str) -> list:
+    """Return formatted new deviations."""
     if not deviation:
         raise APIException("Ingen avvik å rapportere.", 400)
-    return (
-        '<blockquote style="border-color: #FF0000;">'
-        + str(markupsafe.escape(deviation))
-        + "</blockquote>"
-        + "<small><i><b>NB:</b> Avvik må oppfølges manuelt av dere mennesker, jeg kan kun varsle om nye avvik.</i></small>"
-    )
+    return [
+        {
+            "type": "Container",
+            "style": "emphasis",
+            "items": [
+                {
+                    "type": "TextBlock",
+                    "text": str(markupsafe.escape(deviation)),
+                    "wrap": True,
+                }
+            ],
+        },
+        {
+            "type": "TextBlock",
+            "text": "NB: Avvik må oppfølges manuelt av dere mennesker, jeg kan kun varsle om nye avvik.",
+            "isSubtle": True,
+            "italic": True,
+            "wrap": True,
+            "spacing": "Medium",
+        },
+    ]
 
 
-def generate_card(title, text, color, webhook=None) -> pymsteams.connectorcard:
+def generate_card(title, text, color, webhook=None) -> dict:
     """Generate a teams card."""
-    card = pymsteams.connectorcard(webhook)
-    card.title(title)
-    card.color(color)
-    card.text(text)
-    return card
+    return {
+        "type": "message",
+        "attachments": [
+            {
+                "contentType": "application/vnd.microsoft.card.adaptive",
+                "contentUrl": None,
+                "content": {
+                    "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+                    "type": "AdaptiveCard",
+                    "version": "1.2",
+                    "body": [
+                        {
+                            "type": "Container",
+                            "style": "attention",
+                            "bleed": True,
+                            "items": [
+                                {
+                                    "type": "TextBlock",
+                                    "text": title,
+                                    "size": "Large",
+                                    "weight": "Bolder",
+                                    "color": "Light",
+                                    "wrap": True,
+                                }
+                            ],
+                        },
+                        *text,
+                    ],
+                },
+            }
+        ],
+    }
 
 
 def last_sent_within_hour_treshold() -> float | int | str:
@@ -142,7 +216,7 @@ def last_sent_within_hour_treshold() -> float | int | str:
     return last_sent
 
 
-def get_overdue_card(overdue_items: list) -> pymsteams.connectorcard:
+def get_overdue_card(overdue_items: list) -> dict:
     """Return a card with overdue items."""
     return generate_card(
         title="Utlån på overtid",
@@ -151,30 +225,35 @@ def get_overdue_card(overdue_items: list) -> pymsteams.connectorcard:
     )
 
 
-def get_deviation_card(deviation: str) -> pymsteams.connectorcard:
+def get_deviation_card(deviation: str) -> dict:
     """Return a card with new deviations."""
     title, text = deviation.split(":", 1)
     return generate_card(
-        title=title, text=formatted_deviation(f"Melding: {text}"), color="FFA500"
+        title=title,
+        text=formatted_deviation(f"Melding: {text}"),
+        color="FFA500",
     )
 
 
-def _send_card(card):
+def _send_card(card, webhook):
     try:
-        card.send()
-    except pymsteams.TeamsWebhookException as e:
+        request = urllib.request.Request(
+            webhook,
+            data=json.dumps(card).encode("utf-8"),
+            headers={"Content-Type": "application/json"},
+            method="POST",
+        )
+        urllib.request.urlopen(request)
+    except Exception as e:
         # TODO: Update bulletin or send an email to the admin
         print(f"Failed to send card to webhook ({e})")
         pass
 
 
-def send_card_to_hooks(
-    card: pymsteams.connectorcard, webhooks: list[str]
-) -> None:  # pragma: no cover
+def send_card_to_hooks(card: dict, webhooks: list[str]) -> None:  # pragma: no cover
     """Send a card to all webhooks."""
     for webhook in webhooks:
-        card.newhookurl(webhook)
-        Process(target=_send_card, args=(card,)).start()
+        Process(target=_send_card, args=(card, webhook)).start()
 
 
 def send_deviation(deviation: str) -> flask.Response:  # pragma: no cover
@@ -225,4 +304,4 @@ def send_report() -> flask.Response:  # pragma: no cover
         message_users(overdue_users)
 
     # Return 200 OK, even if some webhooks failed (the process is async, so we can't catch exceptions)
-    return flask.Response('Rapport ble sendt til alle brukere og kanaler!', 200)
+    return flask.Response("Rapport ble sendt til alle brukere og kanaler!", 200)
