@@ -11,10 +11,25 @@ from teams import (
 from test_items import generate_item
 
 
+def adaptive_card_contains(element: dict, text: str) -> bool:
+    if element.get("text") == text:
+        return True
+
+    return any(
+        adaptive_card_contains(child, text)
+        for child in element.get("items", [])
+        if isinstance(child, dict)
+    )
+
+
 def test_generate_overdue_card():
     item = generate_item()
     c = get_overdue_card([item])
-    assert item.daily_report_text() in str(c["attachments"][0]["content"]["body"])
+    body = c["attachments"][0]["content"]["body"]
+
+    assert any(
+        adaptive_card_contains(element, item.daily_report_text()) for element in body
+    )
 
 
 def test_empty_formatted_cards():
