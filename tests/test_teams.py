@@ -14,7 +14,7 @@ from test_items import generate_item
 def test_generate_overdue_card():
     item = generate_item()
     c = get_overdue_card([item])
-    assert item.daily_report_text() in c.payload["text"]
+    assert item.daily_report_text() in str(c["attachments"][0]["content"]["body"])
 
 
 def test_empty_formatted_cards():
