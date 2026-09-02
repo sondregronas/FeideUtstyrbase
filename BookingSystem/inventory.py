@@ -122,7 +122,7 @@ class Item:
             return "Slettet bruker [Sjekk historikk]"
         if not self.user.get("classroom"):
             return "Ansatt"
-        return f"{self.classroom} (<at>{self.teacher}</at>)"
+        return f"{self.classroom} (**{self.teacher}**)"
 
     @property
     def classroom(self) -> str:
